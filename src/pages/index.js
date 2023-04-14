@@ -233,7 +233,7 @@ const Page = () => {
             </Grid>
             <Grid
               xs={12}
-              sm={6}
+              sm={12}
               lg={4}
             >
               <OverviewProgress
