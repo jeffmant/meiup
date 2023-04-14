@@ -75,7 +75,7 @@ export const AccountProfileDetails = () => {
                   name="cnpj"
                   onChange={handleChange}
                   disabled
-                  value={cnpjMask(user.company.cnpj)}
+                  value={cnpjMask(user?.company?.cnpj || '')}
                 />
               </Grid>
 
@@ -103,7 +103,7 @@ export const AccountProfileDetails = () => {
                   name="cpf"
                   onChange={handleChange}
                   disabled
-                  value={maskCPF(user.cpf)}
+                  value={maskCPF(user?.cpf || '')}
                 />
               </Grid>
               <Grid
@@ -130,7 +130,7 @@ export const AccountProfileDetails = () => {
                   label="celular"
                   name="phone"
                   onChange={handleChange}
-                  value={maskPhone(user.phone)}
+                  value={maskPhone(user?.phone || '')}
                 />
               </Grid>
             </Grid>

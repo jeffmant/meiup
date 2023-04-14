@@ -44,7 +44,7 @@ export const AccountPopover = (props) => {
           color="text.secondary"
           variant="body2"
         >
-          {cnpjMask(user?.company?.cnpj)}
+          {cnpjMask(user?.company?.cnpj || '')}
         </Typography>
       </Box>
       <Divider />
