@@ -31,7 +31,11 @@ const Page = () => {
       password: Yup
         .string()
         .max(255)
-        .required('Password is required')
+        .required('Password is required'),
+      confirmPassword: Yup
+        .string()
+        .max(255)
+        .required('ConfirmPassword is required')
     }),
     onSubmit: async (values, helpers) => {
       try {
@@ -91,6 +95,39 @@ const Page = () => {
                   onChange={formik.handleChange}
                   value={cnpjMask(formik.values.cnpj || '')}
                 />
+                <TextField
+                  error={!!(formik.touched.email && formik.errors.email)}
+                  fullWidth
+                  helperText={formik.touched.email && formik.errors.email}
+                  label="Email"
+                  name="email"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  type="email"
+                  value={formik.values.email}
+                />
+                <TextField
+                  error={!!(formik.touched.password && formik.errors.password)}
+                  fullWidth
+                  helperText={formik.touched.password && formik.errors.password}
+                  label="Senha"
+                  name="password"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  type="password"
+                  value={formik.values.password}
+                />
+                <TextField
+                  error={!!(formik.touched.confirmPassword && formik.errors.confirmPassword)}
+                  fullWidth
+                  helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                  label="Confirmar Senha"
+                  name="confirmPassword"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  type="password"
+                  value={formik.values.confirmPassword}
+                />
               </Stack>
               {formik.errors.submit && (
                 <Typography
@@ -102,7 +139,15 @@ const Page = () => {
                 </Typography>
               )}
               <Button
-                disabled={!formik.values.cnpj || formik.values.cnpj.length < 18}
+                disabled={
+                  !formik.values.cnpj || 
+                  formik.values.cnpj.length < 18 || 
+                  !formik.values.email || 
+                  !formik.values.name || 
+                  !formik.values.password || 
+                  !formik.values.confirmPassword || 
+                  formik.values.password !== formik.values.confirmPassword
+                }
                 fullWidth
                 size="large"
                 sx={{ mt: 3 }}
