@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import { cnpjMask } from 'src/utils/masks';
 
 const Page = () => {
   const router = useRouter();
@@ -48,7 +49,7 @@ const Page = () => {
     <>
       <Head>
         <title>
-          mei | criar conta
+          criar conta | meumei
         </title>
       </Head>
       <Box
@@ -88,29 +89,7 @@ const Page = () => {
                   name="cnpj"
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
-                  value={formik.values.cnpj}
-                />
-                <TextField
-                  error={!!(formik.touched.email && formik.errors.email)}
-                  fullWidth
-                  helperText={formik.touched.email && formik.errors.email}
-                  label="Email Address"
-                  name="email"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="email"
-                  value={formik.values.email}
-                />
-                <TextField
-                  error={!!(formik.touched.password && formik.errors.password)}
-                  fullWidth
-                  helperText={formik.touched.password && formik.errors.password}
-                  label="Password"
-                  name="password"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="password"
-                  value={formik.values.password}
+                  value={cnpjMask(formik.values.cnpj || '')}
                 />
               </Stack>
               {formik.errors.submit && (
@@ -123,13 +102,14 @@ const Page = () => {
                 </Typography>
               )}
               <Button
+                disabled={!formik.values.cnpj || formik.values.cnpj.length < 18}
                 fullWidth
                 size="large"
                 sx={{ mt: 3 }}
                 type="submit"
                 variant="contained"
               >
-                Criar minha conta
+                Avançar
               </Button>
 
             </form>
