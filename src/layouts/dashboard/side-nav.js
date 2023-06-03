@@ -54,7 +54,7 @@ export const SideNav = (props) => {
           >
             <Logo />
           </Box>
-          <Typography sx={{ ml: 2 }}>mei</Typography>
+          <Typography sx={{ ml: 2 }}>meumei</Typography>
         </Box>
         <Divider sx={{ borderColor: 'neutral.700' }} />
         <Box

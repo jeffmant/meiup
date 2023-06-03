@@ -20,7 +20,7 @@ const Page = () => {
     <>
       <Head>
         <title>
-          configurações | mei
+          configurações | meumei
         </title>
       </Head>
       <Box
