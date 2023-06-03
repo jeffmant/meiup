@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import signIn from '../api/auth';
 
 const Page = () => {
   const router = useRouter();
@@ -43,6 +44,9 @@ const Page = () => {
     onSubmit: async (values, helpers) => {
       try {
         await auth.signIn(values.email, values.password);
+        // firebase login
+        const loggedUser = await signIn(values.email, values.password)
+        console.log('LOGGED USER BY FIREBASE -->', loggedUser)
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -51,21 +55,6 @@ const Page = () => {
       }
     }
   });
-
-  const handleMethodChange = useCallback(
-    (event, value) => {
-      setMethod(value);
-    },
-    []
-  );
-
-  const handleSkip = useCallback(
-    () => {
-      auth.skip();
-      router.push('/');
-    },
-    [auth, router]
-  );
 
   return (
     <>
