@@ -29,11 +29,13 @@ export const OverviewProgress = (props) => {
               gutterBottom
               variant="overline"
             >
-              Receita Anual (R$63.000,00)
+              Receita Anual
             </Typography>
             <Typography variant="h4">
-              {value}%
+              R$63.000,00
             </Typography>
+              {value}% 
+            do teto (R$81.000,00)
           </Stack>
           <Avatar
             sx={{

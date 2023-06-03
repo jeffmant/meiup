@@ -23,9 +23,14 @@ import { SeverityPill } from 'src/components/severity-pill';
 import { useCallback, useState } from 'react';
 
 const statusMap = {
-  pending: 'warning',
-  delivered: 'success',
-  refunded: 'error'
+  emited: {
+    color: 'success',
+    displayName: 'Emitida'
+  },
+  canceled: {
+    color: 'error',
+    displayName: 'Cancelada'
+  }
 };
 
 export const OverviewLatestOrders = (props) => {
@@ -44,6 +49,9 @@ export const OverviewLatestOrders = (props) => {
             </TableCell>
             <TableCell>
               Cliente
+            </TableCell>
+            <TableCell>
+              Valor
             </TableCell>
             <TableCell sortDirection="desc">
               Data
@@ -70,11 +78,14 @@ export const OverviewLatestOrders = (props) => {
                   {order.customer.name}
                 </TableCell>
                 <TableCell>
+                  {`R$${order.amount}`}
+                </TableCell>
+                <TableCell>
                   {createdAt}
                 </TableCell>
                 <TableCell>
-                  <SeverityPill color={statusMap[order.status]}>
-                    {order.status}
+                  <SeverityPill color={statusMap[order.status].color}>
+                    {statusMap[order.status].displayName}
                   </SeverityPill>
                 </TableCell>
               </TableRow>

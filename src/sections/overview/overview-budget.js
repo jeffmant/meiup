@@ -21,7 +21,7 @@ export const OverviewBudget = (props) => {
               color="text.secondary"
               variant="overline"
             >
-              Total de Receita
+              sua receita neste mês
             </Typography>
             <Typography variant="h4">
               {value}
