@@ -125,7 +125,7 @@ const Page = () => {
                       Sua Receita neste mês
                     </Typography>
                     <Typography variant='h4'>
-                      R$ 15.000,00
+                      {receivesMonth.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                     </Typography>
                   </Stack>
                 </Stack>
@@ -148,16 +148,21 @@ const Page = () => {
                       Receita Anual
                     </Typography>
                     <Typography variant='h4'>
-                      R$63.000,00
+                      {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                     </Typography>
-                    75%
-                    do teto (R$81.000,00)
+                    75% do teto (R$81.000,00)
                   </Stack>
                 </Stack>
                 <LinearProgress
                   value={75}
                   variant='determinate'
-                  color='error'
+                  color={
+                    receivesPercentageFromYearLimit <= 35
+                      ? 'success'
+                      : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
+                        ? 'info'
+                        : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'success' : ''
+                  }
                 />
               </Card>
             )
@@ -234,7 +239,7 @@ const Page = () => {
                           Sua Receita neste mês
                         </Typography>
                         <Typography variant='h4'>
-                          R$ {receivesMonth}
+                          {receivesMonth.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                         </Typography>
                       </Stack>
                     </Stack>
@@ -257,7 +262,7 @@ const Page = () => {
                           Receita Anual
                         </Typography>
                         <Typography variant='h4'>
-                          R${receivesYear}
+                          {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                         </Typography>
                         <Box sx={{
                           display: 'flex',
@@ -274,7 +279,7 @@ const Page = () => {
                                 : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
                                   ? 'info'
                                   : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'error' : ''
-}
+                            }
                           />
                           <Typography> {receivesPercentageFromYearLimit}% do teto (R$ 81.000,00) </Typography>
                         </Box>
