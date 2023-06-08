@@ -3,4 +3,4 @@ export const getInitials = (name = '') => name
   .split(' ')
   .slice(0, 2)
   .map((v) => v && v[0].toUpperCase())
-  .join('');
+  .join('')

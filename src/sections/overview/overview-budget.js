@@ -1,29 +1,27 @@
-import PropTypes from 'prop-types';
-import ArrowDownIcon from '@heroicons/react/24/solid/ArrowDownIcon';
-import ArrowUpIcon from '@heroicons/react/24/solid/ArrowUpIcon';
-import CurrencyDollarIcon from '@heroicons/react/24/solid/CurrencyDollarIcon';
-import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from '@mui/material';
+import PropTypes from 'prop-types'
+import CurrencyDollarIcon from '@heroicons/react/24/solid/CurrencyDollarIcon'
+import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from '@mui/material'
 
 export const OverviewBudget = (props) => {
-  const { difference, positive = false, sx, value } = props;
+  const { sx, value } = props
 
   return (
     <Card sx={sx}>
       <CardContent>
         <Stack
-          alignItems="flex-start"
-          direction="row"
-          justifyContent="space-between"
+          alignItems='flex-start'
+          direction='row'
+          justifyContent='space-between'
           spacing={3}
         >
           <Stack spacing={1}>
             <Typography
-              color="text.secondary"
-              variant="overline"
+              color='text.secondary'
+              variant='overline'
             >
               sua receita neste mês
             </Typography>
-            <Typography variant="h4">
+            <Typography variant='h4'>
               {value}
             </Typography>
           </Stack>
@@ -41,12 +39,12 @@ export const OverviewBudget = (props) => {
         </Stack>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
 OverviewBudget.prototypes = {
   difference: PropTypes.number,
   positive: PropTypes.bool,
   sx: PropTypes.object,
   value: PropTypes.string.isRequired
-};
+}

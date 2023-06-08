@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback } from 'react'
 import {
   Button,
   Card,
@@ -11,28 +11,28 @@ import {
   Stack,
   Typography,
   Unstable_Grid2 as Grid
-} from '@mui/material';
+} from '@mui/material'
 
 export const SettingsNotifications = () => {
   const handleSubmit = useCallback(
     (event) => {
-      event.preventDefault();
+      event.preventDefault()
     },
     []
-  );
+  )
 
   return (
     <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader
-          title="notificações"
+          title='notificações'
         />
         <Divider />
         <CardContent>
           <Grid
             container
             spacing={6}
-            wrap="wrap"
+            wrap='wrap'
           >
             <Grid
               xs={12}
@@ -40,21 +40,21 @@ export const SettingsNotifications = () => {
               md={4}
             >
               <Stack spacing={1}>
-                <Typography variant="h6">
+                <Typography variant='h6'>
                   sobre a conta
                 </Typography>
                 <Stack>
                   <FormControlLabel
                     control={<Checkbox defaultChecked />}
-                    label="email"
+                    label='email'
                   />
                   <FormControlLabel
                     control={<Checkbox />}
-                    label="sms"
+                    label='sms'
                   />
                   <FormControlLabel
                     control={<Checkbox defaultChecked />}
-                    label="WhatsApp"
+                    label='WhatsApp'
                   />
                 </Stack>
               </Stack>
@@ -66,21 +66,21 @@ export const SettingsNotifications = () => {
               xs={12}
             >
               <Stack spacing={1}>
-                <Typography variant="h6">
+                <Typography variant='h6'>
                   novidades
                 </Typography>
                 <Stack>
                   <FormControlLabel
                     control={<Checkbox defaultChecked />}
-                    label="email"
+                    label='email'
                   />
                   <FormControlLabel
                     control={<Checkbox />}
-                    label="sms"
+                    label='sms'
                   />
                   <FormControlLabel
                     control={<Checkbox defaultChecked />}
-                    label="WhatsApp"
+                    label='WhatsApp'
                   />
                 </Stack>
               </Stack>
@@ -89,11 +89,11 @@ export const SettingsNotifications = () => {
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">
+          <Button variant='contained'>
             Save
           </Button>
         </CardActions>
       </Card>
     </form>
-  );
-};
+  )
+}

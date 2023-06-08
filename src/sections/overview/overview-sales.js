@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
-import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
-import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
+import PropTypes from 'prop-types'
+import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon'
+import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon'
 import {
   Button,
   Card,
@@ -9,12 +9,12 @@ import {
   CardHeader,
   Divider,
   SvgIcon
-} from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
-import { Chart } from 'src/components/chart';
+} from '@mui/material'
+import { alpha, useTheme } from '@mui/material/styles'
+import { Chart } from 'src/components/chart'
 
 const useChartOptions = () => {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return {
     chart: {
@@ -101,22 +101,22 @@ const useChartOptions = () => {
         }
       }
     }
-  };
-};
+  }
+}
 
 export const OverviewSales = (props) => {
-  const { chartSeries, sx } = props;
-  const chartOptions = useChartOptions();
+  const { chartSeries, sx } = props
+  const chartOptions = useChartOptions()
 
   return (
     <Card sx={sx}>
       <CardHeader
         action={(
           <Button
-            color="inherit"
-            size="small"
+            color='inherit'
+            size='small'
             startIcon={(
-              <SvgIcon fontSize="small">
+              <SvgIcon fontSize='small'>
                 <ArrowPathIcon />
               </SvgIcon>
             )}
@@ -124,36 +124,36 @@ export const OverviewSales = (props) => {
             Sync
           </Button>
         )}
-        title="Sales"
+        title='Sales'
       />
       <CardContent>
         <Chart
           height={350}
           options={chartOptions}
           series={chartSeries}
-          type="bar"
-          width="100%"
+          type='bar'
+          width='100%'
         />
       </CardContent>
       <Divider />
       <CardActions sx={{ justifyContent: 'flex-end' }}>
         <Button
-          color="inherit"
+          color='inherit'
           endIcon={(
-            <SvgIcon fontSize="small">
+            <SvgIcon fontSize='small'>
               <ArrowRightIcon />
             </SvgIcon>
           )}
-          size="small"
+          size='small'
         >
           Overview
         </Button>
       </CardActions>
     </Card>
-  );
-};
+  )
+}
 
 OverviewSales.protoTypes = {
   chartSeries: PropTypes.array.isRequired,
   sx: PropTypes.object
-};
+}

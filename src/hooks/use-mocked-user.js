@@ -13,5 +13,5 @@ export const useMockedUser = () => {
       name: 'Jefferson Gabriel Silva Mantovani 08468678937',
       fantasyName: 'BOAZ Tecnologias'
     }
-  };
-};
+  }
+}

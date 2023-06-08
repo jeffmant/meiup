@@ -1,22 +1,22 @@
-import NextLink from 'next/link';
-import PropTypes from 'prop-types';
-import { Box, ButtonBase } from '@mui/material';
+import NextLink from 'next/link'
+import PropTypes from 'prop-types'
+import { Box, ButtonBase } from '@mui/material'
 
 export const SideNavItem = (props) => {
-  const { active = false, disabled, external, icon, path, title } = props;
+  const { active = false, disabled, external, icon, path, title } = props
 
   const linkProps = path
     ? external
       ? {
-        component: 'a',
-        href: path,
-        target: '_blank'
-      }
+          component: 'a',
+          href: path,
+          target: '_blank'
+        }
       : {
-        component: NextLink,
-        href: path
-      }
-    : {};
+          component: NextLink,
+          href: path
+        }
+    : {}
 
   return (
     <li>
@@ -42,7 +42,7 @@ export const SideNavItem = (props) => {
       >
         {icon && (
           <Box
-            component="span"
+            component='span'
             sx={{
               alignItems: 'center',
               color: 'neutral.400',
@@ -58,7 +58,7 @@ export const SideNavItem = (props) => {
           </Box>
         )}
         <Box
-          component="span"
+          component='span'
           sx={{
             color: 'neutral.400',
             flexGrow: 1,
@@ -79,8 +79,8 @@ export const SideNavItem = (props) => {
         </Box>
       </ButtonBase>
     </li>
-  );
-};
+  )
+}
 
 SideNavItem.propTypes = {
   active: PropTypes.bool,
@@ -89,4 +89,4 @@ SideNavItem.propTypes = {
   icon: PropTypes.node,
   path: PropTypes.string,
   title: PropTypes.string.isRequired
-};
+}

@@ -7,8 +7,8 @@ import {
   CardContent,
   Divider,
   Typography
-} from '@mui/material';
-import { useAuth } from 'src/hooks/use-auth';
+} from '@mui/material'
+import { useAuth } from 'src/hooks/use-auth'
 
 export const AccountProfile = () => {
   const { user } = useAuth()
@@ -33,7 +33,7 @@ export const AccountProfile = () => {
           />
           <Typography
             gutterBottom
-            variant="h5"
+            variant='h5'
           >
             {user?.name}
           </Typography>
@@ -43,11 +43,11 @@ export const AccountProfile = () => {
       <CardActions>
         <Button
           fullWidth
-          variant="text"
+          variant='text'
         >
           Atualizar Foto
         </Button>
       </CardActions>
     </Card>
   )
-};
+}

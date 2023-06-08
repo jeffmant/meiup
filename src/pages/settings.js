@@ -1,20 +1,18 @@
-import Head from 'next/head';
-import { Box, Container, Stack, Tab, Tabs, Typography } from '@mui/material';
-import { SettingsNotifications } from 'src/sections/settings/settings-notifications';
-import { SettingsPassword } from 'src/sections/settings/settings-password';
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { useCallback, useState } from 'react';
-import AccountPage from './account';
+import Head from 'next/head'
+import { Box, Container, Stack, Tab, Tabs } from '@mui/material'
+import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
+import { useCallback, useState } from 'react'
+import AccountPage from './account'
 
 const Page = () => {
-  const [method, setMethod] = useState('profile');
+  const [method, setMethod] = useState('profile')
 
   const handleMethodChange = useCallback(
     (event, value) => {
-      setMethod(value);
+      setMethod(value)
     },
     []
-  );
+  )
 
   return (
     <>
@@ -24,13 +22,13 @@ const Page = () => {
         </title>
       </Head>
       <Box
-        component="main"
+        component='main'
         sx={{
           flexGrow: 1,
           py: 8
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth='lg'>
           <Stack spacing={3}>
             <Tabs
               onChange={handleMethodChange}
@@ -38,41 +36,29 @@ const Page = () => {
               value={method}
             >
               <Tab
-                label="perfil"
-                value="profile"
-                disableRipple
-              />
-              <Tab
-                label="mudar senha"
-                value="password"
-                disableRipple
-              />
-              <Tab
-                label="notificações"
-                value="notification"
+                label='perfil'
+                value='profile'
                 disableRipple
               />
             </Tabs>
             {
-              method === 'profile' ? (
-                <AccountPage />
-              ) : method === 'password' ? (
-                <SettingsPassword />
-              ) : method === 'notification' ? (
-                <SettingsNotifications />
-              ) : null
+              method === 'profile'
+                ? (
+                  <AccountPage />
+                  )
+                : null
             }
           </Stack>
         </Container>
-      </Box >
+      </Box>
     </>
   )
-};
+}
 
 Page.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
-);
+)
 
-export default Page;
+export default Page

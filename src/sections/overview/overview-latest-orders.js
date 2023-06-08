@@ -1,26 +1,14 @@
-import { format } from 'date-fns';
-import PropTypes from 'prop-types';
-import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
+import { format } from 'date-fns'
+import PropTypes from 'prop-types'
 import {
   Box,
-  Button,
-  Card,
-  CardActions,
-  CardHeader,
-  Divider,
-  Pagination,
-  SvgIcon,
-  Tab,
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableRow,
-  Tabs
-} from '@mui/material';
-import { Scrollbar } from 'src/components/scrollbar';
-import { SeverityPill } from 'src/components/severity-pill';
-import { useCallback, useState } from 'react';
+  TableRow
+} from '@mui/material'
+import { SeverityPill } from 'src/components/severity-pill'
 
 const statusMap = {
   emited: {
@@ -31,14 +19,12 @@ const statusMap = {
     color: 'error',
     displayName: 'Cancelada'
   }
-};
+}
 
 export const OverviewLatestOrders = (props) => {
-  const { orders = [], sx } = props;
-
+  const { orders = [] } = props
 
   return (
-
 
     <Box sx={{ minWidth: 800 }}>
       <Table>
@@ -53,7 +39,7 @@ export const OverviewLatestOrders = (props) => {
             <TableCell>
               Valor
             </TableCell>
-            <TableCell sortDirection="desc">
+            <TableCell sortDirection='desc'>
               Data
             </TableCell>
             <TableCell>
@@ -63,7 +49,7 @@ export const OverviewLatestOrders = (props) => {
         </TableHead>
         <TableBody>
           {orders.map((order) => {
-            const createdAt = format(order.createdAt, 'dd/MM/yyyy');
+            const createdAt = format(order.createdAt, 'dd/MM/yyyy')
 
             return (
               <TableRow
@@ -89,15 +75,15 @@ export const OverviewLatestOrders = (props) => {
                   </SeverityPill>
                 </TableCell>
               </TableRow>
-            );
+            )
           })}
         </TableBody>
       </Table>
     </Box>
-  );
-};
+  )
+}
 
 OverviewLatestOrders.prototype = {
   orders: PropTypes.array,
   sx: PropTypes.object
-};
+}

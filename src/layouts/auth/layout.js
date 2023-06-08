@@ -1,19 +1,18 @@
-import PropTypes from 'prop-types';
-import NextLink from 'next/link';
-import { Box, Typography, Unstable_Grid2 as Grid, useMediaQuery } from '@mui/material';
-import { Logo } from 'src/components/logo';
-import { Stack } from '@mui/system';
+import PropTypes from 'prop-types'
+import NextLink from 'next/link'
+import { Box, Unstable_Grid2 as Grid, useMediaQuery } from '@mui/material'
+import { Logo } from 'src/components/logo'
 
 export const Layout = (props) => {
-  const { children } = props;
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+  const { children } = props
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
 
   return (
     <Box
-      component="main"
+      component='main'
       sx={{
         display: 'flex',
-        flex: '1 1 auto',
+        flex: '1 1 auto'
       }}
     >
       <Grid
@@ -31,7 +30,7 @@ export const Layout = (props) => {
           }}
         >
           <Box
-            component="header"
+            component='header'
             sx={{
               left: 0,
               p: 3,
@@ -42,7 +41,7 @@ export const Layout = (props) => {
           >
             <Box
               component={NextLink}
-              href="/"
+              href='/'
               sx={{
                 display: 'inline-flex',
                 height: 32,
@@ -65,23 +64,23 @@ export const Layout = (props) => {
                 display: 'flex',
                 justifyContent: 'center',
                 '& img': {
-                  maxWidth: '75%',
+                  maxWidth: '75%'
 
                 }
               }}
             >
               <img
-                alt=""
-                src="/assets/mei-auth.svg"
+                alt=''
+                src='/assets/mei-auth.svg'
               />
             </Grid>
           )
         }
       </Grid>
-    </Box >
-  );
-};
+    </Box>
+  )
+}
 
 Layout.prototypes = {
   children: PropTypes.node
-};
+}

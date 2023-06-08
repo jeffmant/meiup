@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import {
   Box,
   Card,
@@ -7,11 +7,11 @@ import {
   Stack,
   Typography,
   useTheme
-} from '@mui/material';
-import { Chart } from 'src/components/chart';
+} from '@mui/material'
+import { Chart } from 'src/components/chart'
 
 const useChartOptions = (labels) => {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return {
     chart: {
@@ -55,39 +55,39 @@ const useChartOptions = (labels) => {
     tooltip: {
       fillSeriesColor: false
     }
-  };
-};
+  }
+}
 
 const iconMap = {
   Desktop: null,
   Tablet: null,
   Phone: null
-};
+}
 
 export const OverviewTraffic = (props) => {
-  const { chartSeries, labels, sx } = props;
-  const chartOptions = useChartOptions(labels);
+  const { chartSeries, labels, sx } = props
+  const chartOptions = useChartOptions(labels)
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Traffic Source" />
+      <CardHeader title='Traffic Source' />
       <CardContent>
         <Chart
           height={300}
           options={chartOptions}
           series={chartSeries}
-          type="donut"
-          width="100%"
+          type='donut'
+          width='100%'
         />
         <Stack
-          alignItems="center"
-          direction="row"
-          justifyContent="center"
+          alignItems='center'
+          direction='row'
+          justifyContent='center'
           spacing={2}
           sx={{ mt: 2 }}
         >
           {chartSeries.map((item, index) => {
-            const label = labels[index];
+            const label = labels[index]
 
             return (
               <Box
@@ -101,27 +101,27 @@ export const OverviewTraffic = (props) => {
                 {iconMap[label]}
                 <Typography
                   sx={{ my: 1 }}
-                  variant="h6"
+                  variant='h6'
                 >
                   {label}
                 </Typography>
                 <Typography
-                  color="text.secondary"
-                  variant="subtitle2"
+                  color='text.secondary'
+                  variant='subtitle2'
                 >
                   {item}%
                 </Typography>
               </Box>
-            );
+            )
           })}
         </Stack>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
 OverviewTraffic.propTypes = {
   chartSeries: PropTypes.array.isRequired,
   labels: PropTypes.array.isRequired,
   sx: PropTypes.object
-};
+}

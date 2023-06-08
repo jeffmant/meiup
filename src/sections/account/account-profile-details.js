@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react'
 import {
   Box,
   Button,
@@ -9,41 +9,41 @@ import {
   Divider,
   TextField,
   Unstable_Grid2 as Grid
-} from '@mui/material';
-import { useAuth } from 'src/hooks/use-auth';
-import { cnpjMask, maskCPF, maskPhone } from 'src/utils/masks';
+} from '@mui/material'
+import { useAuth } from 'src/hooks/use-auth'
+import { cnpjMask, maskCPF, maskPhone } from 'src/utils/masks'
 
 export const AccountProfileDetails = () => {
   const { user: loggedUser } = useAuth()
-  const [user, setUser] = useState(loggedUser);
+  const [user, setUser] = useState(loggedUser)
 
   const handleChange = useCallback(
     (event) => {
       setUser((prevState) => ({
         ...prevState,
         [event.target.name]: event.target.value
-      }));
+      }))
     },
     []
-  );
+  )
 
   const handleSubmit = useCallback(
     (event) => {
-      event.preventDefault();
+      event.preventDefault()
     },
     []
-  );
+  )
 
   return (
     <form
-      autoComplete="off"
+      autoComplete='off'
       noValidate
       onSubmit={handleSubmit}
     >
       <Card>
         <CardHeader
-          subheader="mantenha seu perfil atualizado ;)"
-          title="perfil"
+          subheader='mantenha seu perfil atualizado ;)'
+          title='perfil'
         />
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>
@@ -51,15 +51,15 @@ export const AccountProfileDetails = () => {
               container
               spacing={3}
             >
-              { /* Company Info */}
+              {/* Company Info */}
               <Grid
                 xs={12}
                 md={6}
               >
                 <TextField
                   fullWidth
-                  label="nome fantasia"
-                  name="fantasyName"
+                  label='nome fantasia'
+                  name='fantasyName'
                   onChange={handleChange}
                   disabled
                   value={user.company.fantasyName}
@@ -71,23 +71,23 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  label="cnpj"
-                  name="cnpj"
+                  label='cnpj'
+                  name='cnpj'
                   onChange={handleChange}
                   disabled
                   value={cnpjMask(user?.company?.cnpj || '')}
                 />
               </Grid>
 
-              { /* User Info */}
+              {/* User Info */}
               <Grid
                 xs={12}
                 md={6}
               >
                 <TextField
                   fullWidth
-                  label="seu nome"
-                  name="name"
+                  label='seu nome'
+                  name='name'
                   onChange={handleChange}
                   required
                   value={user.name}
@@ -99,8 +99,8 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  label="cpf"
-                  name="cpf"
+                  label='cpf'
+                  name='cpf'
                   onChange={handleChange}
                   disabled
                   value={maskCPF(user?.cpf || '')}
@@ -113,8 +113,8 @@ export const AccountProfileDetails = () => {
                 <TextField
                   type='email'
                   fullWidth
-                  label="email"
-                  name="email"
+                  label='email'
+                  name='email'
                   onChange={handleChange}
                   required
                   value={user.email}
@@ -127,8 +127,8 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  label="celular"
-                  name="phone"
+                  label='celular'
+                  name='phone'
                   onChange={handleChange}
                   value={maskPhone(user?.phone || '')}
                 />
@@ -139,11 +139,11 @@ export const AccountProfileDetails = () => {
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">
+          <Button variant='contained'>
             salvar
           </Button>
         </CardActions>
       </Card>
-    </form >
-  );
-};
+    </form>
+  )
+}

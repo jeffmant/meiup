@@ -72,5 +72,5 @@ export const createTypography = () => {
       fontSize: '1.125rem',
       lineHeight: 1.2
     }
-  };
-};
+  }
+}

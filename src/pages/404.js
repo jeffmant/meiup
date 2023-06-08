@@ -1,7 +1,7 @@
-import Head from 'next/head';
-import NextLink from 'next/link';
-import ArrowLeftIcon from '@heroicons/react/24/solid/ArrowLeftIcon';
-import { Box, Button, Container, SvgIcon, Typography } from '@mui/material';
+import Head from 'next/head'
+import NextLink from 'next/link'
+import ArrowLeftIcon from '@heroicons/react/24/solid/ArrowLeftIcon'
+import { Box, Button, Container, SvgIcon, Typography } from '@mui/material'
 
 const Page = () => (
   <>
@@ -11,7 +11,7 @@ const Page = () => (
       </title>
     </Head>
     <Box
-      component="main"
+      component='main'
       sx={{
         alignItems: 'center',
         display: 'flex',
@@ -19,7 +19,7 @@ const Page = () => (
         minHeight: '100%'
       }}
     >
-      <Container maxWidth="md">
+      <Container maxWidth='md'>
         <Box
           sx={{
             alignItems: 'center',
@@ -34,8 +34,8 @@ const Page = () => (
             }}
           >
             <img
-              alt="Under development"
-              src="/assets/errors/error-404.png"
+              alt='Under development'
+              src='/assets/errors/error-404.png'
               style={{
                 display: 'inline-block',
                 maxWidth: '100%',
@@ -44,22 +44,22 @@ const Page = () => (
             />
           </Box>
           <Typography
-            align="center"
+            align='center'
             sx={{ mb: 3 }}
-            variant="h3"
+            variant='h3'
           >
             ops! esta página não existe :/
           </Typography>
           <Button
             component={NextLink}
-            href="/"
+            href='/'
             startIcon={(
-              <SvgIcon fontSize="small">
+              <SvgIcon fontSize='small'>
                 <ArrowLeftIcon />
               </SvgIcon>
             )}
             sx={{ mt: 3 }}
-            variant="contained"
+            variant='contained'
           >
             voltar ao início
           </Button>
@@ -67,6 +67,6 @@ const Page = () => (
       </Container>
     </Box>
   </>
-);
+)
 
-export default Page;
+export default Page

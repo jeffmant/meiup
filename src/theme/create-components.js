@@ -5,13 +5,13 @@ import {
   outlinedInputClasses,
   paperClasses,
   tableCellClasses
-} from '@mui/material';
+} from '@mui/material'
 
 // Used only to create transitions
-const muiTheme = createTheme();
+const muiTheme = createTheme()
 
-export function createComponents(config) {
-  const { palette } = config;
+export function createComponents (config) {
+  const { palette } = config
 
   return {
     MuiAvatar: {
@@ -214,7 +214,7 @@ export function createComponents(config) {
         input: {
           fontSize: 14,
           fontWeight: 500,
-          lineHeight: '24px',
+          lineHeight: '24px'
         },
         notchedOutline: {
           borderColor: palette.neutral[200],
@@ -297,5 +297,5 @@ export function createComponents(config) {
         variant: 'filled'
       }
     }
-  };
+  }
 }
