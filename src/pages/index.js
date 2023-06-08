@@ -116,7 +116,7 @@ const Page = () => {
                 >
                   <Stack
                     spacing={1}
-                    sx={{ p: 4 }}
+                    sx={{ p: 2 }}
                   >
                     <Typography
                       color='text.secondary'
@@ -138,7 +138,7 @@ const Page = () => {
                 >
                   <Stack
                     spacing={1}
-                    sx={{ p: 4 }}
+                    sx={{ p: 2 }}
                   >
                     <Typography
                       color='text.secondary'

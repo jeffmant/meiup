@@ -1,6 +1,6 @@
 import CheckIcon from '@heroicons/react/24/solid/CheckIcon'
 import XMarkIcon from '@heroicons/react/24/solid/XMarkIcon'
-import { Avatar, Card, CardContent, SvgIcon, Tooltip, Typography } from '@mui/material'
+import { Avatar, Card, CardContent, SvgIcon, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import { Stack } from '@mui/system'
 
 export const Invoice = ({
@@ -10,6 +10,7 @@ export const Invoice = ({
   status,
   createdAt
 }) => {
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   return (
     <Card sx={{
       width: '100%',
@@ -33,10 +34,10 @@ export const Invoice = ({
             <Typography color='text.secondary'>
               # {number}
             </Typography>
-            <Typography variant='h4'>
+            <Typography variant={lgUp ? 'h5' : 'h6'}>
               {customerName}
             </Typography>
-            <Typography variant='h5'>
+            <Typography variant={lgUp ? 'h6' : 'p'}>
               R$ {amount}
             </Typography>
           </Stack>
@@ -55,11 +56,13 @@ export const Invoice = ({
                       <CheckIcon />
                     </Tooltip>
                     )
-                  : (
-                    <Tooltip title='Cancelada'>
-                      <XMarkIcon />
-                    </Tooltip>
-                    )
+                  : status === 'canceled'
+                    ? (
+                      <Tooltip title='Cancelada'>
+                        <XMarkIcon />
+                      </Tooltip>
+                      )
+                    : null
               }
             </SvgIcon>
           </Avatar>
