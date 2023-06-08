@@ -1,9 +1,8 @@
 import Head from 'next/head'
-import { Box, Card, CardActions, CardContent, Container, Unstable_Grid2 as Grid, Pagination, Typography } from '@mui/material'
+import { Box, Button, Card, CardActions, CardContent, Container, Divider, Unstable_Grid2 as Grid, LinearProgress, Pagination, Typography, useMediaQuery } from '@mui/material'
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
-import { OverviewBudget } from 'src/sections/overview/overview-budget'
-import { OverviewLatestOrders } from 'src/sections/overview/overview-latest-orders'
-import { OverviewProgress } from 'src/sections/overview/overview-progress'
+import { InvoiceList } from 'src/components/Invoice/InvoiceList'
+import { Stack } from '@mui/system'
 
 const now = new Date()
 const months = [
@@ -85,6 +84,7 @@ const ordersMock = [
 ]
 
 const Page = () => {
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   return (
     <>
       <Head>
@@ -101,22 +101,63 @@ const Page = () => {
       >
 
         <Container maxWidth='xl'>
-          <Grid
-            xs={12}
-            sm={12}
-            lg={4}
-          >
-            <OverviewBudget
-              difference={12}
-              positive
-              sx={{ width: '100%', backgroundColor: '#ececec' }}
-              value='R$5.000,00'
-            />
-            <OverviewProgress
-              value={75}
-              sx={{ mt: 4, mb: 4, width: '100%', backgroundColor: '#ececec' }}
-            />
-          </Grid>
+          {
+            !lgUp && (
+              <Card sx={{ height: '100%', backgroundColor: '#ececec', mb: 2 }}>
+                <Stack
+                  alignItems='flex-start'
+                  direction='row'
+                  justifyContent='space-between'
+                  spacing={3}
+                >
+                  <Stack
+                    spacing={1}
+                    sx={{ p: 4 }}
+                  >
+                    <Typography
+                      color='text.secondary'
+                      variant='overline'
+                    >
+                      Sua Receita neste mês
+                    </Typography>
+                    <Typography variant='h4'>
+                      R$ 15.000,00
+                    </Typography>
+                  </Stack>
+                </Stack>
+                <Divider />
+                <Stack
+                  alignItems='flex-start'
+                  direction='row'
+                  justifyContent='space-between'
+                  spacing={3}
+                >
+                  <Stack
+                    spacing={1}
+                    sx={{ p: 4 }}
+                  >
+                    <Typography
+                      color='text.secondary'
+                      gutterBottom
+                      variant='overline'
+                    >
+                      Receita Anual
+                    </Typography>
+                    <Typography variant='h4'>
+                      R$63.000,00
+                    </Typography>
+                    75%
+                    do teto (R$81.000,00)
+                  </Stack>
+                </Stack>
+                <LinearProgress
+                  value={75}
+                  variant='determinate'
+                  color='error'
+                />
+              </Card>
+            )
+          }
           <Grid
             container
             spacing={3}
@@ -126,20 +167,27 @@ const Page = () => {
               lg={8}
             >
               <Card sx={{ height: '100%', backgroundColor: '#ececec' }}>
-
-                <Typography
-                  variant='h5'
-                  sx={{ p: 2, color: 'black' }}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between'
+                }}
                 >
-                  {months[now.getMonth()]} {now.getFullYear()}
-                </Typography>
+                  <div>
+                    <Typography
+                      variant='h5'
+                      sx={{ p: 2, color: 'black' }}
+                    >
+                      {months[now.getMonth()]} {now.getFullYear()}
+                    </Typography>
+                  </div>
+
+                  <Button sx={{ m: 2 }}>Gerar Nova NFS-e</Button>
+
+                </div>
 
                 <CardContent>
-                  <OverviewLatestOrders
-                    orders={ordersMock}
-                    sx={{ height: '100%' }}
-                  />
-
+                  <InvoiceList invoices={ordersMock} />
                 </CardContent>
 
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
@@ -157,6 +205,69 @@ const Page = () => {
                 </CardActions>
               </Card>
             </Grid>
+            {
+              lgUp && (
+                <Grid
+                  xs={12}
+                  sm={12}
+                  lg={4}
+                >
+                  <Card sx={{ backgroundColor: '#ececec', mb: 2 }}>
+                    <Stack
+                      alignItems='flex-start'
+                      direction='row'
+                      justifyContent='space-between'
+                      spacing={3}
+                    >
+                      <Stack
+                        spacing={1}
+                        sx={{ p: 4 }}
+                      >
+                        <Typography
+                          color='text.secondary'
+                          variant='overline'
+                        >
+                          Sua Receita neste mês
+                        </Typography>
+                        <Typography variant='h4'>
+                          R$ 15.000,00
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                    <Divider />
+                    <Stack
+                      alignItems='flex-start'
+                      direction='row'
+                      justifyContent='space-between'
+                      spacing={3}
+                    >
+                      <Stack
+                        spacing={1}
+                        sx={{ p: 4 }}
+                      >
+                        <Typography
+                          color='text.secondary'
+                          gutterBottom
+                          variant='overline'
+                        >
+                          Receita Anual
+                        </Typography>
+                        <Typography variant='h4'>
+                          R$63.000,00
+                        </Typography>
+                        75%
+                        do teto (R$81.000,00)
+                      </Stack>
+                    </Stack>
+                    <LinearProgress
+                      value={75}
+                      variant='determinate'
+                      color='error'
+                    />
+                  </Card>
+                </Grid>
+              )
+            }
           </Grid>
         </Container>
       </Box>
