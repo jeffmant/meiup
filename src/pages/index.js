@@ -161,7 +161,7 @@ const Page = () => {
                       ? 'success'
                       : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
                         ? 'info'
-                        : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'success' : ''
+                        : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'error' : ''
                   }
                 />
               </Card>
