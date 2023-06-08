@@ -83,6 +83,10 @@ const ordersMock = [
   }
 ]
 
+const receivesMonth = 15000
+const receivesYear = 63000
+const receivesPercentageFromYearLimit = ((receivesYear * 100) / 81000).toFixed(2)
+
 const Page = () => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   return (
@@ -230,7 +234,7 @@ const Page = () => {
                           Sua Receita neste mês
                         </Typography>
                         <Typography variant='h4'>
-                          R$ 15.000,00
+                          R$ {receivesMonth}
                         </Typography>
                       </Stack>
                     </Stack>
@@ -253,17 +257,29 @@ const Page = () => {
                           Receita Anual
                         </Typography>
                         <Typography variant='h4'>
-                          R$63.000,00
+                          R${receivesYear}
                         </Typography>
-                        75%
-                        do teto (R$81.000,00)
+                        <Box sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-around'
+                        }}
+                        >
+                          <LinearProgress
+                            value={75}
+                            variant='determinate'
+                            color={
+                              receivesPercentageFromYearLimit <= 35
+                                ? 'success'
+                                : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
+                                  ? 'info'
+                                  : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'error' : ''
+}
+                          />
+                          <Typography> {receivesPercentageFromYearLimit}% do teto (R$ 81.000,00) </Typography>
+                        </Box>
                       </Stack>
                     </Stack>
-                    <LinearProgress
-                      value={75}
-                      variant='determinate'
-                      color='error'
-                    />
                   </Card>
                 </Grid>
               )
