@@ -3,7 +3,8 @@ import {
   Avatar,
   Box,
   Stack,
-  Typography
+  Typography,
+  useMediaQuery
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { usePopover } from 'src/hooks/use-popover'
@@ -16,6 +17,7 @@ const SIDE_NAV_WIDTH = 280
 const TOP_NAV_HEIGHT = 64
 
 export const TopNav = (props) => {
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const accountPopover = usePopover()
   const { user } = useAuth()
 
@@ -69,7 +71,7 @@ export const TopNav = (props) => {
             direction='row'
             spacing={2}
           >
-            <Typography>{user?.name}</Typography>
+            <Typography>{lgUp && user?.name}</Typography>
             <Avatar
               onClick={accountPopover.handleOpen}
               ref={accountPopover.anchorRef}
