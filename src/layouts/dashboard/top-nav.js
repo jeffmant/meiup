@@ -56,7 +56,9 @@ export const TopNav = (props) => {
               sx={{
                 display: 'inline-flex',
                 height: 32,
-                width: 32
+                width: 32,
+                marginTop: 2,
+                marginBottom: 4
               }}
             >
               <Logo />
