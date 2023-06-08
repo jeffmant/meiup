@@ -11,7 +11,7 @@
     "start": "next start",
     "export": "next export",
     "lint": "standard",
-    "lint-fix": "standard --fix"
+    "lint:fix": "standard --fix"
   },
   "dependencies": {
     "@emotion/cache": "11.10.5",
@@ -44,6 +44,9 @@
     "@types/react-dom": "18.0.11",
     "eslint": "8.34.0",
     "eslint-config-next": "13.1.6",
+    "git-commit-msg-linter": "^5.0.4",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
     "standard": "^17.1.0"
   }
 }
