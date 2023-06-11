@@ -37,10 +37,10 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.email, values.password)
-        // firebase login
-        const loggedUser = await signIn(values.email, values.password)
-        console.log('LOGGED USER BY FIREBASE -->', loggedUser)
+        await auth.signIn(values.email, values.password); //Login no Firebase.auth
+
+        console.log('Page Login ok.')
+        
         router.push('/')
       } catch (err) {
         helpers.setStatus({ success: false })

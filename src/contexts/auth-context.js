@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { signin } from 'src/pages/api/user'
+import Cookies from 'js-cookie';
+import { login, logout, register } from '../pages/api/auth';
 
 const USER = {
   id: '5e86809283e28b96d2d38537',
@@ -133,16 +135,17 @@ export const AuthProvider = (props) => {
   }
 
   const signIn = async (email, password) => {
-    const signedUser = signin({ email, password })
+    const signedUser = login({ email, password })
     if (!signedUser) {
       throw new Error('Please check your email and password')
     }
 
     try {
-      window.sessionStorage.setItem('authenticated', 'true')
+      Cookies.set('authenticated', 'true');
     } catch (err) {
       console.error(err)
     }
+    USER.name = (await signedUser).result.user.displayName
 
     const user = USER
 
@@ -150,17 +153,21 @@ export const AuthProvider = (props) => {
       type: HANDLERS.SIGN_IN,
       payload: user
     })
-  }
+  };
 
-  const signUp = async (email, name, password) => {
-    throw new Error('Sign up is not implemented')
-  }
+  const signUp = async (cnpj, email, name, password) => {
+    register(cnpj, email, name, password)
+  };
 
   const signOut = () => {
-    dispatch({
-      type: HANDLERS.SIGN_OUT
-    })
-  }
+    logout()
+      .then(
+        dispatch({
+        type: HANDLERS.SIGN_OUT
+        })
+      )
+    
+  };
 
   return (
     <AuthContext.Provider

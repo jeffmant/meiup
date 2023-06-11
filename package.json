@@ -6,6 +6,7 @@
   "homepage": "https://devias.io",
   "private": false,
   "scripts": {
+    "dev": "next dev",
     "start": "node src/server",
     "build": "next build",
     "export": "next export",
@@ -31,6 +32,7 @@
     "express": "^4.18.2",
     "firebase": "^9.22.1",
     "formik": "2.2.9",
+    "js-cookie": "^3.0.5",
     "next": "13.1.6",
     "nprogress": "0.2.0",
     "prop-types": "15.8.1",
