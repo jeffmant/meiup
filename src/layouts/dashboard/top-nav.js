@@ -71,7 +71,7 @@ export const TopNav = (props) => {
             direction='row'
             spacing={2}
           >
-            <Typography>{mdUp && user.name}</Typography>
+            <Typography>{mdUp && user?.name}</Typography>
             <Avatar
               onClick={accountPopover.handleOpen}
               ref={accountPopover.anchorRef}

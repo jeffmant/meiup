@@ -3,15 +3,8 @@ import { Box, Button, Card, CardActions, CardContent, Container, Divider, Unstab
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
 import { InvoiceList } from 'src/components/Invoice/InvoiceList'
 import { Stack } from '@mui/system'
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
-import { getAuth } from 'firebase/auth'
-import firebaseApp from 'src/firebase/config'
-
-
-
-
-
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
 
 const now = new Date()
 const months = [
@@ -97,14 +90,14 @@ const receivesYear = 63000
 const receivesPercentageFromYearLimit = ((receivesYear * 100) / 81000).toFixed(2)
 
 const Page = () => {
-  const router = useRouter();
-  const isAuthenticated = Cookies.get('authenticated');
-  //TODO: Verificar questão do cookie ou inicializar firebase-admin no backend para poder verificar o cookie
+  const router = useRouter()
+  const isAuthenticated = Cookies.get('authenticated')
+  // TODO: Verificar questão do cookie ou inicializar firebase-admin no backend para poder verificar o cookie
 
-  if(!isAuthenticated) {
+  if (!isAuthenticated) {
     router.push('/auth/login')
   };
-  
+
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   return (
     <>

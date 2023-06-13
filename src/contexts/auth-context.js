@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { login, logout, register } from '../pages/api/auth';
-import fetchUserData from 'src/pages/api/user';
+import { login, logout, register } from '../pages/api/auth'
+import fetchUserData from 'src/pages/api/user'
+import Cookies from 'js-cookie'
 
 let USER = {}
 
@@ -79,7 +80,7 @@ export const AuthProvider = (props) => {
     let isAuthenticated = false
 
     try {
-      isAuthenticated = window.sessionStorage.getItem('authenticated') === 'true'
+      isAuthenticated = Cookies.get('authenticated') === 'true'
     } catch (err) {
       console.error(err)
     }
@@ -105,57 +106,41 @@ export const AuthProvider = (props) => {
     []
   )
 
-  const skip = () => {
-    try {
-      window.sessionStorage.setItem('authenticated', 'true')
-    } catch (err) {
-      console.error(err)
-    }
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    })
-  }
-
   const signIn = async (email, password) => {
     try {
-      const user = await login({ email, password });
-      const userData = await fetchUserData(user.result.user);
+      const user = await login({ email, password })
+      const userData = await fetchUserData(user.result.user)
       USER = userData
-  
+
       dispatch({
         type: HANDLERS.SIGN_IN,
         payload: userData
-      });
-
+      })
     } catch (error) {
-        throw new Error('Please check your email and password');
-      }
+      throw new Error('Please check your email and password')
+    }
   }
 
   const signUp = async (cnpj, email, name, password) => {
     register(cnpj, email, name, password)
-  };
+  }
 
   const signOut = () => {
     logout()
       .then(
         dispatch({
-        type: HANDLERS.SIGN_OUT
+          type: HANDLERS.SIGN_OUT
         })
       )
-    
-  };
+  }
 
   return (
     <AuthContext.Provider
       value={{
         ...state,
-        skip,
         signIn,
         signUp,
-        signOut,
+        signOut
       }}
     >
       {children}

@@ -14,19 +14,18 @@
 //   }
 // }
 
-import { db } from '../../firebase/config';
-import { collection, getDoc, doc } from 'firebase/firestore';
+import { db } from '../../firebase/config'
+import { collection, getDoc, doc } from 'firebase/firestore'
 
-
-export default async function fetchUserData(user) {
+export default async function fetchUserData (user) {
   const uid = user.uid
   try {
-    const userDocRef = doc(collection(db, 'users'), uid);
-    const userDocSnap = await getDoc(userDocRef);
+    const userDocRef = doc(collection(db, 'users'), uid)
+    const userDocSnap = await getDoc(userDocRef)
 
     if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      const { avatar, phone, name, email, cpf, cnpj } = userData;
+      const userData = userDocSnap.data()
+      const { avatar, phone, name, email, cpf, cnpj } = userData
 
       // Atribua os dados do usuário à variável USER
       const USER = {
@@ -36,26 +35,14 @@ export default async function fetchUserData(user) {
         name: name || '',
         email: email || '',
         cpf: cpf || '',
-        company: cnpj || '',
-      };
+        company: cnpj || ''
+      }
 
-    console.log('>>>USUARIO<<<')
-    console.log(USER); // Exiba a estrutura do usuário preenchida com os dados
-    return {
-           id: uid || '',
-           avatar: avatar || '',
-           phone: phone || '',
-           name: name || '',
-           email: email || '',
-           cpf: cpf || '',
-           company: {
-             id: '7f86809283e28b96d2d38598',
-            name: 'Jefferson Gabriel Silva Mantovani 08468678937',
-             fantasyName: 'BOAZ Tecnologias'
-           }
-         }
-       }
-  } catch (error) {
-      console.error('Erro ao buscar os dados do usuário e da empresa:', error);
+      console.log('>>>USUARIO<<<')
+      console.log(USER) // Exiba a estrutura do usuário preenchida com os dados
+      return USER
     }
-}
+  } catch (error) {
+    console.error('Erro ao buscar os dados do usuário e da empresa:', error)
+  };
+};

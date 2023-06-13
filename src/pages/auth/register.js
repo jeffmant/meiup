@@ -40,8 +40,8 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signUp(values.cnpj, values.email, values.name, values.password); //Metodo de registro da plataforma
-        router.push('/auth/login'); //Retorna à pagina de login para poder realizar a autenticação dentro da plataforma
+        await auth.signUp(values.cnpj, values.email, values.name, values.password) // Metodo de registro da plataforma
+        router.push('/auth/login') // Retorna à pagina de login para poder realizar a autenticação dentro da plataforma
       } catch (err) {
         helpers.setStatus({ success: false })
         helpers.setErrors({ submit: err.message })
@@ -101,8 +101,8 @@ const Page = () => {
                   error={!!(formik.touched.name && formik.errors.name)}
                   fullWidth
                   helperText={formik.touched.name && formik.errors.name}
-                  label="Nome"
-                  name="name"
+                  label='Nome'
+                  name='name'
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={formik.values.name}
