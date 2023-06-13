@@ -3,6 +3,7 @@ import { Box, Button, Card, CardActions, CardContent, Container, Divider, Unstab
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
 import { InvoiceList } from 'src/components/Invoice/InvoiceList'
 import { Stack } from '@mui/system'
+import { InvoiceTable } from 'src/components/Invoice/invoiceTable'
 
 const now = new Date()
 const months = [
@@ -196,7 +197,11 @@ const Page = () => {
                 </div>
 
                 <CardContent>
-                  <InvoiceList invoices={ordersMock} />
+                  {
+                    lgUp
+                      ? <InvoiceTable invoices={ordersMock} />
+                      : <InvoiceList invoices={ordersMock} />
+                  }
                 </CardContent>
 
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
