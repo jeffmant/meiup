@@ -10,18 +10,27 @@ export const  login = async ({ email, password }) => {
   let result = null,
       error = null;
   try {
-      result = await signInWithEmailAndPassword(auth, email, password); //Método de autenticação do firebase
-      console.log('Logado com sucesso', result.user)
+        result = await signInWithEmailAndPassword(auth, email, password); //Método de autenticação do firebase
+        const user = auth.currentUser
+        const token = await user.getIdToken();
+        Cookies.set('authenticated', token)
+        console.log(token)
+        console.log('Logado com sucesso', result.user)
+      
   } catch (e) {
       error = e;
-      //TODO: Tratar erros
   }
   return { result, error };
 };
 
 export async function logout() {
-  Cookies.remove('authenticated'); //Remove o cookie de authenticação
-  console.log('Usuário deslogado com sucesso!');
+    auth.signOut()
+        .then(() => {  
+            Cookies.remove('authenticated');// Limpa o cookie armazenado
+        })
+    .catch((error) => {
+      console.log('Erro ao realizar logout:', error);
+    });
 }
 
 export async function register(cnpj, email, name, password) {

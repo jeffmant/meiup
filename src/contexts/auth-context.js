@@ -2,7 +2,11 @@ import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { signin } from 'src/pages/api/user'
 import Cookies from 'js-cookie';
-import { login, logout, register } from '../pages/api/auth';
+import { login, logout, register, authenticationCheck } from '../pages/api/auth';
+import firebaseApp from 'src/firebase/config';
+import { getAuth } from 'firebase/auth';
+
+const auth = getAuth(firebaseApp)
 
 const USER = {
   id: '5e86809283e28b96d2d38537',
@@ -139,12 +143,6 @@ export const AuthProvider = (props) => {
     if (!signedUser) {
       throw new Error('Please check your email and password')
     }
-
-    try {
-      Cookies.set('authenticated', 'true');
-    } catch (err) {
-      console.error(err)
-    }
     USER.name = (await signedUser).result.user.displayName
 
     const user = USER
@@ -176,7 +174,7 @@ export const AuthProvider = (props) => {
         skip,
         signIn,
         signUp,
-        signOut
+        signOut,
       }}
     >
       {children}

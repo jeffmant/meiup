@@ -5,6 +5,13 @@ import { InvoiceList } from 'src/components/Invoice/InvoiceList'
 import { Stack } from '@mui/system'
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { getAuth } from 'firebase/auth'
+import firebaseApp from 'src/firebase/config'
+
+
+
+
+
 
 const now = new Date()
 const months = [
@@ -91,12 +98,12 @@ const receivesPercentageFromYearLimit = ((receivesYear * 100) / 81000).toFixed(2
 
 const Page = () => {
   const router = useRouter();
-  const isAuthenticated = Cookies.get('authenticated') === 'true';
+  const isAuthenticated = Cookies.get('authenticated');
+  //TODO: Verificar questão do cookie ou inicializar firebase-admin no backend para poder verificar o cookie
 
   if(!isAuthenticated) {
     router.push('/auth/login')
-    return null;
-  }
+  };
   
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   return (

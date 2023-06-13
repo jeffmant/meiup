@@ -38,13 +38,11 @@ const Page = () => {
     onSubmit: async (values, helpers) => {
       try {
         await auth.signIn(values.email, values.password); //Login no Firebase.auth
-
         console.log('Page Login ok.')
-        
         router.push('/')
       } catch (err) {
         helpers.setStatus({ success: false })
-        helpers.setErrors({ submit: err.message })
+        helpers.setErrors({ submit: 'Ocorreu um erro durante o login. Por favor, tente novamente.' });
         helpers.setSubmitting(false)
       }
     }
