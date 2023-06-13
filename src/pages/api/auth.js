@@ -15,7 +15,6 @@ export const  login = async ({ email, password }) => {
         const token = await user.getIdToken();
         Cookies.set('authenticated', token)
         console.log(token)
-        console.log('Logado com sucesso', result.user)
       
   } catch (e) {
       error = e;

@@ -1,27 +1,9 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { signin } from 'src/pages/api/user'
-import Cookies from 'js-cookie';
-import { login, logout, register, authenticationCheck } from '../pages/api/auth';
-import firebaseApp from 'src/firebase/config';
-import { getAuth } from 'firebase/auth';
+import { login, logout, register } from '../pages/api/auth';
+import fetchUserData from 'src/pages/api/user';
 
-const auth = getAuth(firebaseApp)
-
-const USER = {
-  id: '5e86809283e28b96d2d38537',
-  avatar: 'https://github.com/jeffmant.png',
-  phone: '11936187180',
-  name: 'Jefferson Mantovani',
-  email: 'jgsmantovani@gmail.com',
-  cpf: '08468678937',
-  company: {
-    id: '7f86809283e28b96d2d38598',
-    cnpj: '36255676000173',
-    name: 'Jefferson Gabriel Silva Mantovani 08468678937',
-    fantasyName: 'BOAZ Tecnologias'
-  }
-}
+let USER = {}
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -130,8 +112,6 @@ export const AuthProvider = (props) => {
       console.error(err)
     }
 
-    const user = USER
-
     dispatch({
       type: HANDLERS.SIGN_IN,
       payload: user
@@ -139,19 +119,20 @@ export const AuthProvider = (props) => {
   }
 
   const signIn = async (email, password) => {
-    const signedUser = login({ email, password })
-    if (!signedUser) {
-      throw new Error('Please check your email and password')
-    }
-    USER.name = (await signedUser).result.user.displayName
+    try {
+      const user = await login({ email, password });
+      const userData = await fetchUserData(user.result.user);
+      USER = userData
+  
+      dispatch({
+        type: HANDLERS.SIGN_IN,
+        payload: userData
+      });
 
-    const user = USER
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    })
-  };
+    } catch (error) {
+        throw new Error('Please check your email and password');
+      }
+  }
 
   const signUp = async (cnpj, email, name, password) => {
     register(cnpj, email, name, password)

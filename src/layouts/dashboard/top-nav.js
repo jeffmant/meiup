@@ -17,7 +17,7 @@ const SIDE_NAV_WIDTH = 280
 const TOP_NAV_HEIGHT = 64
 
 export const TopNav = (props) => {
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
+  const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
   const accountPopover = usePopover()
   const { user } = useAuth()
 
@@ -71,7 +71,7 @@ export const TopNav = (props) => {
             direction='row'
             spacing={2}
           >
-            <Typography>{lgUp && user?.name}</Typography>
+            <Typography>{mdUp && user.name}</Typography>
             <Avatar
               onClick={accountPopover.handleOpen}
               ref={accountPopover.anchorRef}
