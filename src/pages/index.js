@@ -5,6 +5,7 @@ import { InvoiceList } from 'src/components/Invoice/InvoiceList'
 import { Stack } from '@mui/system'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
+import { InvoiceTable } from 'src/components/Invoice/invoiceTable'
 
 const now = new Date()
 const months = [
@@ -206,7 +207,11 @@ const Page = () => {
                 </div>
 
                 <CardContent>
-                  <InvoiceList invoices={ordersMock} />
+                  {
+                    lgUp
+                      ? <InvoiceTable invoices={ordersMock} />
+                      : <InvoiceList invoices={ordersMock} />
+                  }
                 </CardContent>
 
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
