@@ -18,8 +18,6 @@ export const SideNav = (props) => {
   const pathname = usePathname()
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
 
-  console.log('Sidenav opened')
-
   const content = (
     <Scrollbar
       sx={{
