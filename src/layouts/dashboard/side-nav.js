@@ -6,7 +6,6 @@ import {
   Divider,
   Drawer,
   Stack,
-  Typography,
   useMediaQuery
 } from '@mui/material'
 import { Logo } from 'src/components/logo'
@@ -18,6 +17,8 @@ export const SideNav = (props) => {
   const { open, onClose } = props
   const pathname = usePathname()
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
+
+  console.log('Sidenav opened')
 
   const content = (
     <Scrollbar
@@ -48,9 +49,8 @@ export const SideNav = (props) => {
               width: 32
             }}
           >
-            <Logo />
+            <Logo dark />
           </Box>
-          <Typography sx={{ ml: 2 }}>meumei</Typography>
         </Box>
         <Divider sx={{ borderColor: 'neutral.700' }} />
         <Box

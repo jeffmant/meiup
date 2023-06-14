@@ -2,7 +2,9 @@ import PropTypes from 'prop-types'
 import {
   Avatar,
   Box,
+  IconButton,
   Stack,
+  SvgIcon,
   Typography,
   useMediaQuery
 } from '@mui/material'
@@ -10,13 +12,13 @@ import { alpha } from '@mui/material/styles'
 import { usePopover } from 'src/hooks/use-popover'
 import { AccountPopover } from './account-popover'
 import { useAuth } from 'src/hooks/use-auth'
-import { Logo } from 'src/components/logo'
-import NextLink from 'next/link'
+import Bars3Icon from '@heroicons/react/24/solid/Bars3Icon'
 
 const SIDE_NAV_WIDTH = 280
 const TOP_NAV_HEIGHT = 64
 
 export const TopNav = (props) => {
+  const { onNavOpen } = props
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const accountPopover = usePopover()
   const { user } = useAuth()
@@ -52,19 +54,13 @@ export const TopNav = (props) => {
             direction='row'
             spacing={2}
           >
-            <Box
-              component={NextLink}
-              href='/'
-              sx={{
-                display: 'inline-flex',
-                height: 32,
-                width: 32,
-                marginTop: 2,
-                marginBottom: 4
-              }}
-            >
-              <Logo />
-            </Box>
+            {!lgUp && (
+              <IconButton onClick={onNavOpen}>
+                <SvgIcon fontSize='small'>
+                  <Bars3Icon />
+                </SvgIcon>
+              </IconButton>
+            )}
           </Stack>
           <Stack
             alignItems='center'
