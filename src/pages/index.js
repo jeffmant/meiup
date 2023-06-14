@@ -1,95 +1,100 @@
 import Head from 'next/head'
-import { Box, Button, Card, CardActions, CardContent, Container, Divider, Unstable_Grid2 as Grid, LinearProgress, Pagination, Typography, useMediaQuery } from '@mui/material'
+import {
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  Container,
+  Divider,
+  Unstable_Grid2 as Grid,
+  LinearProgress,
+  Pagination,
+  Tab,
+  Tabs,
+  Typography,
+  useMediaQuery
+} from '@mui/material'
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
-import { InvoiceList } from 'src/components/Invoice/InvoiceList'
+import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
 import { Stack } from '@mui/system'
-import { InvoiceTable } from 'src/components/Invoice/invoiceTable'
-
-const now = new Date()
-const months = [
-  'Janeiro',
-  'Fevereiro',
-  'Março',
-  'Abril',
-  'Maio',
-  'Junho',
-  'Julho',
-  'Agosto',
-  'Setembro',
-  'Outubro',
-  'Novembro',
-  'Dezembro'
-]
+import { TransactionTable } from 'src/components/Transaction/TransactionTable'
+import { useState } from 'react'
 
 const ordersMock = [
   {
     id: 'f69f88012978187a6c12897f',
     ref: 'DEV1049',
+    description: 'lorem ipsum',
     amount: 30.5,
-    customer: {
-      name: 'Ekaterina Tankova'
-    },
+    partyName: 'Ekaterina Tankova',
     createdAt: 1555016400000,
     status: 'emited'
   },
   {
     id: '9eaa1c7dd4433f413c308ce2',
     ref: 'DEV1048',
+    description: 'lorem ipsum',
     amount: 25.1,
-    customer: {
-      name: 'Cao Yu'
-    },
+    partyName: 'Cao Yu',
     createdAt: 1555016400000,
     status: 'emited'
   },
   {
     id: '01a5230c811bd04996ce7c13',
     ref: 'DEV1047',
+    description: 'lorem ipsum',
     amount: 10.99,
-    customer: {
-      name: 'Alexa Richardson'
-    },
+    partyName: 'Alexa Richardson',
     createdAt: 1554930000000,
     status: 'canceled'
   },
   {
     id: '1f4e1bd0a87cea23cdb83d18',
     ref: 'DEV1046',
+    description: 'lorem ipsum',
     amount: 96.43,
-    customer: {
-      name: 'Anje Keizer'
-    },
+    partyName: 'Anje Keizer',
     createdAt: 1554757200000,
     status: 'emited'
   },
   {
     id: '9f974f239d29ede969367103',
     ref: 'DEV1045',
+    description: 'lorem ipsum',
     amount: 32.54,
-    customer: {
-      name: 'Clarke Gillebert'
-    },
+    partyName: 'Clarke Gillebert',
     createdAt: 1554670800000,
     status: 'emited'
   },
   {
     id: 'ffc83c1560ec2f66a1c05596',
     ref: 'DEV1044',
+    description: 'lorem ipsum',
     amount: 16.76,
-    customer: {
-      name: 'Adam Denisov'
-    },
+    partyName: 'Adam Denisov',
     createdAt: 1554670800000,
     status: 'emited'
   }
 ]
 
+const useTransactions = () => ({
+  revenues: ordersMock.slice(0, 3),
+  costs: ordersMock.slice(3)
+})
+
 const receivesMonth = 15000
 const receivesYear = 63000
-const receivesPercentageFromYearLimit = ((receivesYear * 100) / 81000).toFixed(2)
+const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(2)
 
 const Page = () => {
+  const [transactionType, setTransactionType] = useState('revenue')
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
+  const { revenues, costs } = useTransactions()
+
+  const handleTransactionType = async () => {
+    setTransactionType(transactionType === 'revenue' ? 'cost' : 'revenue')
+  }
+
   return (
     <>
       <Head>
@@ -106,101 +111,115 @@ const Page = () => {
       >
 
         <Container maxWidth='xl'>
-          {
-            !lgUp && (
-              <Card sx={{ height: '100%', backgroundColor: '#ececec', mb: 2 }}>
-                <Stack
-                  alignItems='flex-start'
-                  direction='row'
-                  justifyContent='space-between'
-                  spacing={3}
+          <Card sx={{
+            display: 'flex',
+            direction: 'column',
+            justifyContent: 'space-around',
+            height: '100%',
+            backgroundColor: '#ececec',
+            mb: 2,
+            p: 2
+          }}
+          >
+            <Stack
+              alignItems='center'
+              direction='row'
+              justifyContent='space-between'
+              spacing={4}
+            >
+              <div>
+                <Typography
+                  color='text.secondary'
+                  variant='overline'
                 >
-                  <Stack
-                    spacing={1}
-                    sx={{ p: 2 }}
-                  >
-                    <Typography
-                      color='text.secondary'
-                      variant='overline'
-                    >
-                      Sua Receita neste mês
-                    </Typography>
-                    <Typography variant='h4'>
-                      {receivesMonth.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Divider />
-                <Stack
-                  alignItems='flex-start'
-                  direction='row'
-                  justifyContent='space-between'
-                  spacing={3}
+                  Receita no mês
+                </Typography>
+              </div>
+              <div>
+
+                <Typography variant='h4'>
+                  {receivesMonth.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                </Typography>
+              </div>
+
+            </Stack>
+            <Divider
+              orientation='vertical'
+              flexItem
+              sx={{ borderWidth: '1px', borderColor: '#c6c6c6' }}
+            />
+            <Stack
+              alignItems='center'
+              direction='row'
+              justifyContent='space-between'
+              spacing={4}
+            >
+              <div>
+                <Typography
+                  color='text.secondary'
+                  gutterBottom
+                  variant='overline'
                 >
-                  <Stack
-                    spacing={1}
-                    sx={{ p: 2 }}
-                  >
-                    <Typography
-                      color='text.secondary'
-                      gutterBottom
-                      variant='overline'
-                    >
-                      Receita Anual
-                    </Typography>
-                    <Typography variant='h4'>
-                      {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                    </Typography>
-                    75% do teto (R$81.000,00)
-                  </Stack>
-                </Stack>
+                  Receita Anual
+                </Typography>
+              </div>
+              <div>
+                <Typography
+                  variant='h4'
+                  sx={{ mb: 2 }}
+                >
+                  {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                </Typography>
                 <LinearProgress
-                  value={75}
+                  value={receivesPercentageFromYearLimit}
                   variant='determinate'
                   color={
-                    receivesPercentageFromYearLimit <= 35
-                      ? 'success'
-                      : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
-                        ? 'info'
-                        : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'error' : ''
-                  }
+                        receivesPercentageFromYearLimit <= 35
+                          ? 'success'
+                          : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
+                            ? 'info'
+                            : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'error' : ''
+                      }
                 />
-              </Card>
-            )
-          }
+                {receivesPercentageFromYearLimit}% do teto (R$81.000,00)
+              </div>
+            </Stack>
+          </Card>
           <Grid
             container
             spacing={3}
           >
-            <Grid
-              xs={12}
-              lg={8}
-            >
-              <Card sx={{ height: '100%', backgroundColor: '#ececec' }}>
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between'
-                }}
+            <Grid xs={12}>
+              <Card sx={{
+                minHeight: '70vh',
+                height: '100%',
+                width: '100%',
+                backgroundColor: '#ececec'
+              }}
+              >
+                <Tabs
+                  onChange={handleTransactionType}
+                  sx={{ mx: 4 }}
+                  value={transactionType}
+                  variant='fullWidth'
                 >
-                  <div>
-                    <Typography
-                      variant='h5'
-                      sx={{ p: 2, color: 'black' }}
-                    >
-                      {months[now.getMonth()]} {now.getFullYear()}
-                    </Typography>
-                  </div>
-
-                  <Button sx={{ m: 2 }}>Gerar Nova NFS-e</Button>
-
-                </div>
+                  <Tab
+                    label='Receitas'
+                    value='revenue'
+                    disableRipple
+                  />
+                  <Tab
+                    label='Despesas'
+                    value='cost'
+                    disableRipple
+                  />
+                </Tabs>
 
                 <CardContent>
                   {
                     lgUp
-                      ? <InvoiceTable invoices={ordersMock} />
-                      : <InvoiceList invoices={ordersMock} />
+                      ? <TransactionTable transactions={revenues} />
+                      : <TransactionCardList transactions={costs} />
                   }
                 </CardContent>
 
@@ -219,81 +238,6 @@ const Page = () => {
                 </CardActions>
               </Card>
             </Grid>
-            {
-              lgUp && (
-                <Grid
-                  xs={12}
-                  sm={12}
-                  lg={4}
-                >
-                  <Card sx={{ backgroundColor: '#ececec', mb: 2 }}>
-                    <Stack
-                      alignItems='flex-start'
-                      direction='row'
-                      justifyContent='space-between'
-                      spacing={3}
-                    >
-                      <Stack
-                        spacing={1}
-                        sx={{ p: 4 }}
-                      >
-                        <Typography
-                          color='text.secondary'
-                          variant='overline'
-                        >
-                          Sua Receita neste mês
-                        </Typography>
-                        <Typography variant='h4'>
-                          {receivesMonth.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                    <Divider />
-                    <Stack
-                      alignItems='flex-start'
-                      direction='row'
-                      justifyContent='space-between'
-                      spacing={3}
-                    >
-                      <Stack
-                        spacing={1}
-                        sx={{ p: 4 }}
-                      >
-                        <Typography
-                          color='text.secondary'
-                          gutterBottom
-                          variant='overline'
-                        >
-                          Receita Anual
-                        </Typography>
-                        <Typography variant='h4'>
-                          {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                        </Typography>
-                        <Box sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-around'
-                        }}
-                        >
-                          <LinearProgress
-                            value={75}
-                            variant='determinate'
-                            color={
-                              receivesPercentageFromYearLimit <= 35
-                                ? 'success'
-                                : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
-                                  ? 'info'
-                                  : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'error' : ''
-                            }
-                          />
-                          <Typography> {receivesPercentageFromYearLimit}% do teto (R$ 81.000,00) </Typography>
-                        </Box>
-                      </Stack>
-                    </Stack>
-                  </Card>
-                </Grid>
-              )
-            }
           </Grid>
         </Container>
       </Box>

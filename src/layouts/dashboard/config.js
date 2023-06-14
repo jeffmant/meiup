@@ -1,7 +1,7 @@
-import ChartPieIcon from '@heroicons/react/24/solid/ChartPieIcon'
-import NewspaperIcon from '@heroicons/react/24/solid/NewspaperIcon'
-import ClipboardDocumentListIcon from '@heroicons/react/24/solid/ClipboardDocumentListIcon'
-import DocumentChartBarIcon from '@heroicons/react/24/solid/DocumentChartBarIcon'
+import RocketLaunchIcon from '@heroicons/react/24/solid/RocketLaunchIcon'
+import ArchiveBoxIcon from '@heroicons/react/24/solid/ArchiveBoxIcon'
+import BanknotesIcon from '@heroicons/react/24/solid/BanknotesIcon'
+import BookOpenIcon from '@heroicons/react/24/solid/BookOpenIcon'
 import { SvgIcon } from '@mui/material'
 
 export const items = [
@@ -10,7 +10,7 @@ export const items = [
     path: '/',
     icon: (
       <SvgIcon fontSize='small'>
-        <ChartPieIcon />
+        <RocketLaunchIcon />
       </SvgIcon>
     )
   },
@@ -20,7 +20,7 @@ export const items = [
     disabled: true,
     icon: (
       <SvgIcon fontSize='small'>
-        <NewspaperIcon />
+        <ArchiveBoxIcon />
       </SvgIcon>
     )
   },
@@ -30,7 +30,7 @@ export const items = [
     disabled: true,
     icon: (
       <SvgIcon fontSize='small'>
-        <ClipboardDocumentListIcon />
+        <BanknotesIcon />
       </SvgIcon>
     )
   },
@@ -40,7 +40,7 @@ export const items = [
     disabled: true,
     icon: (
       <SvgIcon fontSize='small'>
-        <DocumentChartBarIcon />
+        <BookOpenIcon />
       </SvgIcon>
     )
   }
