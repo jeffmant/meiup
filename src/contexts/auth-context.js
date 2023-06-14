@@ -3,8 +3,10 @@ import PropTypes from 'prop-types'
 import { login, logout, register } from '../pages/api/auth'
 import fetchUserData from 'src/pages/api/user'
 import Cookies from 'js-cookie'
+import { saveCompanyDataToFirestore, getCompanyDocument } from 'src/pages/api/utils'
 
 let USER = {}
+let COMPANY = {}
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -20,7 +22,7 @@ const initialState = {
 
 const handlers = {
   [HANDLERS.INITIALIZE]: (state, action) => {
-    const user = action.payload
+    const { user, company } = action.payload
 
     return {
       ...state,
@@ -30,7 +32,10 @@ const handlers = {
           ? ({
               isAuthenticated: true,
               isLoading: false,
-              user
+              user: {
+                ...user,
+                company
+              }
             })
           : ({
               isLoading: false
@@ -39,12 +44,15 @@ const handlers = {
     }
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
-    const user = action.payload
+    const { user, company } = action.payload
 
     return {
       ...state,
       isAuthenticated: true,
-      user
+      user: {
+        ...user,
+        company
+      }
     }
   },
   [HANDLERS.SIGN_OUT]: (state) => {
@@ -87,10 +95,14 @@ export const AuthProvider = (props) => {
 
     if (isAuthenticated) {
       const user = USER
+      const company = COMPANY
 
       dispatch({
         type: HANDLERS.INITIALIZE,
-        payload: user
+        payload: {
+          user,
+          company
+        }
       })
     } else {
       dispatch({
@@ -108,13 +120,20 @@ export const AuthProvider = (props) => {
 
   const signIn = async (email, password) => {
     try {
-      const user = await login({ email, password })
-      const userData = await fetchUserData(user.result.user)
+      const userResult = await login({ email, password })
+      const userData = await fetchUserData(userResult.result.user)
+      const company = await getCompanyDocument(userData.company)
+
+      COMPANY = company
       USER = userData
+      const user = userData
 
       dispatch({
         type: HANDLERS.SIGN_IN,
-        payload: userData
+        payload: {
+          user,
+          company
+        }
       })
     } catch (error) {
       throw new Error('Please check your email and password')
@@ -140,7 +159,9 @@ export const AuthProvider = (props) => {
         ...state,
         signIn,
         signUp,
-        signOut
+        signOut,
+        saveCompanyDataToFirestore,
+        getCompanyDocument
       }}
     >
       {children}

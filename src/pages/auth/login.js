@@ -43,6 +43,7 @@ const Page = () => {
         helpers.setStatus({ success: false })
         helpers.setErrors({ submit: 'Ocorreu um erro durante o login. Por favor, tente novamente.' })
         helpers.setSubmitting(false)
+        console.log(err)
       }
     }
   })

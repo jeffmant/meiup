@@ -1,8 +1,9 @@
 import firebaseApp, { db } from '../../firebase/config'
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, getAuth } from 'firebase/auth'
 import { collection, setDoc, doc } from 'firebase/firestore'
-
 import Cookies from 'js-cookie'
+import { getCompanyInfoByCNPJ } from './company'
+import { saveCompanyDataToFirestore } from './utils'
 
 const auth = getAuth(firebaseApp)
 
@@ -11,10 +12,9 @@ export const login = async ({ email, password }) => {
   let error = null
   try {
     result = await signInWithEmailAndPassword(auth, email, password) // Método de autenticação do firebase
-    const user = auth.currentUser
-    const token = await user.getIdToken()
+
+    const token = await result.user.getIdToken()
     Cookies.set('authenticated', token)
-    console.log(token)
   } catch (e) {
     error = e
   }
@@ -32,38 +32,29 @@ export async function logout () {
 }
 
 export async function register (cnpj, email, name, password) {
-  const cnpjNumber = Number(cnpj.replace(/[^\d]/g, '')) // Converte cnpj para number
-  const cnpjString = cnpjNumber.toString() // converte novamente para uma string, isso é necessário pois a collection não pode conter simbolos
+  const cnpjNumber = Number(cnpj.replace(/[^\d]/g, ''))
+  const cnpjString = cnpjNumber.toString() // converte novamente para uma string, isso é necessário pois o documento do firestore não pode conter simbolos
 
   try {
-    const { user } = await createUserWithEmailAndPassword(auth, email, password) // Método de criação de usuário no Firebase
+    const { user } = await createUserWithEmailAndPassword(auth, email, password)
 
-    await updateProfile(user, { displayName: name }) // Atualização do nome do usuário armazenado no firebase authentication conforme nome fornecido no form
+    await updateProfile(user, { displayName: name })
 
-    const userDocData = { // Dados para criação do documento do user na collection users
+    const userDocData = {
       cnpj: cnpjString,
       name,
       email
-      // TODO: Add outros campos conforme necessidade.
     }
-    const usersCollectionRef = collection(db, 'users') // Referencia da collection users
-    await setDoc(doc(usersCollectionRef, user.uid), userDocData) // Criação de um novo documento na collection users para o usuário recém criado, o id do documento é o uid do novo usuario criado.
+    const usersCollectionRef = collection(db, 'users')
+    await setDoc(doc(usersCollectionRef, user.uid), userDocData)
 
-    const companyDocData = { // Dados para criação do documento da empresa na collection companies
-      fantasyName: null,
-      isME: null,
-      isMEI: null,
-      name: null,
-      userId: user.uid,
-      userName: user.displayName
-    }
-    // TODO: Fazer a requisição na API do Infosimples para pegar as informações de cadastro da empresa.
-
-    const companiesCollectionRef = collection(db, 'companies') // Referencia da collection
-    await setDoc(doc(companiesCollectionRef, cnpjString), companyDocData) // Criação do documento
+    // Criar doc da empresa
+    const companyData = await getCompanyInfoByCNPJ({ cnpj: cnpjNumber })
+    console.log('CompanyData')
+    console.log(companyData)
+    await saveCompanyDataToFirestore(companyData, user)
 
     console.log('Usuário criado com sucesso:', user)
-    console.log('Empresa criada com sucesso:', companyDocData)
 
     return user
   } catch (error) {
