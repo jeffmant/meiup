@@ -1,6 +1,11 @@
 import firebaseApp, { db } from '../../firebase/config'
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, getAuth } from 'firebase/auth'
 import { collection, setDoc, doc } from 'firebase/firestore'
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  getAuth
+} from 'firebase/auth'
 import Cookies from 'js-cookie'
 import { getCompanyInfoByCNPJ } from './company'
 import { saveCompanyDataToFirestore } from './utils'
@@ -22,9 +27,10 @@ export const login = async ({ email, password }) => {
 }
 
 export async function logout () {
-  auth.signOut()
+  auth
+    .signOut()
     .then(() => {
-      Cookies.remove('authenticated')// Limpa o cookie armazenado
+      Cookies.remove('authenticated') // Limpa o cookie armazenado
     })
     .catch((error) => {
       console.log('Erro ao realizar logout:', error)
@@ -50,8 +56,7 @@ export async function register (cnpj, email, name, password) {
 
     // Criar doc da empresa
     const companyData = await getCompanyInfoByCNPJ({ cnpj: cnpjNumber })
-    console.log('CompanyData')
-    console.log(companyData)
+
     await saveCompanyDataToFirestore(companyData, user)
 
     console.log('Usuário criado com sucesso:', user)
@@ -61,4 +66,4 @@ export async function register (cnpj, email, name, password) {
     console.log('Erro ao criar usuário:', error)
     throw error
   }
-};
+}

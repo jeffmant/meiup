@@ -1,8 +1,8 @@
 import { db } from 'src/firebase/config'
-import { getDoc, setDoc, updateDoc, doc, collection } from 'firebase/firestore'
+import { getDoc, setDoc, doc, collection } from 'firebase/firestore'
 
 // Consulta para buscar dados do documento do usuário
-export const getUserData = async userId => {
+export const getUserData = async (userId) => {
   const userDocRef = doc(collection(db, 'users'), userId)
   const userDocSnap = await getDoc(userDocRef)
 
@@ -16,7 +16,7 @@ export const getUserData = async userId => {
 }
 
 // Consulta para buscar dados do documento da empresa
-export const getCompanyDocument = async cnpj => {
+export const getCompanyDocument = async (cnpj) => {
   const companyDocRef = doc(collection(db, 'companies'), cnpj)
   const companyDocSnap = await getDoc(companyDocRef)
 
@@ -33,7 +33,8 @@ export const getCompanyDocument = async cnpj => {
 // Armazenar os dados da empresa obtidos em um documento na coleção 'companies'
 export const saveCompanyDataToFirestore = async (companyData, user) => {
   try {
-    const { cnpj, companyName, fantasyName, status, email, phone, foundationDate, address } = companyData.data
+    const { cnpj, companyName, fantasyName, status, email, phone, foundationDate, address } =
+      companyData.data
     console.log(cnpj)
 
     const userUid = user.uid
@@ -62,23 +63,3 @@ export const saveCompanyDataToFirestore = async (companyData, user) => {
     console.error('Erro ao salvar dados da empresa no Firestore:', error)
   }
 }
-
-// Atualizar as informações dp usuário na page profile
-export const updateUserProfile = async (values, user) => {
-  const userUid = user.uid
-  const userDocRef = doc(collection(db, 'users'), userUid)
-
-  // atualizando os dados do usuário com os novos dados recebidos via form
-  await updateDoc(userDocRef, values)
-  // retornar usuário para o auth
-  console.log('Dados do usuário atualizados com sucesso!')
-  return user
-}
-
-// export const fetchUserData = async uid => {
-//   try {
-
-//   } catch {
-
-//   }
-// }

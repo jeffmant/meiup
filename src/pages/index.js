@@ -1,11 +1,25 @@
 import Head from 'next/head'
-import { Box, Button, Card, CardActions, CardContent, Container, Divider, Unstable_Grid2 as Grid, LinearProgress, Pagination, Typography, useMediaQuery } from '@mui/material'
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Container,
+  Divider,
+  Unstable_Grid2 as Grid,
+  LinearProgress,
+  Pagination,
+  Typography,
+  useMediaQuery
+} from '@mui/material'
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
 import { InvoiceList } from 'src/components/Invoice/InvoiceList'
 import { Stack } from '@mui/system'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import { InvoiceTable } from 'src/components/Invoice/invoiceTable'
+import { useAuth } from 'src/hooks/use-auth'
 
 const now = new Date()
 const months = [
@@ -91,21 +105,24 @@ const receivesYear = 63000
 const receivesPercentageFromYearLimit = ((receivesYear * 100) / 81000).toFixed(2)
 
 const Page = () => {
+  const { user } = useAuth()
+
+  console.log('auth user:')
+  console.log(user)
+
   const router = useRouter()
   const isAuthenticated = Cookies.get('authenticated')
   // TODO: Verificar questão do cookie ou inicializar firebase-admin no backend para poder verificar o cookie
 
   if (!isAuthenticated) {
     router.push('/auth/login')
-  };
+  }
 
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   return (
     <>
       <Head>
-        <title>
-          meumei
-        </title>
+        <title>meumei</title>
       </Head>
       <Box
         component='main'
@@ -114,104 +131,83 @@ const Page = () => {
           py: 2
         }}
       >
-
         <Container maxWidth='xl'>
-          {
-            !lgUp && (
-              <Card sx={{ height: '100%', backgroundColor: '#ececec', mb: 2 }}>
-                <Stack
-                  alignItems='flex-start'
-                  direction='row'
-                  justifyContent='space-between'
-                  spacing={3}
-                >
-                  <Stack
-                    spacing={1}
-                    sx={{ p: 2 }}
-                  >
-                    <Typography
-                      color='text.secondary'
-                      variant='overline'
-                    >
-                      Sua Receita neste mês
-                    </Typography>
-                    <Typography variant='h4'>
-                      {receivesMonth.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                    </Typography>
-                  </Stack>
+          {!lgUp && (
+            <Card sx={{ height: '100%', backgroundColor: '#ececec', mb: 2 }}>
+              <Stack
+                alignItems='flex-start'
+                direction='row'
+                justifyContent='space-between'
+                spacing={3}
+              >
+                <Stack spacing={1} sx={{ p: 2 }}>
+                  <Typography color='text.secondary' variant='overline'>
+                    Sua Receita neste mês
+                  </Typography>
+                  <Typography variant='h4'>
+                    {receivesMonth.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                  </Typography>
                 </Stack>
-                <Divider />
-                <Stack
-                  alignItems='flex-start'
-                  direction='row'
-                  justifyContent='space-between'
-                  spacing={3}
-                >
-                  <Stack
-                    spacing={1}
-                    sx={{ p: 2 }}
-                  >
-                    <Typography
-                      color='text.secondary'
-                      gutterBottom
-                      variant='overline'
-                    >
-                      Receita Anual
-                    </Typography>
-                    <Typography variant='h4'>
-                      {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                    </Typography>
-                    75% do teto (R$81.000,00)
-                  </Stack>
+              </Stack>
+              <Divider />
+              <Stack
+                alignItems='flex-start'
+                direction='row'
+                justifyContent='space-between'
+                spacing={3}
+              >
+                <Stack spacing={1} sx={{ p: 2 }}>
+                  <Typography color='text.secondary' gutterBottom variant='overline'>
+                    Receita Anual
+                  </Typography>
+                  <Typography variant='h4'>
+                    {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                  </Typography>
+                  75% do teto (R$81.000,00)
                 </Stack>
-                <LinearProgress
-                  value={75}
-                  variant='determinate'
-                  color={
-                    receivesPercentageFromYearLimit <= 35
-                      ? 'success'
-                      : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
-                        ? 'info'
-                        : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'error' : ''
-                  }
-                />
-              </Card>
-            )
-          }
-          <Grid
-            container
-            spacing={3}
-          >
-            <Grid
-              xs={12}
-              lg={8}
-            >
+              </Stack>
+              <LinearProgress
+                value={75}
+                variant='determinate'
+                color={
+                  receivesPercentageFromYearLimit <= 35
+                    ? 'success'
+                    : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
+                      ? 'info'
+                      : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100
+                        ? 'error'
+                        : ''
+                }
+              />
+            </Card>
+          )}
+          <Grid container spacing={3}>
+            <Grid xs={12} lg={8}>
               <Card sx={{ height: '100%', backgroundColor: '#ececec' }}>
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between'
-                }}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between'
+                  }}
                 >
                   <div>
-                    <Typography
-                      variant='h5'
-                      sx={{ p: 2, color: 'black' }}
-                    >
+                    <Typography variant='h5' sx={{ p: 2, color: 'black' }}>
                       {months[now.getMonth()]} {now.getFullYear()}
                     </Typography>
                   </div>
 
                   <Button sx={{ m: 2 }}>Gerar Nova NFS-e</Button>
-
                 </div>
 
                 <CardContent>
-                  {
-                    lgUp
-                      ? <InvoiceTable invoices={ordersMock} />
-                      : <InvoiceList invoices={ordersMock} />
-                  }
+                  {lgUp
+                    ? (
+                      <InvoiceTable invoices={ordersMock} />
+                      )
+                    : (
+                      <InvoiceList invoices={ordersMock} />
+                      )}
                 </CardContent>
 
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
@@ -221,89 +217,81 @@ const Page = () => {
                       justifyContent: 'center'
                     }}
                   >
-                    <Pagination
-                      count={ordersMock.length / 2}
-                      size='small'
-                    />
+                    <Pagination count={ordersMock.length / 2} size='small' />
                   </Box>
                 </CardActions>
               </Card>
             </Grid>
-            {
-              lgUp && (
-                <Grid
-                  xs={12}
-                  sm={12}
-                  lg={4}
-                >
-                  <Card sx={{ backgroundColor: '#ececec', mb: 2 }}>
-                    <Stack
-                      alignItems='flex-start'
-                      direction='row'
-                      justifyContent='space-between'
-                      spacing={3}
-                    >
-                      <Stack
-                        spacing={1}
-                        sx={{ p: 4 }}
-                      >
-                        <Typography
-                          color='text.secondary'
-                          variant='overline'
-                        >
-                          Sua Receita neste mês
-                        </Typography>
-                        <Typography variant='h4'>
-                          {receivesMonth.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                        </Typography>
-                      </Stack>
+            {lgUp && (
+              <Grid xs={12} sm={12} lg={4}>
+                <Card sx={{ backgroundColor: '#ececec', mb: 2 }}>
+                  <Stack
+                    alignItems='flex-start'
+                    direction='row'
+                    justifyContent='space-between'
+                    spacing={3}
+                  >
+                    <Stack spacing={1} sx={{ p: 4 }}>
+                      <Typography color='text.secondary' variant='overline'>
+                        Sua Receita neste mês
+                      </Typography>
+                      <Typography variant='h4'>
+                        {receivesMonth.toLocaleString('pt-br', {
+                          style: 'currency',
+                          currency: 'BRL'
+                        })}
+                      </Typography>
                     </Stack>
-                    <Divider />
-                    <Stack
-                      alignItems='flex-start'
-                      direction='row'
-                      justifyContent='space-between'
-                      spacing={3}
-                    >
-                      <Stack
-                        spacing={1}
-                        sx={{ p: 4 }}
-                      >
-                        <Typography
-                          color='text.secondary'
-                          gutterBottom
-                          variant='overline'
-                        >
-                          Receita Anual
-                        </Typography>
-                        <Typography variant='h4'>
-                          {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                        </Typography>
-                        <Box sx={{
+                  </Stack>
+                  <Divider />
+                  <Stack
+                    alignItems='flex-start'
+                    direction='row'
+                    justifyContent='space-between'
+                    spacing={3}
+                  >
+                    <Stack spacing={1} sx={{ p: 4 }}>
+                      <Typography color='text.secondary' gutterBottom variant='overline'>
+                        Receita Anual
+                      </Typography>
+                      <Typography variant='h4'>
+                        {receivesYear.toLocaleString('pt-br', {
+                          style: 'currency',
+                          currency: 'BRL'
+                        })}
+                      </Typography>
+                      <Box
+                        sx={{
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'space-around'
                         }}
-                        >
-                          <LinearProgress
-                            value={75}
-                            variant='determinate'
-                            color={
-                              receivesPercentageFromYearLimit <= 35
-                                ? 'success'
-                                : receivesPercentageFromYearLimit > 35 && receivesPercentageFromYearLimit <= 75
-                                  ? 'info'
-                                  : receivesPercentageFromYearLimit > 75 && receivesPercentageFromYearLimit <= 100 ? 'error' : ''
-                            }
-                          />
-                          <Typography> {receivesPercentageFromYearLimit}% do teto (R$ 81.000,00) </Typography>
-                        </Box>
-                      </Stack>
+                      >
+                        <LinearProgress
+                          value={75}
+                          variant='determinate'
+                          color={
+                            receivesPercentageFromYearLimit <= 35
+                              ? 'success'
+                              : receivesPercentageFromYearLimit > 35 &&
+                                receivesPercentageFromYearLimit <= 75
+                                ? 'info'
+                                : receivesPercentageFromYearLimit > 75 &&
+                                receivesPercentageFromYearLimit <= 100
+                                  ? 'error'
+                                  : ''
+                          }
+                        />
+                        <Typography>
+                          {' '}
+                          {receivesPercentageFromYearLimit}% do teto (R$ 81.000,00){' '}
+                        </Typography>
+                      </Box>
                     </Stack>
-                  </Card>
-                </Grid>
-              )
-            }
+                  </Stack>
+                </Card>
+              </Grid>
+            )}
           </Grid>
         </Container>
       </Box>
@@ -311,10 +299,6 @@ const Page = () => {
   )
 }
 
-Page.getLayout = (page) => (
-  <DashboardLayout>
-    {page}
-  </DashboardLayout>
-)
+Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>
 
 export default Page

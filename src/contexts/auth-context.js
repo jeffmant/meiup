@@ -4,6 +4,11 @@ import { login, logout, register } from '../pages/api/auth'
 import fetchUserData from 'src/pages/api/user'
 import Cookies from 'js-cookie'
 import { saveCompanyDataToFirestore, getCompanyDocument } from 'src/pages/api/utils'
+import { updateDoc, doc } from 'firebase/firestore'
+import firebaseApp, { db } from 'src/firebase/config'
+import { getAuth } from 'firebase/auth'
+
+const firebaseAuth = getAuth(firebaseApp)
 
 let USER = {}
 let COMPANY = {}
@@ -22,25 +27,22 @@ const initialState = {
 
 const handlers = {
   [HANDLERS.INITIALIZE]: (state, action) => {
-    const { user, company } = action.payload
+    const { user, company } = action.payload || {}
 
     return {
       ...state,
-      ...(
-        // if payload (user) is provided, then is authenticated
-        user
-          ? ({
-              isAuthenticated: true,
-              isLoading: false,
-              user: {
-                ...user,
-                company
-              }
-            })
-          : ({
-              isLoading: false
-            })
-      )
+      ...(user
+        ? {
+            isAuthenticated: true,
+            isLoading: false,
+            user: {
+              ...user,
+              company
+            }
+          }
+        : {
+            isLoading: false
+          })
     }
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
@@ -61,12 +63,25 @@ const handlers = {
       isAuthenticated: false,
       user: null
     }
+  },
+  [HANDLERS.UPDATE_USER_PROFILE]: (state, action) => {
+    const { name, cpf, email, phone } = action.payload
+
+    return {
+      ...state,
+      user: {
+        ...state.user,
+        name,
+        cpf,
+        email,
+        phone
+      }
+    }
   }
 }
 
-const reducer = (state, action) => (
+const reducer = (state, action) =>
   handlers[action.type] ? handlers[action.type](state, action) : state
-)
 
 // The role of this context is to propagate authentication state through the App tree.
 
@@ -111,12 +126,9 @@ export const AuthProvider = (props) => {
     }
   }
 
-  useEffect(
-    () => {
-      initialize()
-    },
-    []
-  )
+  useEffect(() => {
+    initialize()
+  }, [])
 
   const signIn = async (email, password) => {
     try {
@@ -145,12 +157,39 @@ export const AuthProvider = (props) => {
   }
 
   const signOut = () => {
-    logout()
-      .then(
-        dispatch({
-          type: HANDLERS.SIGN_OUT
-        })
-      )
+    logout().then(
+      dispatch({
+        type: HANDLERS.SIGN_OUT
+      })
+    )
+  }
+
+  const updateUserProfile = async (name, cpf, email, phone, user) => {
+    try {
+      const user = firebaseAuth.currentUser
+      // Atualize os campos do documento do usuário no Firestore
+      await updateDoc(doc(db, 'users', user.uid), {
+        name,
+        cpf,
+        email,
+        phone
+      })
+
+      // Atualize o usuário no contexto de autenticação
+      dispatch({
+        type: HANDLERS.UPDATE_USER_PROFILE,
+        payload: {
+          name,
+          cpf,
+          email,
+          phone
+        }
+      })
+
+      console.log('Perfil do usuário atualizado com sucesso!')
+    } catch (error) {
+      console.error('Erro ao atualizar o perfil do usuário:', error)
+    }
   }
 
   return (
@@ -161,7 +200,8 @@ export const AuthProvider = (props) => {
         signUp,
         signOut,
         saveCompanyDataToFirestore,
-        getCompanyDocument
+        getCompanyDocument,
+        updateUserProfile
       }}
     >
       {children}
