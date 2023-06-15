@@ -6,7 +6,6 @@ import {
   Divider,
   Drawer,
   Stack,
-  Typography,
   useMediaQuery
 } from '@mui/material'
 import { Logo } from 'src/components/logo'
@@ -48,9 +47,8 @@ export const SideNav = (props) => {
               width: 32
             }}
           >
-            <Logo />
+            <Logo dark />
           </Box>
-          <Typography sx={{ ml: 2 }}>meumei</Typography>
         </Box>
         <Divider sx={{ borderColor: 'neutral.700' }} />
         <Box

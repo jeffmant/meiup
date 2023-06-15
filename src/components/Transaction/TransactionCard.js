@@ -3,10 +3,10 @@ import XMarkIcon from '@heroicons/react/24/solid/XMarkIcon'
 import { Avatar, Card, CardContent, SvgIcon, Tooltip, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 
-export const Invoice = ({
-  number,
+export const TransactionCard = ({
+  description,
   amount,
-  customer: { name: customerName },
+  partyName,
   status,
   createdAt
 }) => {
@@ -31,13 +31,23 @@ export const Invoice = ({
         >
           <Stack spacing={1}>
             <Typography color='text.secondary'>
-              # {number}
+              {description}
             </Typography>
+          </Stack>
+          <Stack spacing={1}>
+
             <Typography variant='h6'>
-              {customerName}
+              {partyName}
             </Typography>
+          </Stack>
+          <Stack spacing={1}>
             <Typography variant='p'>
               R$ {amount}
+            </Typography>
+          </Stack>
+          <Stack spacing={1}>
+            <Typography variant='p'>
+              {createdAt}
             </Typography>
           </Stack>
           <Avatar

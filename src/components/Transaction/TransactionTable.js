@@ -1,27 +1,15 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { Box } from '@mui/system'
 import { format } from 'date-fns'
-import { SeverityPill } from '../severity-pill'
 
-const statusMap = {
-  emited: {
-    color: 'success',
-    displayName: 'Emitida'
-  },
-  canceled: {
-    color: 'error',
-    displayName: 'Cancelada'
-  }
-}
-
-export const InvoiceTable = ({ invoices }) => {
+export const TransactionTable = ({ transactions }) => {
   return (
     <Box sx={{ minWidth: 800 }}>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>
-              NFS-e
+              Descrição
             </TableCell>
             <TableCell>
               Cliente
@@ -32,37 +20,29 @@ export const InvoiceTable = ({ invoices }) => {
             <TableCell sortDirection='desc'>
               Data
             </TableCell>
-            <TableCell>
-              Status da NFS
-            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {invoices.map((invoice) => {
-            const createdAt = format(invoice.createdAt, 'dd/MM/yyyy')
+          {transactions.map((transaction) => {
+            const createdAt = format(transaction.createdAt, 'dd/MM/yyyy')
 
             return (
               <TableRow
                 hover
-                key={invoice.id}
+                key={transaction.id}
                 sx={{ '&:hover': { cursor: 'pointer' } }}
               >
                 <TableCell>
-                  {invoice.ref}
+                  {transaction.description}
                 </TableCell>
                 <TableCell>
-                  {invoice.customer.name}
+                  {transaction.partyName}
                 </TableCell>
                 <TableCell>
-                  {`R$${invoice.amount}`}
+                  {`R$${transaction.amount}`}
                 </TableCell>
                 <TableCell>
                   {createdAt}
-                </TableCell>
-                <TableCell>
-                  <SeverityPill color={statusMap[invoice.status].color}>
-                    {statusMap[invoice.status].displayName}
-                  </SeverityPill>
                 </TableCell>
               </TableRow>
             )

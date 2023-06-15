@@ -1,83 +1,46 @@
-import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon'
-import CogIcon from '@heroicons/react/24/solid/CogIcon'
-import LockClosedIcon from '@heroicons/react/24/solid/LockClosedIcon'
-import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon'
-import UserIcon from '@heroicons/react/24/solid/UserIcon'
-import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon'
-import UsersIcon from '@heroicons/react/24/solid/UsersIcon'
-import XCircleIcon from '@heroicons/react/24/solid/XCircleIcon'
+import RocketLaunchIcon from '@heroicons/react/24/solid/RocketLaunchIcon'
+import ArchiveBoxIcon from '@heroicons/react/24/solid/ArchiveBoxIcon'
+import BanknotesIcon from '@heroicons/react/24/solid/BanknotesIcon'
+import BookOpenIcon from '@heroicons/react/24/solid/BookOpenIcon'
 import { SvgIcon } from '@mui/material'
 
 export const items = [
   {
-    title: 'Overview',
+    title: 'Transações',
     path: '/',
     icon: (
       <SvgIcon fontSize='small'>
-        <ChartBarIcon />
+        <RocketLaunchIcon />
       </SvgIcon>
     )
   },
   {
-    title: 'Customers',
-    path: '/customers',
+    title: 'NFS-e (em breve)',
+    path: '/nfse',
+    disabled: true,
     icon: (
       <SvgIcon fontSize='small'>
-        <UsersIcon />
+        <ArchiveBoxIcon />
       </SvgIcon>
     )
   },
   {
-    title: 'Companies',
-    path: '/companies',
+    title: 'DAS (em breve)',
+    path: '/das',
+    disabled: true,
     icon: (
       <SvgIcon fontSize='small'>
-        <ShoppingBagIcon />
+        <BanknotesIcon />
       </SvgIcon>
     )
   },
   {
-    title: 'Account',
-    path: '/account',
+    title: 'DASN (em breve)',
+    path: '/dasn',
+    disabled: true,
     icon: (
       <SvgIcon fontSize='small'>
-        <UserIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Settings',
-    path: '/settings',
-    icon: (
-      <SvgIcon fontSize='small'>
-        <CogIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Login',
-    path: '/auth/login',
-    icon: (
-      <SvgIcon fontSize='small'>
-        <LockClosedIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Register',
-    path: '/auth/register',
-    icon: (
-      <SvgIcon fontSize='small'>
-        <UserPlusIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Error',
-    path: '/404',
-    icon: (
-      <SvgIcon fontSize='small'>
-        <XCircleIcon />
+        <BookOpenIcon />
       </SvgIcon>
     )
   }
