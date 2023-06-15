@@ -24,7 +24,7 @@ export const TransactionTable = ({ transactions }) => {
         </TableHead>
         <TableBody>
           {transactions.map((transaction) => {
-            const createdAt = format(transaction.createdAt, 'dd/MM/yyyy')
+            const createdAt = format(new Date(transaction.createdAt), 'dd/MM/yyyy')
 
             return (
               <TableRow
@@ -36,7 +36,7 @@ export const TransactionTable = ({ transactions }) => {
                   {transaction.description}
                 </TableCell>
                 <TableCell>
-                  {transaction.partyName}
+                  {transaction.party}
                 </TableCell>
                 <TableCell>
                   {`R$${transaction.amount}`}

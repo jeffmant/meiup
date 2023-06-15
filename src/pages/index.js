@@ -18,69 +18,8 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
 import { Stack } from '@mui/system'
 import { TransactionTable } from 'src/components/Transaction/TransactionTable'
-import { useState } from 'react'
-
-const ordersMock = [
-  {
-    id: 'f69f88012978187a6c12897f',
-    ref: 'DEV1049',
-    description: 'lorem ipsum',
-    amount: 30.5,
-    partyName: 'Ekaterina Tankova',
-    createdAt: 1555016400000,
-    status: 'emited'
-  },
-  {
-    id: '9eaa1c7dd4433f413c308ce2',
-    ref: 'DEV1048',
-    description: 'lorem ipsum',
-    amount: 25.1,
-    partyName: 'Cao Yu',
-    createdAt: 1555016400000,
-    status: 'emited'
-  },
-  {
-    id: '01a5230c811bd04996ce7c13',
-    ref: 'DEV1047',
-    description: 'lorem ipsum',
-    amount: 10.99,
-    partyName: 'Alexa Richardson',
-    createdAt: 1554930000000,
-    status: 'canceled'
-  },
-  {
-    id: '1f4e1bd0a87cea23cdb83d18',
-    ref: 'DEV1046',
-    description: 'lorem ipsum',
-    amount: 96.43,
-    partyName: 'Anje Keizer',
-    createdAt: 1554757200000,
-    status: 'emited'
-  },
-  {
-    id: '9f974f239d29ede969367103',
-    ref: 'DEV1045',
-    description: 'lorem ipsum',
-    amount: 32.54,
-    partyName: 'Clarke Gillebert',
-    createdAt: 1554670800000,
-    status: 'emited'
-  },
-  {
-    id: 'ffc83c1560ec2f66a1c05596',
-    ref: 'DEV1044',
-    description: 'lorem ipsum',
-    amount: 16.76,
-    partyName: 'Adam Denisov',
-    createdAt: 1554670800000,
-    status: 'emited'
-  }
-]
-
-const useTransactions = () => ({
-  revenues: ordersMock.slice(0, 3),
-  costs: ordersMock.slice(3)
-})
+import { useEffect, useState } from 'react'
+import { getCompanyTransactions } from './api/transaction'
 
 const receivesMonth = 15000
 const receivesYear = 63000
@@ -88,11 +27,24 @@ const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(
 
 const Page = () => {
   const [transactionType, setTransactionType] = useState('revenue')
+  const [companyId] = useState('36255676000173')
+  const [transactions, setTransactions] = useState([])
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
-  const { revenues, costs } = useTransactions()
+
+  async function getTransactions () {
+    const transactions = await getCompanyTransactions({ companyId, type: transactionType })
+    console.log(transactions)
+    setTransactions(transactions)
+    return transactions
+  }
+
+  useEffect(() => {
+    getTransactions().then((resp) => console.log(resp)).catch(console.error)
+  }, [companyId, transactionType])
 
   const handleTransactionType = async () => {
     setTransactionType(transactionType === 'revenue' ? 'cost' : 'revenue')
+    await getTransactions()
   }
 
   return (
@@ -218,8 +170,8 @@ const Page = () => {
                 <CardContent>
                   {
                     lgUp
-                      ? <TransactionTable transactions={revenues} />
-                      : <TransactionCardList transactions={costs} />
+                      ? <TransactionTable transactions={transactions || []} />
+                      : <TransactionCardList transactions={transactions || []} />
                   }
                 </CardContent>
 
@@ -231,7 +183,7 @@ const Page = () => {
                     }}
                   >
                     <Pagination
-                      count={ordersMock.length / 2}
+                      count={2}
                       size='small'
                     />
                   </Box>
