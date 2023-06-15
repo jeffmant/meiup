@@ -32,9 +32,12 @@ export const AccountProfileDetails = () => {
       phone: Yup.string().required('Telefone é obrigatório')
     }),
     onSubmit: async (values) => {
-      // Chame sua função de atualização de usuário aqui
-      await updateUserProfile(values.name, values.cpf, values.email, values.phone)
-      console.log(values)
+      try {
+        await updateUserProfile(values.name, values.cpf, values.email, values.phone)
+        console.log('Informações de cadastro atualizadas com sucesso!')
+      } catch (error) {
+        console.log('Houve um erro ao atualizar o cadastro:', error)
+      }
     }
   })
 
@@ -54,7 +57,7 @@ export const AccountProfileDetails = () => {
                   onChange={formik.handleChange}
                   disabled
                   value={formik.values.fantasyName}
-                  error={formik.touched.fantasyName && formik.errors.fantasyName} // Exibe o erro de validação, se houver
+                  error={formik.touched.fantasyName && formik.errors.fantasyName}
                   helperText={formik.touched.fantasyName && formik.errors.fantasyName}
                   readOnly
                 />

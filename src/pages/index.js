@@ -19,7 +19,6 @@ import { Stack } from '@mui/system'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import { InvoiceTable } from 'src/components/Invoice/invoiceTable'
-import { useAuth } from 'src/hooks/use-auth'
 
 const now = new Date()
 const months = [
@@ -105,11 +104,6 @@ const receivesYear = 63000
 const receivesPercentageFromYearLimit = ((receivesYear * 100) / 81000).toFixed(2)
 
 const Page = () => {
-  const { user } = useAuth()
-
-  console.log('auth user:')
-  console.log(user)
-
   const router = useRouter()
   const isAuthenticated = Cookies.get('authenticated')
   // TODO: Verificar questão do cookie ou inicializar firebase-admin no backend para poder verificar o cookie

@@ -20,27 +20,14 @@ const Page = () => {
       submit: null
     },
     validationSchema: Yup.object({
-      email: Yup
-        .string()
-        .email('Must be a valid email')
-        .max(255)
-        .required('Email is required'),
-      name: Yup
-        .string()
-        .max(255)
-        .required('Name is required'),
-      password: Yup
-        .string()
-        .max(255)
-        .required('Password is required'),
-      confirmPassword: Yup
-        .string()
-        .max(255)
-        .required('ConfirmPassword is required')
+      email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+      name: Yup.string().max(255).required('Name is required'),
+      password: Yup.string().max(255).required('Password is required'),
+      confirmPassword: Yup.string().max(255).required('ConfirmPassword is required')
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signUp(values.cnpj, values.email, values.name, values.password) // Metodo de registro da plataforma
+        await auth.signUp(values.cnpj, values.email, values.name, values.password)
         router.push('/auth/login') // Retorna à pagina de login para poder realizar a autenticação dentro da plataforma
       } catch (err) {
         helpers.setStatus({ success: false })
@@ -53,9 +40,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>
-          criar conta | meumei
-        </title>
+        <title>criar conta | meumei</title>
       </Head>
       <Box
         sx={{
@@ -74,18 +59,11 @@ const Page = () => {
           }}
         >
           <div>
-
-            <Typography
-              variant='h5'
-              sx={{ py: 4 }}
-            >
+            <Typography variant='h5' sx={{ py: 4 }}>
               você vai se juntar ao time? ;)
             </Typography>
 
-            <form
-              noValidate
-              onSubmit={formik.handleSubmit}
-            >
+            <form noValidate onSubmit={formik.handleSubmit}>
               <Stack spacing={3}>
                 <TextField
                   error={!!(formik.touched.cnpj && formik.errors.cnpj)}
@@ -142,11 +120,7 @@ const Page = () => {
                 />
               </Stack>
               {formik.errors.submit && (
-                <Typography
-                  color='error'
-                  sx={{ mt: 3 }}
-                  variant='body2'
-                >
+                <Typography color='error' sx={{ mt: 3 }} variant='body2'>
                   {formik.errors.submit}
                 </Typography>
               )}
@@ -168,7 +142,6 @@ const Page = () => {
               >
                 Avançar
               </Button>
-
             </form>
             <Box
               sx={{
@@ -178,12 +151,7 @@ const Page = () => {
                 justifyContent: 'flex-end'
               }}
             >
-              <Link
-                component={NextLink}
-                href='/auth/login'
-                underline='hover'
-                variant='subtitle2'
-              >
+              <Link component={NextLink} href='/auth/login' underline='hover' variant='subtitle2'>
                 já tenho conta, quero fazer login
               </Link>
             </Box>
@@ -194,10 +162,6 @@ const Page = () => {
   )
 }
 
-Page.getLayout = (page) => (
-  <AuthLayout>
-    {page}
-  </AuthLayout>
-)
+Page.getLayout = (page) => <AuthLayout>{page}</AuthLayout>
 
 export default Page

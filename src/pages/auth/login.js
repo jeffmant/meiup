@@ -3,14 +3,7 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import {
-  Box,
-  Button,
-  Link,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material'
+import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material'
 import { useAuth } from 'src/hooks/use-auth'
 import { Layout as AuthLayout } from 'src/layouts/auth/layout'
 
@@ -24,15 +17,8 @@ const Page = () => {
       submit: null
     },
     validationSchema: Yup.object({
-      email: Yup
-        .string()
-        .email('Must be a valid email')
-        .max(255)
-        .required('Email is required'),
-      password: Yup
-        .string()
-        .max(255)
-        .required('Password is required')
+      email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+      password: Yup.string().max(255).required('Password is required')
     }),
     onSubmit: async (values, helpers) => {
       try {
@@ -41,7 +27,9 @@ const Page = () => {
         router.push('/')
       } catch (err) {
         helpers.setStatus({ success: false })
-        helpers.setErrors({ submit: 'Ocorreu um erro durante o login. Por favor, tente novamente.' })
+        helpers.setErrors({
+          submit: 'Ocorreu um erro durante o login. Por favor, tente novamente.'
+        })
         helpers.setSubmitting(false)
         console.log(err)
       }
@@ -51,9 +39,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>
-          entrar | meumei
-        </title>
+        <title>entrar | meumei</title>
       </Head>
       <Box
         sx={{
@@ -72,17 +58,11 @@ const Page = () => {
             width: '100%'
           }}
         >
-          <Typography
-            variant='h4'
-            sx={{ py: 4 }}
-          >
+          <Typography variant='h4' sx={{ py: 4 }}>
             olá mei :)
           </Typography>
           <div>
-            <form
-              noValidate
-              onSubmit={formik.handleSubmit}
-            >
+            <form noValidate onSubmit={formik.handleSubmit}>
               <Stack spacing={3}>
                 <TextField
                   error={!!(formik.touched.email && formik.errors.email)}
@@ -108,21 +88,11 @@ const Page = () => {
                 />
               </Stack>
               {formik.errors.submit && (
-                <Typography
-                  color='error'
-                  sx={{ mt: 3 }}
-                  variant='body2'
-                >
+                <Typography color='error' sx={{ mt: 3 }} variant='body2'>
                   {formik.errors.submit}
                 </Typography>
               )}
-              <Button
-                fullWidth
-                size='large'
-                sx={{ mt: 3 }}
-                type='submit'
-                variant='contained'
-              >
+              <Button fullWidth size='large' sx={{ mt: 3 }} type='submit' variant='contained'>
                 Entrar
               </Button>
             </form>
@@ -134,12 +104,7 @@ const Page = () => {
                 justifyContent: 'space-between'
               }}
             >
-              <Link
-                component={NextLink}
-                href='/auth/forgot'
-                underline='hover'
-                variant='subtitle2'
-              >
+              <Link component={NextLink} href='/auth/forgot' underline='hover' variant='subtitle2'>
                 esqueci minha senha
               </Link>
               <Link
@@ -158,10 +123,6 @@ const Page = () => {
   )
 }
 
-Page.getLayout = (page) => (
-  <AuthLayout>
-    {page}
-  </AuthLayout>
-)
+Page.getLayout = (page) => <AuthLayout>{page}</AuthLayout>
 
 export default Page

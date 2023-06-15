@@ -167,6 +167,7 @@ export const AuthProvider = (props) => {
   const updateUserProfile = async (name, cpf, email, phone, user) => {
     try {
       const user = firebaseAuth.currentUser
+
       // Atualize os campos do documento do usuário no Firestore
       await updateDoc(doc(db, 'users', user.uid), {
         name,
