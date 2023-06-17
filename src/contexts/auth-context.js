@@ -1,17 +1,14 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { login, logout, register } from '../pages/api/auth'
-import fetchUserData from 'src/pages/api/user'
 import Cookies from 'js-cookie'
-import { saveCompanyDataToFirestore, getCompanyDocument } from 'src/pages/api/utils'
+import { saveCompanyDataToFirestore, getCompanyByUserId } from 'src/pages/api/utils'
 import { updateDoc, doc } from 'firebase/firestore'
 import firebaseApp, { db } from 'src/firebase/config'
 import { getAuth } from 'firebase/auth'
+import jwtDecode from 'jwt-decode'
 
 const firebaseAuth = getAuth(firebaseApp)
-
-let USER = {}
-let COMPANY = {}
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -27,18 +24,14 @@ const initialState = {
 
 const handlers = {
   [HANDLERS.INITIALIZE]: (state, action) => {
-    const { user, company } = action.payload || {}
-
+    const { user } = action.payload || {}
     return {
       ...state,
       ...(user
         ? {
             isAuthenticated: true,
             isLoading: false,
-            user: {
-              ...user,
-              company
-            }
+            user
           }
         : {
             isLoading: false
@@ -100,29 +93,45 @@ export const AuthProvider = (props) => {
 
     initialized.current = true
 
-    let isAuthenticated = false
+    let loggedUser = null
+    let userCompany = null
 
     try {
-      isAuthenticated = Cookies.get('authenticated') === 'true'
-    } catch (err) {
-      console.error(err)
-    }
+      const accessToken = Cookies.get('accessToken')
 
-    if (isAuthenticated) {
-      const user = USER
-      const company = COMPANY
-
-      dispatch({
-        type: HANDLERS.INITIALIZE,
-        payload: {
-          user,
-          company
-        }
-      })
-    } else {
+      if (accessToken) {
+        const decodedAccessToken = jwtDecode(accessToken)
+        firebaseAuth.onAuthStateChanged(async (user) => {
+          if (user && user.uid === decodedAccessToken?.user_id) {
+            loggedUser = user
+            userCompany = await getCompanyByUserId({ userId: loggedUser.uid })
+            dispatch({
+              type: HANDLERS.INITIALIZE,
+              payload: {
+                user: loggedUser
+                  ? {
+                      id: loggedUser.uid,
+                      accessToken: loggedUser.accessToken,
+                      name: loggedUser.displayName,
+                      email: loggedUser.email,
+                      emailVerified: loggedUser.emailVerified,
+                      phone: loggedUser.phoneNumber,
+                      avatar: loggedUser.photoURL,
+                      company: userCompany
+                    }
+                  : null
+              }
+            })
+          } else {
+            Cookies.remove('accessToken')
+          }
+        })
+      }
       dispatch({
         type: HANDLERS.INITIALIZE
       })
+    } catch (err) {
+      console.error(err)
     }
   }
 
@@ -130,30 +139,73 @@ export const AuthProvider = (props) => {
     initialize()
   }, [])
 
-  const signIn = async (email, password) => {
+  const signIn = async ({ email, password }) => {
     try {
-      const userResult = await login({ email, password })
-      const userData = await fetchUserData(userResult.result.user)
-      const company = await getCompanyDocument(userData.company)
+      const { user: loggedUser } = await login({ email, password })
 
-      COMPANY = company
-      USER = userData
-      const user = userData
+      const company = await getCompanyByUserId({ userId: loggedUser.uid })
+
+      if (!company) {
+        throw new Error('Empresa não está cadastrada')
+      }
+
+      const { uid: id, accessToken, displayName: name, email: loggedUserEmail, emailVerified, phoneNumber: phone, photoURL: avatar } = loggedUser
+
+      Cookies.set('accessToken', accessToken)
 
       dispatch({
         type: HANDLERS.SIGN_IN,
         payload: {
-          user,
-          company
+          user: {
+            id,
+            accessToken,
+            name,
+            email: loggedUserEmail,
+            emailVerified,
+            phone,
+            avatar,
+            company
+          }
         }
       })
     } catch (error) {
-      throw new Error('Please check your email and password')
+      console.error(error)
+      return error
     }
   }
 
-  const signUp = async (cnpj, email, name, password) => {
-    register(cnpj, email, name, password)
+  const signUp = async ({ email, password, companyData }) => {
+    const registeredUser = await register({ email, password, companyData })
+
+    if (registeredUser) {
+      const company = await getCompanyByUserId({ userId: registeredUser.uid })
+
+      if (!company) {
+        throw new Error('Empresa não está cadastrada')
+      }
+
+      const { uid: id, accessToken, displayName: name, email, emailVerified, phoneNumber: phone, photoURL: avatar } = registeredUser
+
+      Cookies.set('accessToken', accessToken)
+
+      dispatch({
+        type: HANDLERS.SIGN_IN,
+        payload: {
+          user: {
+            id,
+            accessToken,
+            name,
+            email,
+            emailVerified,
+            phone,
+            avatar,
+            company
+          }
+        }
+      })
+    } else {
+      throw new Error('Não foi possível cadastrar MEI')
+    }
   }
 
   const signOut = () => {
@@ -164,26 +216,24 @@ export const AuthProvider = (props) => {
     )
   }
 
-  const updateUserProfile = async (name, cpf, email, phone, user) => {
+  const updateUserProfile = async ({ companyId, companyData }) => {
     try {
-      const user = firebaseAuth.currentUser
+      const updatedCompany = await updateDoc(doc(db, 'companies', companyId), companyData)
+      console.log('updatedCompany -> ', updatedCompany)
+      const loggedUser = firebaseAuth.currentUser
 
-      // Atualize os campos do documento do usuário no Firestore
-      await updateDoc(doc(db, 'users', user.uid), {
-        name,
-        cpf,
-        email,
-        phone
-      })
+      const { accessToken, displayName: name, email, emailVerified, phoneNumber: phone, photoURL: avatar } = loggedUser
 
-      // Atualize o usuário no contexto de autenticação
       dispatch({
         type: HANDLERS.UPDATE_USER_PROFILE,
         payload: {
+          accessToken,
           name,
-          cpf,
           email,
-          phone
+          emailVerified,
+          phone,
+          avatar,
+          company: updatedCompany
         }
       })
 
@@ -201,7 +251,6 @@ export const AuthProvider = (props) => {
         signUp,
         signOut,
         saveCompanyDataToFirestore,
-        getCompanyDocument,
         updateUserProfile
       }}
     >
@@ -211,7 +260,8 @@ export const AuthProvider = (props) => {
 }
 
 AuthProvider.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
+  loggedUser: PropTypes.object
 }
 
 export const AuthConsumer = AuthContext.Consumer
