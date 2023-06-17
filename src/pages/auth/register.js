@@ -3,33 +3,80 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Link, Stack, TextField, Typography } from '@mui/material'
 import { useAuth } from 'src/hooks/use-auth'
 import { Layout as AuthLayout } from 'src/layouts/auth/layout'
-import { cnpjMask } from 'src/utils/masks'
+import { cnpjMask, removeMask } from 'src/utils/masks'
+import { getExternalCompanyInfoByCNPJ } from '../api/company'
+import { useState } from 'react'
+import { getCompanyByCnpj } from '../api/utils'
 
 const Page = () => {
   const router = useRouter()
   const auth = useAuth()
+
+  if (auth.user) router.push('/')
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [cnpjIsValid, setCnpjIsValid] = useState(false)
+  const [companyData, setCompanyData] = useState(null)
+
+  const validateCNPJ = async ({ cnpj }) => {
+    const companyAlreadyExists = await getCompanyByCnpj({ cnpj })
+
+    if (companyAlreadyExists) {
+      formik.values.cnpj = ''
+      setIsLoading(false)
+      window.alert('Este MEI já está cadastrado. Vamos fazer o login?')
+      router.push('/auth/login')
+    } else {
+      const { error, success, data: company } = await getExternalCompanyInfoByCNPJ({ cnpj })
+
+      if (error) {
+        formik.values.cnpj = ''
+        setIsLoading(false)
+        console.error(error)
+        window.alert(error.message)
+      } else {
+        setCnpjIsValid(success)
+        setCompanyData(company)
+        formik.values.email = company.email
+        formik.values.name = company.fantasyName
+        setIsLoading(false)
+      }
+    }
+  }
+
   const formik = useFormik({
     initialValues: {
       cnpj: '',
       email: '',
       name: '',
       password: '',
+      confirmPassword: '',
       submit: null
     },
     validationSchema: Yup.object({
-      email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-      name: Yup.string().max(255).required('Name is required'),
-      password: Yup.string().max(255).required('Password is required'),
-      confirmPassword: Yup.string().max(255).required('ConfirmPassword is required')
+      cnpj: Yup.string().required('Digite o CNPJ do seu MEI'),
+      email: Yup.string().email('Eita! Este Email é inválido').max(255).required('Ops! Esqueceu do Email'),
+      password: Yup.string().min(8, 'Mínimo 8 dígitos').required('Ops! Esqueceu da Senha'),
+      confirmPassword: Yup.string().min(8, 'Mínimo 8 dígitos').required('Ops! Esqueceu de Confirmar a Senha').oneOf([Yup.ref('password'), null], 'As senhas precisam ser iguais')
     }),
     onSubmit: async (values, helpers) => {
+      setIsLoading(true)
       try {
-        await auth.signUp(values.cnpj, values.email, values.name, values.password)
-        router.push('/auth/login') // Retorna à pagina de login para poder realizar a autenticação dentro da plataforma
+        auth.signUp({
+          email: values.email,
+          password: values.password,
+          companyData
+        }).then(() => {
+          setIsLoading(false)
+          router.push('/')
+        })
+          .catch(error => { throw new Error(error) })
       } catch (err) {
+        setIsLoading(false)
+        window.alert(err.message)
         helpers.setStatus({ success: false })
         helpers.setErrors({ submit: err.message })
         helpers.setSubmitting(false)
@@ -59,11 +106,17 @@ const Page = () => {
           }}
         >
           <div>
-            <Typography variant='h5' sx={{ py: 4 }}>
+            <Typography
+              variant='h5'
+              sx={{ py: 4 }}
+            >
               você vai se juntar ao time? ;)
             </Typography>
 
-            <form noValidate onSubmit={formik.handleSubmit}>
+            <form
+              noValidate
+              onSubmit={formik.handleSubmit}
+            >
               <Stack spacing={3}>
                 <TextField
                   error={!!(formik.touched.cnpj && formik.errors.cnpj)}
@@ -71,77 +124,111 @@ const Page = () => {
                   helperText={formik.touched.cnpj && formik.errors.cnpj}
                   label='CNPJ'
                   name='cnpj'
+                  disabled={cnpjIsValid}
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={cnpjMask(formik.values.cnpj || '')}
                 />
-                <TextField
-                  error={!!(formik.touched.name && formik.errors.name)}
-                  fullWidth
-                  helperText={formik.touched.name && formik.errors.name}
-                  label='Nome'
-                  name='name'
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.name}
-                />
-                <TextField
-                  error={!!(formik.touched.email && formik.errors.email)}
-                  fullWidth
-                  helperText={formik.touched.email && formik.errors.email}
-                  label='Email'
-                  name='email'
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type='email'
-                  value={formik.values.email}
-                />
-                <TextField
-                  error={!!(formik.touched.password && formik.errors.password)}
-                  fullWidth
-                  helperText={formik.touched.password && formik.errors.password}
-                  label='Senha'
-                  name='password'
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type='password'
-                  value={formik.values.password}
-                />
-                <TextField
-                  error={!!(formik.touched.confirmPassword && formik.errors.confirmPassword)}
-                  fullWidth
-                  helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
-                  label='Confirmar Senha'
-                  name='confirmPassword'
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type='password'
-                  value={formik.values.confirmPassword}
-                />
+                {
+                  cnpjIsValid && (
+                    <>
+                      <TextField
+                        error={!!(formik.touched.name && formik.errors.name)}
+                        fullWidth
+                        helperText={formik.touched.name && formik.errors.name}
+                        label='Nome Fantasia'
+                        name='name'
+                        disabled
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.name}
+                      />
+                      <TextField
+                        error={!!(formik.touched.email && formik.errors.email)}
+                        fullWidth
+                        helperText={formik.touched.email && formik.errors.email}
+                        label='Email'
+                        name='email'
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        type='email'
+                        value={formik.values.email.toLowerCase()}
+                      />
+                      <TextField
+                        error={!!(formik.touched.password && formik.errors.password)}
+                        fullWidth
+                        helperText={formik.touched.password && formik.errors.password}
+                        label='Senha'
+                        name='password'
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        type='password'
+                        value={formik.values.password}
+                      />
+                      <TextField
+                        error={!!(formik.touched.confirmPassword && formik.errors.confirmPassword)}
+                        fullWidth
+                        helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                        label='Confirmar Senha'
+                        name='confirmPassword'
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        type='password'
+                        value={formik.values.confirmPassword}
+                      />
+                    </>
+                  )
+                }
               </Stack>
               {formik.errors.submit && (
-                <Typography color='error' sx={{ mt: 3 }} variant='body2'>
+                <Typography
+                  color='error'
+                  sx={{ mt: 3 }}
+                  variant='body2'
+                >
                   {formik.errors.submit}
                 </Typography>
               )}
-              <Button
-                disabled={
-                  !formik.values.cnpj ||
-                  formik.values.cnpj.length < 18 ||
-                  !formik.values.email ||
-                  !formik.values.name ||
-                  !formik.values.password ||
-                  !formik.values.confirmPassword ||
-                  formik.values.password !== formik.values.confirmPassword
-                }
-                fullWidth
-                size='large'
-                sx={{ mt: 3 }}
-                type='submit'
-                variant='contained'
-              >
-                Avançar
-              </Button>
+              {
+                !cnpjIsValid
+                  ? (
+                    <Button
+                      disabled={!formik.values.cnpj || isLoading}
+                      fullWidth
+                      size='large'
+                      sx={{ mt: 3 }}
+                      variant='contained'
+                      onClick={async () => {
+                        setIsLoading(true)
+                        await validateCNPJ({ cnpj: removeMask(formik.values.cnpj) })
+                      }}
+                    >
+                      {
+                        isLoading ? <CircularProgress color='primary' /> : 'Avançar'
+                      }
+                    </Button>
+                    )
+                  : (
+                    <Button
+                      disabled={
+                    !formik.values.cnpj ||
+                    formik.values.cnpj.length < 18 ||
+                    !formik.values.email ||
+                    !formik.values.name ||
+                    isLoading
+                  }
+                      fullWidth
+                      size='large'
+                      sx={{ mt: 3 }}
+                      type='submit'
+                      variant='contained'
+                    >
+                      {
+                        isLoading ? <CircularProgress color='primary' /> : 'Criar Conta'
+                      }
+                    </Button>
+                    )
+              }
             </form>
             <Box
               sx={{
@@ -150,10 +237,15 @@ const Page = () => {
                 display: 'flex',
                 justifyContent: 'flex-end'
               }}
-            >
-              <Link component={NextLink} href='/auth/login' underline='hover' variant='subtitle2'>
+            > {!isLoading && !cnpjIsValid &&
+              <Link
+                component={NextLink}
+                href='/auth/login'
+                underline='hover'
+                variant='subtitle2'
+              >
                 já tenho conta, quero fazer login
-              </Link>
+              </Link>}
             </Box>
           </div>
         </Box>
