@@ -10,6 +10,9 @@ import { Layout as AuthLayout } from 'src/layouts/auth/layout'
 const Page = () => {
   const router = useRouter()
   const auth = useAuth()
+
+  if (auth.user) router.push('/')
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -22,8 +25,7 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.email, values.password) // Login no Firebase.auth
-        console.log('Page Login ok.')
+        await auth.signIn({ email: values.email, password: values.password })
         router.push('/')
       } catch (err) {
         helpers.setStatus({ success: false })
@@ -58,11 +60,17 @@ const Page = () => {
             width: '100%'
           }}
         >
-          <Typography variant='h4' sx={{ py: 4 }}>
+          <Typography
+            variant='h4'
+            sx={{ py: 4 }}
+          >
             olá mei :)
           </Typography>
           <div>
-            <form noValidate onSubmit={formik.handleSubmit}>
+            <form
+              noValidate
+              onSubmit={formik.handleSubmit}
+            >
               <Stack spacing={3}>
                 <TextField
                   error={!!(formik.touched.email && formik.errors.email)}
@@ -88,11 +96,21 @@ const Page = () => {
                 />
               </Stack>
               {formik.errors.submit && (
-                <Typography color='error' sx={{ mt: 3 }} variant='body2'>
+                <Typography
+                  color='error'
+                  sx={{ mt: 3 }}
+                  variant='body2'
+                >
                   {formik.errors.submit}
                 </Typography>
               )}
-              <Button fullWidth size='large' sx={{ mt: 3 }} type='submit' variant='contained'>
+              <Button
+                fullWidth
+                size='large'
+                sx={{ mt: 3 }}
+                type='submit'
+                variant='contained'
+              >
                 Entrar
               </Button>
             </form>
@@ -104,7 +122,12 @@ const Page = () => {
                 justifyContent: 'space-between'
               }}
             >
-              <Link component={NextLink} href='/auth/forgot' underline='hover' variant='subtitle2'>
+              <Link
+                component={NextLink}
+                href='/auth/forgot'
+                underline='hover'
+                variant='subtitle2'
+              >
                 esqueci minha senha
               </Link>
               <Link
