@@ -11,14 +11,14 @@ const AccountPage = () => (
     <Grid
       xs={12}
       md={6}
-      lg={4}
+      lg={5}
     >
       <AccountProfile />
     </Grid>
     <Grid
       xs={12}
       md={6}
-      lg={8}
+      lg={7}
     >
       <AccountProfileDetails />
     </Grid>

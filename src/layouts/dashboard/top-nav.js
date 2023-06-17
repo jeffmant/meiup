@@ -1,13 +1,5 @@
 import PropTypes from 'prop-types'
-import {
-  Avatar,
-  Box,
-  IconButton,
-  Stack,
-  SvgIcon,
-  Typography,
-  useMediaQuery
-} from '@mui/material'
+import { Avatar, Box, IconButton, Stack, SvgIcon, Typography, useMediaQuery } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { usePopover } from 'src/hooks/use-popover'
 import { AccountPopover } from './account-popover'
@@ -49,11 +41,7 @@ export const TopNav = (props) => {
             px: 2
           }}
         >
-          <Stack
-            alignItems='center'
-            direction='row'
-            spacing={2}
-          >
+          <Stack alignItems='center' direction='row' spacing={2}>
             {!lgUp && (
               <IconButton onClick={onNavOpen}>
                 <SvgIcon fontSize='small'>
@@ -62,11 +50,7 @@ export const TopNav = (props) => {
               </IconButton>
             )}
           </Stack>
-          <Stack
-            alignItems='center'
-            direction='row'
-            spacing={2}
-          >
+          <Stack alignItems='center' direction='row' spacing={2}>
             <Typography>{lgUp && user?.name}</Typography>
             <Avatar
               onClick={accountPopover.handleOpen}

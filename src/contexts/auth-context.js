@@ -1,21 +1,17 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { signin } from 'src/pages/api/user'
+import { login, logout, register } from '../pages/api/auth'
+import fetchUserData from 'src/pages/api/user'
+import Cookies from 'js-cookie'
+import { saveCompanyDataToFirestore, getCompanyDocument } from 'src/pages/api/utils'
+import { updateDoc, doc } from 'firebase/firestore'
+import firebaseApp, { db } from 'src/firebase/config'
+import { getAuth } from 'firebase/auth'
 
-const USER = {
-  id: '5e86809283e28b96d2d38537',
-  avatar: 'https://github.com/jeffmant.png',
-  phone: '11936187180',
-  name: 'Jefferson Mantovani',
-  email: 'jgsmantovani@gmail.com',
-  cpf: '08468678937',
-  company: {
-    id: '7f86809283e28b96d2d38598',
-    cnpj: '36255676000173',
-    name: 'Jefferson Gabriel Silva Mantovani 08468678937',
-    fantasyName: 'BOAZ Tecnologias'
-  }
-}
+const firebaseAuth = getAuth(firebaseApp)
+
+let USER = {}
+let COMPANY = {}
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -31,31 +27,34 @@ const initialState = {
 
 const handlers = {
   [HANDLERS.INITIALIZE]: (state, action) => {
-    const user = action.payload
+    const { user, company } = action.payload || {}
 
     return {
       ...state,
-      ...(
-        // if payload (user) is provided, then is authenticated
-        user
-          ? ({
-              isAuthenticated: true,
-              isLoading: false,
-              user
-            })
-          : ({
-              isLoading: false
-            })
-      )
+      ...(user
+        ? {
+            isAuthenticated: true,
+            isLoading: false,
+            user: {
+              ...user,
+              company
+            }
+          }
+        : {
+            isLoading: false
+          })
     }
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
-    const user = action.payload
+    const { user, company } = action.payload
 
     return {
       ...state,
       isAuthenticated: true,
-      user
+      user: {
+        ...user,
+        company
+      }
     }
   },
   [HANDLERS.SIGN_OUT]: (state) => {
@@ -64,12 +63,25 @@ const handlers = {
       isAuthenticated: false,
       user: null
     }
+  },
+  [HANDLERS.UPDATE_USER_PROFILE]: (state, action) => {
+    const { name, cpf, email, phone } = action.payload
+
+    return {
+      ...state,
+      user: {
+        ...state.user,
+        name,
+        cpf,
+        email,
+        phone
+      }
+    }
   }
 }
 
-const reducer = (state, action) => (
+const reducer = (state, action) =>
   handlers[action.type] ? handlers[action.type](state, action) : state
-)
 
 // The role of this context is to propagate authentication state through the App tree.
 
@@ -91,17 +103,21 @@ export const AuthProvider = (props) => {
     let isAuthenticated = false
 
     try {
-      isAuthenticated = window.sessionStorage.getItem('authenticated') === 'true'
+      isAuthenticated = Cookies.get('authenticated') === 'true'
     } catch (err) {
       console.error(err)
     }
 
     if (isAuthenticated) {
       const user = USER
+      const company = COMPANY
 
       dispatch({
         type: HANDLERS.INITIALIZE,
-        payload: user
+        payload: {
+          user,
+          company
+        }
       })
     } else {
       dispatch({
@@ -110,66 +126,83 @@ export const AuthProvider = (props) => {
     }
   }
 
-  useEffect(
-    () => {
-      initialize()
-    },
-    []
-  )
-
-  const skip = () => {
-    try {
-      window.sessionStorage.setItem('authenticated', 'true')
-    } catch (err) {
-      console.error(err)
-    }
-
-    const user = USER
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    })
-  }
+  useEffect(() => {
+    initialize()
+  }, [])
 
   const signIn = async (email, password) => {
-    const signedUser = signin({ email, password })
-    if (!signedUser) {
+    try {
+      const userResult = await login({ email, password })
+      const userData = await fetchUserData(userResult.result.user)
+      const company = await getCompanyDocument(userData.company)
+
+      COMPANY = company
+      USER = userData
+      const user = userData
+
+      dispatch({
+        type: HANDLERS.SIGN_IN,
+        payload: {
+          user,
+          company
+        }
+      })
+    } catch (error) {
       throw new Error('Please check your email and password')
     }
-
-    try {
-      window.sessionStorage.setItem('authenticated', 'true')
-    } catch (err) {
-      console.error(err)
-    }
-
-    const user = USER
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    })
   }
 
-  const signUp = async (email, name, password) => {
-    throw new Error('Sign up is not implemented')
+  const signUp = async (cnpj, email, name, password) => {
+    register(cnpj, email, name, password)
   }
 
   const signOut = () => {
-    dispatch({
-      type: HANDLERS.SIGN_OUT
-    })
+    logout().then(
+      dispatch({
+        type: HANDLERS.SIGN_OUT
+      })
+    )
+  }
+
+  const updateUserProfile = async (name, cpf, email, phone, user) => {
+    try {
+      const user = firebaseAuth.currentUser
+
+      // Atualize os campos do documento do usuário no Firestore
+      await updateDoc(doc(db, 'users', user.uid), {
+        name,
+        cpf,
+        email,
+        phone
+      })
+
+      // Atualize o usuário no contexto de autenticação
+      dispatch({
+        type: HANDLERS.UPDATE_USER_PROFILE,
+        payload: {
+          name,
+          cpf,
+          email,
+          phone
+        }
+      })
+
+      console.log('Perfil do usuário atualizado com sucesso!')
+    } catch (error) {
+      console.error('Erro ao atualizar o perfil do usuário:', error)
+    }
   }
 
   return (
     <AuthContext.Provider
       value={{
         ...state,
-        skip,
         signIn,
         signUp,
-        signOut
+        signOut,
+        saveCompanyDataToFirestore,
+        getCompanyDocument,
+        updateUserProfile
       }}
     >
       {children}

@@ -1,4 +1,3 @@
-import { useCallback, useState } from 'react'
 import {
   Box,
   Button,
@@ -12,134 +11,127 @@ import {
 } from '@mui/material'
 import { useAuth } from 'src/hooks/use-auth'
 import { cnpjMask, maskCPF, maskPhone } from 'src/utils/masks'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 
 export const AccountProfileDetails = () => {
-  const { user: loggedUser } = useAuth()
-  const [user, setUser] = useState(loggedUser)
+  const { user, updateUserProfile } = useAuth()
 
-  const handleChange = useCallback(
-    (event) => {
-      setUser((prevState) => ({
-        ...prevState,
-        [event.target.name]: event.target.value
-      }))
+  const formik = useFormik({
+    initialValues: {
+      fantasyName: user?.company.fantasyName,
+      cnpj: user?.company.cnpj,
+      name: user?.name,
+      cpf: user?.cpf,
+      email: user?.email,
+      phone: user?.phone
     },
-    []
-  )
-
-  const handleSubmit = useCallback(
-    (event) => {
-      event.preventDefault()
-    },
-    []
-  )
+    validationSchema: Yup.object({
+      name: Yup.string().required('Nome é obrigatório'),
+      email: Yup.string().email('Deve ser um email válido').required('Email é obrigatório'),
+      phone: Yup.string().required('Telefone é obrigatório')
+    }),
+    onSubmit: async (values) => {
+      try {
+        await updateUserProfile(values.name, values.cpf, values.email, values.phone)
+        console.log('Informações de cadastro atualizadas com sucesso!')
+      } catch (error) {
+        console.log('Houve um erro ao atualizar o cadastro:', error)
+      }
+    }
+  })
 
   return (
-    <form
-      autoComplete='off'
-      noValidate
-      onSubmit={handleSubmit}
-    >
+    <form autoComplete='off' noValidate onSubmit={formik.handleSubmit}>
       <Card>
-        <CardHeader
-          subheader='mantenha seu perfil atualizado ;)'
-          title='perfil'
-        />
+        <CardHeader subheader='mantenha seu perfil atualizado ;)' title='perfil' />
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>
-            <Grid
-              container
-              spacing={3}
-            >
+            <Grid container spacing={3}>
               {/* Company Info */}
-              <Grid
-                xs={12}
-                md={6}
-              >
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label='nome fantasia'
                   name='fantasyName'
-                  onChange={handleChange}
+                  onChange={formik.handleChange}
                   disabled
-                  value={user.company.fantasyName}
+                  value={formik.values.fantasyName}
+                  error={formik.touched.fantasyName && formik.errors.fantasyName}
+                  helperText={formik.touched.fantasyName && formik.errors.fantasyName}
+                  readOnly
                 />
               </Grid>
-              <Grid
-                xs={12}
-                md={6}
-              >
+              <Grid xs={12} md={6}>
                 <TextField
+                  error={!!(formik.touched.cnpj && formik.errors.cnpj)}
                   fullWidth
-                  label='cnpj'
+                  helperText={formik.touched.cnpj && formik.errors.cnpj}
+                  label='CNPJ'
                   name='cnpj'
-                  onChange={handleChange}
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
                   disabled
-                  value={cnpjMask(user?.company?.cnpj || '')}
+                  value={cnpjMask(formik.values.cnpj || '')}
+                  readOnly
                 />
               </Grid>
 
               {/* User Info */}
-              <Grid
-                xs={12}
-                md={6}
-              >
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label='seu nome'
                   name='name'
-                  onChange={handleChange}
+                  onChange={formik.handleChange}
                   required
-                  value={user.name}
+                  value={formik.values.name}
+                  error={formik.touched.name && formik.errors.name}
+                  helperText={formik.touched.name && formik.errors.name}
                 />
               </Grid>
-              <Grid
-                xs={12}
-                md={6}
-              >
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label='cpf'
                   name='cpf'
-                  onChange={handleChange}
-                  disabled
-                  value={maskCPF(user?.cpf || '')}
+                  onChange={formik.handleChange}
+                  value={maskCPF(formik.values.cpf)}
+                  error={formik.touched.cpf && formik.errors.cpf}
+                  helperText={formik.touched.cpf && formik.errors.cpf}
                 />
               </Grid>
-              <Grid
-                xs={12}
-                md={6}
-              >
+              <Grid xs={12} md={6}>
                 <TextField
                   type='email'
                   fullWidth
                   label='email'
                   name='email'
-                  onChange={handleChange}
+                  onChange={formik.handleChange}
                   required
-                  value={user.email}
+                  value={formik.values.email}
+                  error={formik.touched.email && formik.errors.email}
+                  helperText={formik.touched.email && formik.errors.email}
                 />
               </Grid>
 
-              <Grid
-                xs={12}
-                md={6}
-              >
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label='celular'
                   name='phone'
-                  onChange={handleChange}
-                  value={maskPhone(user?.phone || '')}
+                  onChange={formik.handleChange}
+                  value={maskPhone(formik.values.phone)}
+                  error={formik.touched.phone && formik.errors.phone}
+                  helperText={formik.touched.phone && formik.errors.phone}
                 />
               </Grid>
             </Grid>
-
           </Box>
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant='contained'>
+          <Button variant='contained' type='submit'>
             salvar
           </Button>
         </CardActions>
