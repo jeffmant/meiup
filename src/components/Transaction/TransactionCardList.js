@@ -10,10 +10,10 @@ export const TransactionCardList = ({ transactions = [] }) => {
           <TransactionCard
             key={transaction.id}
             amount={transaction.amount}
-            partyName={transaction.partyName}
+            partyName={transaction.party}
             description={transaction.description}
             status={transaction.status}
-            createdAt={format(transaction.createdAt, 'dd/MM/yyyy')}
+            createdAt={format(new Date(transaction.createdAt), 'dd/MM/yyyy')}
           />
         ))
       }
