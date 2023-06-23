@@ -212,9 +212,12 @@ const Page = () => {
                     <Button
                       disabled={
                     !formik.values.cnpj ||
-                    formik.values.cnpj.length < 18 ||
+                    removeMask(formik.values.cnpj || '').length < 14 ||
                     !formik.values.email ||
                     !formik.values.name ||
+                    !formik.values.password ||
+                    !formik.values.confirmPassword ||
+                    formik.values.password !== formik.values.confirmPassword ||
                     isLoading
                   }
                       fullWidth

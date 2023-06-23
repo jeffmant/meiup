@@ -5,7 +5,6 @@ import {
   updateProfile,
   getAuth
 } from 'firebase/auth'
-import Cookies from 'js-cookie'
 import { saveCompanyDataToFirestore } from './utils'
 
 const auth = getAuth(firebaseApp)
@@ -15,14 +14,7 @@ export const login = async ({ email, password }) => {
 }
 
 export async function logout () {
-  auth
-    .signOut()
-    .then(() => {
-      Cookies.remove('accessToken') // Limpa o cookie armazenado
-    })
-    .catch((error) => {
-      console.log('Erro ao realizar logout:', error)
-    })
+  return auth.signOut()
 }
 
 export async function register ({ email, password, companyData }) {

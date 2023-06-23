@@ -8,7 +8,7 @@ import {
   Divider,
   Unstable_Grid2 as Grid,
   LinearProgress,
-  Pagination,
+  // Pagination,
   Tab,
   Tabs,
   Typography,
@@ -33,9 +33,11 @@ const Page = () => {
   const { user } = useAuth()
 
   async function getTransactions () {
-    const transactions = await getCompanyTransactions({ companyId: user.company.id, type: transactionType })
-    setTransactions(transactions)
-    return transactions
+    if (user?.company?.id) {
+      const transactions = await getCompanyTransactions({ companyId: user?.company?.id, type: transactionType })
+      setTransactions(transactions)
+      return transactions
+    }
   }
 
   const handleTransactionType = async () => {
@@ -177,7 +179,7 @@ const Page = () => {
                 </CardContent>
 
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
-                  <Box
+                  {/* <Box
                     sx={{
                       display: 'flex',
                       justifyContent: 'center'
@@ -187,7 +189,7 @@ const Page = () => {
                       count={2}
                       size='small'
                     />
-                  </Box>
+                  </Box> */}
                 </CardActions>
               </Card>
             </Grid>

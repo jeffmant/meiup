@@ -39,15 +39,12 @@ const handlers = {
     }
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
-    const { user, company } = action.payload
+    const { user } = action.payload
 
     return {
       ...state,
       isAuthenticated: true,
-      user: {
-        ...user,
-        company
-      }
+      user
     }
   },
   [HANDLERS.SIGN_OUT]: (state) => {
@@ -209,17 +206,17 @@ export const AuthProvider = (props) => {
   }
 
   const signOut = () => {
-    logout().then(
+    logout().then(() => {
+      Cookies.remove('accessToken')
       dispatch({
         type: HANDLERS.SIGN_OUT
       })
-    )
+    })
   }
 
   const updateUserProfile = async ({ companyId, companyData }) => {
     try {
       const updatedCompany = await updateDoc(doc(db, 'companies', companyId), companyData)
-      console.log('updatedCompany -> ', updatedCompany)
       const loggedUser = firebaseAuth.currentUser
 
       const { accessToken, displayName: name, email, emailVerified, phoneNumber: phone, photoURL: avatar } = loggedUser

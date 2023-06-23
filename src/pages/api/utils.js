@@ -8,8 +8,8 @@ export const getCompanyByCnpj = async ({ cnpj }) => {
 
   if (!companyDocSnap.empty) {
     return {
-      id: companyDocSnap.docs[0].id,
-      ...companyDocSnap.docs[0].data()
+      ...companyDocSnap.docs[0].data(),
+      id: companyDocSnap.docs[0].id
     }
   } else {
     return console.log('O documento da empresa não foi encontrado.')
@@ -23,8 +23,8 @@ export const getCompanyByUserId = async ({ userId }) => {
 
   if (!companyDocSnap.empty) {
     return {
-      id: companyDocSnap.docs[0].id,
-      ...companyDocSnap.docs[0].data()
+      ...companyDocSnap.docs[0].data(),
+      id: companyDocSnap.docs[0].id
     }
   } else {
     return console.log('O documento da empresa não foi encontrado.')
