@@ -8,7 +8,7 @@ import {
   Divider,
   Unstable_Grid2 as Grid,
   LinearProgress,
-  Pagination,
+  // Pagination,
   Tab,
   Tabs,
   Typography,
@@ -17,11 +17,10 @@ import {
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
 import { Stack } from '@mui/system'
-import Cookies from 'js-cookie'
-import { useRouter } from 'next/navigation'
 import { TransactionTable } from 'src/components/Transaction/TransactionTable'
 import { useEffect, useState } from 'react'
 import { getCompanyTransactions } from './api/transaction'
+import { useAuth } from 'src/hooks/use-auth'
 
 const receivesMonth = 15000
 const receivesYear = 63000
@@ -29,33 +28,26 @@ const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(
 
 const Page = () => {
   const [transactionType, setTransactionType] = useState('revenue')
-  const router = useRouter()
-  const isAuthenticated = Cookies.get('authenticated')
-  // TODO: Verificar questão do cookie ou inicializar firebase-admin no backend para poder verificar o cookie
-
-  if (!isAuthenticated) {
-    router.push('/auth/login')
-  }
-
-  const [companyId] = useState('36255676000173')
   const [transactions, setTransactions] = useState([])
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
+  const { user } = useAuth()
 
   async function getTransactions () {
-    const transactions = await getCompanyTransactions({ companyId, type: transactionType })
-    console.log(transactions)
-    setTransactions(transactions)
-    return transactions
+    if (user?.company?.id) {
+      const transactions = await getCompanyTransactions({ companyId: user?.company?.id, type: transactionType })
+      setTransactions(transactions)
+      return transactions
+    }
   }
-
-  useEffect(() => {
-    getTransactions().then((resp) => console.log(resp)).catch(console.error)
-  }, [companyId, transactionType])
 
   const handleTransactionType = async () => {
     setTransactionType(transactionType === 'revenue' ? 'cost' : 'revenue')
     await getTransactions()
   }
+
+  useEffect(() => {
+    getTransactions()
+  }, [])
 
   return (
     <>
@@ -81,9 +73,17 @@ const Page = () => {
               p: 2
             }}
           >
-            <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
+            <Stack
+              alignItems='center'
+              direction='row'
+              justifyContent='space-between'
+              spacing={4}
+            >
               <div>
-                <Typography color='text.secondary' variant='overline'>
+                <Typography
+                  color='text.secondary'
+                  variant='overline'
+                >
                   Receita no mês
                 </Typography>
               </div>
@@ -98,14 +98,26 @@ const Page = () => {
               flexItem
               sx={{ borderWidth: '1px', borderColor: '#c6c6c6' }}
             />
-            <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
+            <Stack
+              alignItems='center'
+              direction='row'
+              justifyContent='space-between'
+              spacing={4}
+            >
               <div>
-                <Typography color='text.secondary' gutterBottom variant='overline'>
+                <Typography
+                  color='text.secondary'
+                  gutterBottom
+                  variant='overline'
+                >
                   Receita Anual
                 </Typography>
               </div>
               <div>
-                <Typography variant='h4' sx={{ mb: 2 }}>
+                <Typography
+                  variant='h4'
+                  sx={{ mb: 2 }}
+                >
                   {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                 </Typography>
                 <LinearProgress
@@ -167,7 +179,7 @@ const Page = () => {
                 </CardContent>
 
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
-                  <Box
+                  {/* <Box
                     sx={{
                       display: 'flex',
                       justifyContent: 'center'
@@ -177,7 +189,7 @@ const Page = () => {
                       count={2}
                       size='small'
                     />
-                  </Box>
+                  </Box> */}
                 </CardActions>
               </Card>
             </Grid>

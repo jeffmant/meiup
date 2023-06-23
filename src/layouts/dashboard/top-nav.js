@@ -41,7 +41,11 @@ export const TopNav = (props) => {
             px: 2
           }}
         >
-          <Stack alignItems='center' direction='row' spacing={2}>
+          <Stack
+            alignItems='center'
+            direction='row'
+            spacing={2}
+          >
             {!lgUp && (
               <IconButton onClick={onNavOpen}>
                 <SvgIcon fontSize='small'>
@@ -50,8 +54,12 @@ export const TopNav = (props) => {
               </IconButton>
             )}
           </Stack>
-          <Stack alignItems='center' direction='row' spacing={2}>
-            <Typography>{lgUp && user?.name}</Typography>
+          <Stack
+            alignItems='center'
+            direction='row'
+            spacing={2}
+          >
+            <Typography>{user?.name}</Typography>
             <Avatar
               onClick={accountPopover.handleOpen}
               ref={accountPopover.anchorRef}

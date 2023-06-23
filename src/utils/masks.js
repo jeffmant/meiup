@@ -9,6 +9,8 @@ export const cnpjMask = (value) => {
     .replace(/(-\d{2})\d+?$/, '$1')
 }
 
+export const removeMask = (value) => value.replace(/[^\d]+/g, '')
+
 // 000.000.000-00
 export const maskCPF = value => {
   return value

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const getCompanyInfoByCNPJ = async ({ cnpj }) => {
+export const getExternalCompanyInfoByCNPJ = async ({ cnpj }) => {
   try {
     const { data: company } = await axios.get(`http://localhost:3000/api/cnpj/${cnpj}`, {
       headers: {

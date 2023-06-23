@@ -1,69 +1,33 @@
-import firebaseApp, { db } from '../../firebase/config'
-import { collection, setDoc, doc } from 'firebase/firestore'
+import firebaseApp from '../../firebase/config'
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
   getAuth
 } from 'firebase/auth'
-import Cookies from 'js-cookie'
-import { getCompanyInfoByCNPJ } from './company'
 import { saveCompanyDataToFirestore } from './utils'
 
 const auth = getAuth(firebaseApp)
 
 export const login = async ({ email, password }) => {
-  let result = null
-  let error = null
-  try {
-    result = await signInWithEmailAndPassword(auth, email, password) // Método de autenticação do firebase
-
-    const token = await result.user.getIdToken()
-    Cookies.set('authenticated', token)
-  } catch (e) {
-    error = e
-  }
-  return { result, error }
+  return signInWithEmailAndPassword(auth, email, password)
 }
 
 export async function logout () {
-  auth
-    .signOut()
-    .then(() => {
-      Cookies.remove('authenticated') // Limpa o cookie armazenado
-    })
-    .catch((error) => {
-      console.log('Erro ao realizar logout:', error)
-    })
+  return auth.signOut()
 }
 
-export async function register (cnpj, email, name, password) {
-  const cnpjNumber = Number(cnpj.replace(/[^\d]/g, ''))
-  const cnpjString = cnpjNumber.toString() // converte novamente para uma string, isso é necessário pois o documento do firestore não pode conter simbolos
-
+export async function register ({ email, password, companyData }) {
   try {
     const { user } = await createUserWithEmailAndPassword(auth, email, password)
 
-    await updateProfile(user, { displayName: name })
+    await updateProfile(user, { displayName: companyData.fantasyName })
 
-    const userDocData = {
-      cnpj: cnpjString,
-      name,
-      email
-    }
-    const usersCollectionRef = collection(db, 'users')
-    await setDoc(doc(usersCollectionRef, user.uid), userDocData)
-
-    // Criar doc da empresa
-    const companyData = await getCompanyInfoByCNPJ({ cnpj: cnpjNumber })
-
-    await saveCompanyDataToFirestore(companyData, user)
-
-    console.log('Usuário criado com sucesso:', user)
+    await saveCompanyDataToFirestore({ companyData: { ...companyData, email }, userId: user.uid })
 
     return user
   } catch (error) {
     console.log('Erro ao criar usuário:', error)
-    throw error
+    return error
   }
 }
