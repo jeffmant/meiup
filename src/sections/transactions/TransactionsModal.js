@@ -9,45 +9,47 @@ import {
   MenuItem,
   Select,
   TextField,
-  Modal,
-  InputAdornment
+  Modal
 } from '@mui/material'
 import Box from '@mui/material/Box'
+import { formatCurrency } from 'src/utils/masks'
 
 const TransactionsModal = () => {
-  const [open, setOpen] = useState(false)
-  const [type, setType] = useState('')
-  const [description, setDescription] = useState('')
-  const [value, setValue] = useState('')
-  const [category, setCategory] = useState('')
+  const [modalState, setModalState] = useState({
+    open: false,
+    type: '',
+    description: '',
+    value: '',
+    category: ''
+  })
 
   const handleOpen = () => {
-    setOpen(true)
+    setModalState({ ...modalState, open: true })
   }
 
   const handleClose = () => {
-    setOpen(false)
+    setModalState({ ...modalState, open: false })
   }
 
   const handleSave = () => {
-    // TODO: Salvar documento da transaction no firebase
+    // Lógica para salvar os dados do formulário
     handleClose()
   }
 
   const handleTypeChange = (event) => {
-    setType(event.target.value)
+    setModalState({ ...modalState, type: event.target.value })
   }
 
   const handleDescriptionChange = (event) => {
-    setDescription(event.target.value)
+    setModalState({ ...modalState, description: event.target.value })
   }
 
   const handleValueChange = (event) => {
-    setValue(event.target.value)
+    setModalState({ ...modalState, value: event.target.value })
   }
 
   const handleCategoryChange = (event) => {
-    setCategory(event.target.value)
+    setModalState({ ...modalState, category: event.target.value })
   }
 
   return (
@@ -55,7 +57,7 @@ const TransactionsModal = () => {
       <Button variant='contained' onClick={handleOpen}>
         Nova Transação
       </Button>
-      <Modal open={open} onClose={handleClose} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Modal open={modalState.open} onClose={handleClose} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box
           sx={{
             width: { xs: '100%', sm: '50%' },
@@ -67,35 +69,36 @@ const TransactionsModal = () => {
             flexDirection: 'column'
           }}
         >
-          <Box>
-            <DialogTitle>Nova Transação</DialogTitle>
-          </Box>
+          <DialogTitle>Nova Transação</DialogTitle>
           <DialogContent>
             <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel id='select-type-label'>Tipo</InputLabel>
               <Select
                 labelId='select-type-label'
                 id='select-type'
-                value={type}
+                value={modalState.type}
                 label='Tipo'
                 onChange={handleTypeChange}
               >
+                <MenuItem value=''>Selecione</MenuItem>
                 <MenuItem value='receita'>Receita</MenuItem>
                 <MenuItem value='despesa'>Despesa</MenuItem>
               </Select>
             </FormControl>
 
-            {type === 'receita' && (
+            {modalState.type === 'receita' && (
               <TextField
                 fullWidth
                 value='Cliente'
                 label='Cliente/Fornecedor'
-                disabled
+                InputProps={{
+                  readOnly: true
+                }}
                 sx={{ mb: 2 }}
               />
             )}
 
-            {type === 'despesa' && (
+            {modalState.type === 'despesa' && (
               <TextField
                 fullWidth
                 value='Fornecedor'
@@ -109,7 +112,7 @@ const TransactionsModal = () => {
 
             <TextField
               fullWidth
-              value={description}
+              value={modalState.description}
               label='Descrição'
               onChange={handleDescriptionChange}
               multiline
@@ -119,12 +122,9 @@ const TransactionsModal = () => {
 
             <TextField
               fullWidth
-              value={value}
+              value={formatCurrency(modalState.value)}
               label='Valor'
               onChange={handleValueChange}
-              InputProps={{
-                startAdornment: <InputAdornment position='start'>R$</InputAdornment>
-              }}
               sx={{ mb: 2 }}
             />
 
@@ -133,10 +133,11 @@ const TransactionsModal = () => {
               <Select
                 labelId='select-category-label'
                 id='select-category'
-                value={category}
+                value={modalState.category}
                 label='Categoria'
                 onChange={handleCategoryChange}
               >
+                <MenuItem value=''>Selecione</MenuItem>
                 <MenuItem value='reposicao'>Reposição</MenuItem>
                 <MenuItem value='manutencao'>Manutenção</MenuItem>
                 <MenuItem value='venda'>Venda</MenuItem>
