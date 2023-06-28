@@ -21,6 +21,7 @@ import { TransactionTable } from 'src/components/Transaction/TransactionTable'
 import { useEffect, useState } from 'react'
 import { getCompanyTransactions } from './api/transaction'
 import { useAuth } from 'src/hooks/use-auth'
+import TransactionsModal from 'src/sections/transactions/TransactionsModal'
 
 const receivesMonth = 15000
 const receivesYear = 63000
@@ -178,18 +179,19 @@ const Page = () => {
                   }
                 </CardContent>
 
-                <CardActions sx={{ justifyContent: 'flex-end' }}>
+                <CardActions sx={{ justifyContent: 'space-between', marginLeft: '12px', marginRight: '12px' }}>
                   {/* <Box
                     sx={{
                       display: 'flex',
                       justifyContent: 'center'
                     }}
-                  >
+                    >
                     <Pagination
-                      count={2}
-                      size='small'
+                    count={2}
+                    size='small'
                     />
                   </Box> */}
+                  <TransactionsModal sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }} />
                 </CardActions>
               </Card>
             </Grid>
