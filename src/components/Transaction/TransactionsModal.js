@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Button,
   DialogTitle,
@@ -13,27 +13,59 @@ import {
 } from '@mui/material'
 import Box from '@mui/material/Box'
 import { formatCurrency } from 'src/utils/masks'
+import { useAuth } from 'src/hooks/use-auth'
+import createTransactionDoc from 'src/utils/create-transaction-doc'
 
-const TransactionsModal = () => {
+const TransactionsModal = ({ handleTransactionSaved }) => {
+  const { user } = useAuth()
+  const companyId = user?.company?.id
+
   const [modalState, setModalState] = useState({
     open: false,
     type: '',
+    party: '',
     description: '',
-    value: '',
+    amount: '',
     category: ''
   })
+
+  const resetModalStateAndClose = () => {
+    setModalState({
+      open: false,
+      type: '',
+      party: '',
+      description: '',
+      amount: '',
+      category: ''
+    })
+  }
+
+  useEffect(() => {
+    if (modalState.type === 'revenue') {
+      setModalState({ ...modalState, party: 'Cliente' })
+    } else if (modalState.type === 'cost') {
+      setModalState({ ...modalState, party: 'Fornecedor' })
+    }
+  }, [modalState.type])
 
   const handleOpen = () => {
     setModalState({ ...modalState, open: true })
   }
 
   const handleClose = () => {
-    setModalState({ ...modalState, open: false })
+    resetModalStateAndClose()
   }
 
-  const handleSave = () => {
-    // Lógica para salvar os dados do formulário
+  const handleSave = async () => {
+    const { open, ...data } = modalState
+
+    const transactionData = { ...data, companyId, createdAt: new Date().toISOString(), status: true }
+
+    await createTransactionDoc(transactionData)
+
     handleClose()
+
+    handleTransactionSaved()
   }
 
   const handleTypeChange = (event) => {
@@ -44,8 +76,8 @@ const TransactionsModal = () => {
     setModalState({ ...modalState, description: event.target.value })
   }
 
-  const handleValueChange = (event) => {
-    setModalState({ ...modalState, value: event.target.value })
+  const handleAmountChange = (event) => {
+    setModalState({ ...modalState, amount: event.target.value.replace(/[^\d]/g, '') })
   }
 
   const handleCategoryChange = (event) => {
@@ -69,7 +101,9 @@ const TransactionsModal = () => {
             flexDirection: 'column'
           }}
         >
-          <DialogTitle>Nova Transação</DialogTitle>
+          <Box>
+            <DialogTitle>Nova Transação</DialogTitle>
+          </Box>
           <DialogContent>
             <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel id='select-type-label'>Tipo</InputLabel>
@@ -80,35 +114,21 @@ const TransactionsModal = () => {
                 label='Tipo'
                 onChange={handleTypeChange}
               >
-                <MenuItem value=''>Selecione</MenuItem>
-                <MenuItem value='receita'>Receita</MenuItem>
-                <MenuItem value='despesa'>Despesa</MenuItem>
+                <MenuItem value='revenue'>Receita</MenuItem>
+                <MenuItem value='cost'>Despesa</MenuItem>
               </Select>
             </FormControl>
 
-            {modalState.type === 'receita' && (
-              <TextField
-                fullWidth
-                value='Cliente'
-                label='Cliente/Fornecedor'
-                InputProps={{
-                  readOnly: true
-                }}
-                sx={{ mb: 2 }}
-              />
-            )}
-
-            {modalState.type === 'despesa' && (
-              <TextField
-                fullWidth
-                value='Fornecedor'
-                label='Cliente/Fornecedor'
-                InputProps={{
-                  readOnly: true
-                }}
-                sx={{ mb: 2 }}
-              />
-            )}
+            {modalState.type && <TextField
+              fullWidth
+              value={modalState.party}
+              label='Cliente/Fornecedor'
+              id='party'
+              InputProps={{
+                readOnly: true
+              }}
+              sx={{ mb: 2 }}
+                                />}
 
             <TextField
               fullWidth
@@ -122,9 +142,9 @@ const TransactionsModal = () => {
 
             <TextField
               fullWidth
-              value={formatCurrency(modalState.value)}
+              value={formatCurrency(modalState.amount)}
               label='Valor'
-              onChange={handleValueChange}
+              onChange={handleAmountChange}
               sx={{ mb: 2 }}
             />
 
@@ -137,7 +157,6 @@ const TransactionsModal = () => {
                 label='Categoria'
                 onChange={handleCategoryChange}
               >
-                <MenuItem value=''>Selecione</MenuItem>
                 <MenuItem value='reposicao'>Reposição</MenuItem>
                 <MenuItem value='manutencao'>Manutenção</MenuItem>
                 <MenuItem value='venda'>Venda</MenuItem>

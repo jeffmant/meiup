@@ -42,7 +42,7 @@ export const TransactionCard = ({
           </Stack>
           <Stack spacing={1}>
             <Typography variant='p'>
-              R$ {amount}
+              {amount}
             </Typography>
           </Stack>
           <Stack spacing={1}>

@@ -21,7 +21,7 @@ import { TransactionTable } from 'src/components/Transaction/TransactionTable'
 import { useEffect, useState } from 'react'
 import { getCompanyTransactions } from './api/transaction'
 import { useAuth } from 'src/hooks/use-auth'
-import TransactionsModal from 'src/sections/transactions/TransactionsModal'
+import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 
 const receivesMonth = 15000
 const receivesYear = 63000
@@ -33,6 +33,10 @@ const Page = () => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const { user } = useAuth()
 
+  const handleTransactionSaved = async () => {
+    await getTransactions()
+  }
+
   async function getTransactions () {
     if (user?.company?.id) {
       const transactions = await getCompanyTransactions({ companyId: user?.company?.id, type: transactionType })
@@ -42,13 +46,13 @@ const Page = () => {
   }
 
   const handleTransactionType = async () => {
-    setTransactionType(transactionType === 'revenue' ? 'cost' : 'revenue')
-    await getTransactions()
+    const newTransactionType = transactionType === 'cost' ? 'revenue' : 'cost'
+    setTransactionType(newTransactionType)
   }
 
   useEffect(() => {
     getTransactions()
-  }, [])
+  }, [transactionType])
 
   return (
     <>
@@ -191,7 +195,10 @@ const Page = () => {
                     size='small'
                     />
                   </Box> */}
-                  <TransactionsModal sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }} />
+                  <TransactionsModal
+                    sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
+                    handleTransactionSaved={handleTransactionSaved}
+                  />
                 </CardActions>
               </Card>
             </Grid>
