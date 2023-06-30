@@ -12,7 +12,9 @@ import {
   Tab,
   Tabs,
   Typography,
-  useMediaQuery
+  useMediaQuery,
+  Alert,
+  Snackbar
 } from '@mui/material'
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
@@ -30,11 +32,17 @@ const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(
 const Page = () => {
   const [transactionType, setTransactionType] = useState('revenue')
   const [transactions, setTransactions] = useState([])
+  const [transactionAlert, setTransactionAlert] = useState(null)
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const { user } = useAuth()
 
-  const handleTransactionSaved = async () => {
-    await getTransactions()
+  const handleTransactionSaved = async (status) => {
+    if (status) {
+      setTransactionAlert({ type: 'success', message: 'Transação criada com sucesso!' })
+      await getTransactions()
+    } else {
+      setTransactionAlert({ type: 'error', message: 'Houve um erro ao criar a transação.' })
+    }
   }
 
   async function getTransactions () {
@@ -199,6 +207,14 @@ const Page = () => {
                     sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
                     handleTransactionSaved={handleTransactionSaved}
                   />
+
+                  {transactionAlert && (
+                    <Snackbar open={!!transactionAlert} autoHideDuration={3000} onClose={() => setTransactionAlert(null)}>
+                      <Alert onClose={() => setTransactionAlert(null)} severity={transactionAlert.type}>
+                        {transactionAlert.message}
+                      </Alert>
+                    </Snackbar>
+                  )}
                 </CardActions>
               </Card>
             </Grid>

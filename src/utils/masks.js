@@ -56,7 +56,7 @@ export const formatCurrency = (value) => {
   const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 
   // Formata o valor completo com o símbolo "R$" e os separadores
-  const formattedValue = `R$ ${formattedIntegerPart},${decimalPart}`
+  const formattedValue = `${formattedIntegerPart},${decimalPart}`
 
   return formattedValue
 }

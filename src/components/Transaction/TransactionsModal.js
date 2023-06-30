@@ -9,7 +9,8 @@ import {
   MenuItem,
   Select,
   TextField,
-  Modal
+  Modal,
+  CircularProgress
 } from '@mui/material'
 import Box from '@mui/material/Box'
 import { formatCurrency } from 'src/utils/masks'
@@ -26,9 +27,11 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
     party: '',
     description: '',
     amount: '',
-    category: ''
+    category: '',
+    status: ''
   })
 
+  const [savingDoc, setSavingDoc] = useState(false)
   const resetModalStateAndClose = () => {
     setModalState({
       open: false,
@@ -36,7 +39,8 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
       party: '',
       description: '',
       amount: '',
-      category: ''
+      category: '',
+      status: ''
     })
   }
 
@@ -59,13 +63,21 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
   const handleSave = async () => {
     const { open, ...data } = modalState
 
-    const transactionData = { ...data, companyId, createdAt: new Date().toISOString(), status: true }
+    const transactionData = { ...data, companyId, createdAt: new Date().toISOString() }
 
-    await createTransactionDoc(transactionData)
+    setSavingDoc(true)
 
-    handleClose()
+    try {
+      await createTransactionDoc(transactionData)
 
-    handleTransactionSaved()
+      handleClose()
+      handleTransactionSaved(true)
+    } catch (error) {
+      handleClose()
+      handleTransactionSaved(false)
+      console.log('Houve um erro ao salvar a transação: ', error)
+    }
+    setSavingDoc(false)
   }
 
   const handleTypeChange = (event) => {
@@ -77,11 +89,17 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
   }
 
   const handleAmountChange = (event) => {
-    setModalState({ ...modalState, amount: event.target.value.replace(/[^\d]/g, '') })
+    const inputValue = event.target.value.replace(/[^\d]/g, '')
+    const formattedValue = formatCurrency(inputValue)
+    setModalState({ ...modalState, amount: formattedValue })
   }
 
   const handleCategoryChange = (event) => {
     setModalState({ ...modalState, category: event.target.value })
+  }
+
+  const handleStatusChange = (event) => {
+    setModalState({ ...modalState, status: event.target.value })
   }
 
   return (
@@ -162,14 +180,34 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
                 <MenuItem value='venda'>Venda</MenuItem>
               </Select>
             </FormControl>
+
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id='select-status-label'>Status</InputLabel>
+              <Select
+                labelId='select-status-label'
+                id='select-status'
+                value={modalState.status}
+                label='Status'
+                onChange={handleStatusChange}
+              >
+                <MenuItem value='emited'>Emitida</MenuItem>
+                <MenuItem value='canceled'>Cancelada</MenuItem>
+              </Select>
+            </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} variant='outlined' sx={{ mr: 1 }}>
               Cancelar
             </Button>
-            <Button onClick={handleSave} variant='contained' color='primary'>
-              Salvar
-            </Button>
+            {savingDoc
+              ? (
+                <CircularProgress />
+                )
+              : (
+                <Button variant='contained' onClick={handleSave}>
+                  Salvar
+                </Button>
+                )}
           </DialogActions>
         </Box>
       </Modal>

@@ -2,7 +2,6 @@ import { Box } from '@mui/system'
 import { TransactionCard } from './TransactionCard'
 import { format } from 'date-fns'
 import { Typography } from '@mui/material'
-import { formatCurrency } from 'src/utils/masks'
 
 export const TransactionCardList = ({ transactions = [] }) => {
   return (
@@ -12,7 +11,7 @@ export const TransactionCardList = ({ transactions = [] }) => {
           ? transactions.map(transaction => (
             <TransactionCard
               key={transaction.id}
-              amount={formatCurrency(transaction.amount)}
+              amount={transaction.amount}
               partyName={transaction.party}
               description={transaction.description}
               status={transaction.status}
