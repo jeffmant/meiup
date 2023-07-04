@@ -1,14 +1,9 @@
-import CheckIcon from '@heroicons/react/24/solid/CheckIcon'
-import XMarkIcon from '@heroicons/react/24/solid/XMarkIcon'
-import { Avatar, Card, CardContent, SvgIcon, Tooltip, Typography } from '@mui/material'
+import { Card, CardContent, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 
 export const TransactionCard = ({
-  description,
   amount,
-  partyName,
-  status,
-  createdAt
+  partyName
 }) => {
   return (
     <Card sx={{
@@ -29,52 +24,21 @@ export const TransactionCard = ({
           justifyContent='space-between'
           spacing={1}
         >
-          <Stack spacing={1}>
-            <Typography color='text.secondary'>
-              {description}
-            </Typography>
-          </Stack>
-          <Stack spacing={1}>
-
-            <Typography variant='h6'>
-              {partyName}
-            </Typography>
+          <Stack
+            spacing={1}
+            sx={{ maxWidth: 50 }}
+          >
+            <Stack spacing={1}>
+              <Typography variant='h6'>
+                {partyName}
+              </Typography>
+            </Stack>
           </Stack>
           <Stack spacing={1}>
             <Typography variant='p'>
               R$ {amount}
             </Typography>
           </Stack>
-          <Stack spacing={1}>
-            <Typography variant='p'>
-              {createdAt}
-            </Typography>
-          </Stack>
-          <Avatar
-            sx={{
-              backgroundColor: status === 'emited' ? 'success.main' : 'error.main',
-              height: 32,
-              width: 32
-            }}
-          >
-            <SvgIcon>
-              {
-                status === 'emited'
-                  ? (
-                    <Tooltip title='Emitida'>
-                      <CheckIcon />
-                    </Tooltip>
-                    )
-                  : status === 'canceled'
-                    ? (
-                      <Tooltip title='Cancelada'>
-                        <XMarkIcon />
-                      </Tooltip>
-                      )
-                    : null
-              }
-            </SvgIcon>
-          </Avatar>
         </Stack>
       </CardContent>
     </Card>

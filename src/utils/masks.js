@@ -43,3 +43,20 @@ export const maskDate = value => {
     .replace(/(\d{2})(\d)/, '$1/$2')
     .replace(/(\d{4})(\d)/, '$1')
 }
+
+export const formatCurrency = (value) => {
+  // Remove todos os caracteres não numéricos
+  const numericValue = value.replace(/[^\d]/g, '')
+
+  // Divide o valor em partes (parte inteira e parte decimal)
+  const integerPart = numericValue.slice(0, -2)
+  const decimalPart = numericValue.slice(-2)
+
+  // Adiciona separadores de milhares à parte inteira
+  const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+
+  // Formata o valor completo com o símbolo "R$" e os separadores
+  const formattedValue = `${formattedIntegerPart},${decimalPart}`
+
+  return formattedValue
+}
