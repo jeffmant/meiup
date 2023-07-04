@@ -7,7 +7,7 @@ import {
   Container,
   Unstable_Grid2 as Grid,
   LinearProgress,
-  Pagination,
+  // Pagination,
   Tab,
   Tabs,
   Typography,
@@ -139,10 +139,14 @@ const Page = () => {
                       >
                         {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                       </Typography>
-                      <LinearProgress
-                        value={receivesPercentageFromYearLimit}
-                        variant='determinate'
-                        color={
+                      {receivesPercentageFromYearLimit}% do teto
+                    </div>
+                  </Stack>
+
+                  <LinearProgress
+                    value={receivesPercentageFromYearLimit}
+                    variant='determinate'
+                    color={
                     receivesPercentageFromYearLimit <= 35
                       ? 'success'
                       : receivesPercentageFromYearLimit > 35 &&
@@ -153,11 +157,7 @@ const Page = () => {
                           ? 'error'
                           : ''
                   }
-                      />
-                      {receivesPercentageFromYearLimit}% do teto
-                    </div>
-                  </Stack>
-
+                  />
                 </>
               )
             }
@@ -262,7 +262,7 @@ const Page = () => {
                 </CardContent>
 
                 <CardActions sx={{ justifyContent: 'center' }}>
-                  <Box
+                  {/* <Box
                     sx={{
                       display: 'flex',
                       justifyContent: 'center'
@@ -272,7 +272,7 @@ const Page = () => {
                       count={2}
                       size='small'
                     />
-                  </Box>
+                  </Box> */}
                   {transactionAlert && (
                     <Snackbar open={!!transactionAlert} autoHideDuration={3000} onClose={() => setTransactionAlert(null)}>
                       <Alert onClose={() => setTransactionAlert(null)} severity={transactionAlert.type}>
