@@ -10,7 +10,8 @@ import {
   Select,
   TextField,
   Modal,
-  CircularProgress
+  CircularProgress,
+  useMediaQuery
 } from '@mui/material'
 import Box from '@mui/material/Box'
 import { formatCurrency } from 'src/utils/masks'
@@ -18,6 +19,7 @@ import { useAuth } from 'src/hooks/use-auth'
 import createTransactionDoc from 'src/utils/create-transaction-doc'
 
 const TransactionsModal = ({ handleTransactionSaved }) => {
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const { user } = useAuth()
   const companyId = user?.company?.id
 
@@ -103,11 +105,19 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
   }
 
   return (
-    <div>
-      <Button variant='contained' onClick={handleOpen}>
+    <div style={{ display: 'flex', justifyContent: lgUp ? 'flex-end' : 'center' }}>
+      <Button
+        variant='contained'
+        onClick={handleOpen}
+        sx={{ mb: 2 }}
+      >
         Nova Transação
       </Button>
-      <Modal open={modalState.open} onClose={handleClose} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Modal
+        open={modalState.open}
+        onClose={handleClose}
+        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
         <Box
           sx={{
             width: { xs: '100%', sm: '50%' },
@@ -123,7 +133,10 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
             <DialogTitle>Nova Transação</DialogTitle>
           </Box>
           <DialogContent>
-            <FormControl fullWidth sx={{ mb: 2 }}>
+            <FormControl
+              fullWidth
+              sx={{ mb: 2 }}
+            >
               <InputLabel id='select-type-label'>Tipo</InputLabel>
               <Select
                 labelId='select-type-label'
@@ -140,7 +153,7 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
             {modalState.type && <TextField
               fullWidth
               value={modalState.party}
-              label='Cliente/Fornecedor'
+              label={modalState.type === 'cost' ? 'Fornecedor' : 'Cliente'}
               id='party'
               InputProps={{
                 readOnly: true
