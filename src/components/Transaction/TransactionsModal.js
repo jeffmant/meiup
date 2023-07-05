@@ -18,10 +18,11 @@ import { formatCurrency } from 'src/utils/masks'
 import { useAuth } from 'src/hooks/use-auth'
 import createTransactionDoc from 'src/utils/create-transaction-doc'
 
-const TransactionsModal = ({ handleTransactionSaved }) => {
+const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const { user } = useAuth()
   const companyId = user?.company?.id
+  const docId = transaction?.id
 
   const [modalState, setModalState] = useState({
     open: false,
@@ -47,6 +48,15 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
   }
 
   useEffect(() => {
+    if (transaction) {
+      setModalState({ ...transaction, open: true })
+      console.log(transaction)
+    } else {
+      resetModalStateAndClose()
+    }
+  }, [transaction])
+
+  useEffect(() => {
     if (modalState.type === 'revenue') {
       setModalState({ ...modalState, party: 'Cliente' })
     } else if (modalState.type === 'cost') {
@@ -70,7 +80,7 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
     setSavingDoc(true)
 
     try {
-      await createTransactionDoc(transactionData)
+      await createTransactionDoc(transactionData, docId)
 
       handleClose()
       handleTransactionSaved(true)
@@ -106,13 +116,15 @@ const TransactionsModal = ({ handleTransactionSaved }) => {
 
   return (
     <div style={{ display: 'flex', justifyContent: lgUp ? 'flex-end' : 'center' }}>
-      <Button
-        variant='contained'
-        onClick={handleOpen}
-        sx={{ mb: 2 }}
-      >
-        Nova Transação
-      </Button>
+      {!transaction && (
+        <Button
+          variant='contained'
+          onClick={handleOpen}
+          sx={{ mb: 2 }}
+        >
+          Nova Transação
+        </Button>
+      )}
       <Modal
         open={modalState.open}
         onClose={handleClose}

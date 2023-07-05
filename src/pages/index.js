@@ -38,10 +38,10 @@ const Page = () => {
 
   const handleTransactionSaved = async (status) => {
     if (status) {
-      setTransactionAlert({ type: 'success', message: 'Transação criada com sucesso!' })
+      setTransactionAlert({ type: 'success', message: 'Transação salvada com sucesso!' })
       await getTransactions()
     } else {
-      setTransactionAlert({ type: 'error', message: 'Houve um erro ao criar a transação.' })
+      setTransactionAlert({ type: 'error', message: 'Houve um erro ao salvar a transação.' })
     }
   }
 
