@@ -17,6 +17,7 @@ import Box from '@mui/material/Box'
 import { formatCurrency } from 'src/utils/masks'
 import { useAuth } from 'src/hooks/use-auth'
 import createTransactionDoc from 'src/utils/create-transaction-doc'
+import updateTransactionDoc from 'src/utils/update-transaction'
 
 const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
@@ -80,7 +81,11 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
     setSavingDoc(true)
 
     try {
-      await createTransactionDoc(transactionData, docId)
+      if (transaction) {
+        await updateTransactionDoc(transactionData, docId)
+      } else {
+        await createTransactionDoc(transactionData, docId)
+      }
 
       handleClose()
       handleTransactionSaved(true)

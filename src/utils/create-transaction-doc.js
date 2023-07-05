@@ -1,14 +1,14 @@
-import { setDoc, doc } from 'firebase/firestore'
+import { collection, addDoc } from 'firebase/firestore'
 import { db } from 'src/firebase/config'
 
-async function createTransactionDoc (docData, docId) {
-  const docRef = doc(db, 'transactions', docId) // Referência ao documento existente
+async function createTransactionDoc (docData) {
+  const docRef = collection(db, 'transactions')
 
   try {
-    await setDoc(docRef, docData) // Atualiza as informações do documento existente ou cria um novo documento
-    console.log('Documento criado/atualizado com sucesso!')
+    await addDoc(docRef, docData)
+    console.log('Documento criado com sucesso!')
   } catch {
-    console.log('Houve um erro ao criar/atualizar o documento.')
+    console.log('Houve um erro ao criar o documento.')
   };
 };
 
