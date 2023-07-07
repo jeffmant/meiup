@@ -51,7 +51,6 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
   useEffect(() => {
     if (transaction) {
       setModalState({ ...transaction, open: true })
-      console.log(transaction)
     } else {
       resetModalStateAndClose()
     }
@@ -88,10 +87,8 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
       }
 
       handleClose()
-      handleTransactionSaved(true)
     } catch (error) {
       handleClose()
-      handleTransactionSaved(false)
       console.log('Houve um erro ao salvar a transação: ', error)
     }
     setSavingDoc(false)

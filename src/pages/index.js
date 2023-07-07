@@ -32,16 +32,32 @@ const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(
 const Page = () => {
   const [transactionType, setTransactionType] = useState('revenue')
   const [transactions, setTransactions] = useState([])
+  const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionAlert, setTransactionAlert] = useState(null)
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const { user } = useAuth()
 
-  const handleTransactionSaved = async (status) => {
-    if (status) {
+  const handleTransactionSelect = (transaction) => {
+    setSelectedTransaction(transaction)
+
+    // Como fazer o edit:
+    // -> Pegar a transaction em TransactionTable - OK
+    // -> Passar a transaction para o TransactionModal para já abrir com as informações carregadas
+    // -> Devolver uma informação para emitir o alert em index.js
+    // -> Possiveis alertas "OK", "Fail", "Cancel"
+    // -> Efetuar lógica conformeestado do alerta, CRUD
+  }
+
+  async function handleTransactionSaved (status) {
+    if (status === 'ok') {
       setTransactionAlert({ type: 'success', message: 'Transação salvada com sucesso!' })
+      console.log('Transação salva com sucesso!')
+      await getTransactions()
+    } else if (status === 'fail') {
+      setTransactionAlert({ type: 'error', message: 'Houve um erro ao salvar a transação.' })
       await getTransactions()
     } else {
-      setTransactionAlert({ type: 'error', message: 'Houve um erro ao salvar a transação.' })
+      await getTransactions()
     }
   }
 
@@ -61,6 +77,12 @@ const Page = () => {
   useEffect(() => {
     getTransactions()
   }, [transactionType])
+
+  useEffect(() => {
+    if (selectedTransaction) {
+      console.log('Transação selecionada:', selectedTransaction)
+    }
+  }, [selectedTransaction])
 
   return (
     <>
@@ -256,7 +278,7 @@ const Page = () => {
                   />
                   {
                     lgUp
-                      ? <TransactionTable transactions={transactions || []} />
+                      ? <TransactionTable handleTransactionSelect={handleTransactionSelect} transactions={transactions || []} />
                       : <TransactionCardList transactions={transactions || []} />
                   }
                 </CardContent>

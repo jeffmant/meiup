@@ -1,14 +1,11 @@
 import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { format } from 'date-fns'
-import React, { useState } from 'react'
-import TransactionsModal from './TransactionsModal'
+import React from 'react'
 
-export const TransactionTable = ({ transactions }) => {
-  const [selectedTransaction, setSelectedTransaction] = useState(null)
-
-  const handleTransactionSelect = (transaction) => {
-    setSelectedTransaction(transaction)
+export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
+  const handleTransactionClick = (transaction) => {
+    handleTransactionSelect(transaction)
   }
 
   return (
@@ -43,7 +40,7 @@ export const TransactionTable = ({ transactions }) => {
                       hover
                       key={transaction.id}
                       sx={{ '&:hover': { cursor: 'pointer' } }}
-                      onClick={() => handleTransactionSelect(transaction)}
+                      onClick={() => handleTransactionClick(transaction)}
                     >
                       <TableCell>
                         {transaction.description}
@@ -69,13 +66,6 @@ export const TransactionTable = ({ transactions }) => {
             </Typography>
             )
       }
-
-      {selectedTransaction && (
-        <TransactionsModal
-          handleTransactionSaved={() => setSelectedTransaction(null)}
-          transaction={selectedTransaction}
-        />
-      )}
     </Box>
   )
 }
