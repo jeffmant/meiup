@@ -12,7 +12,7 @@ app.prepare()
   .then(() => {
     const server = express()
 
-    server.use(cors())
+    server.use(cors({ origin: '*' }))
 
     server.use(bodyParser.urlencoded({ extended: false }))
     server.use(bodyParser.json())
