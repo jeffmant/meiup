@@ -3,6 +3,7 @@ import { db } from 'src/firebase/config'
 
 async function createTransactionDoc (docData) {
   const docRef = collection(db, 'transactions')
+
   try {
     await addDoc(docRef, docData)
     console.log('Documento criado com sucesso!')

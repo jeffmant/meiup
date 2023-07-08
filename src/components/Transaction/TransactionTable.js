@@ -1,8 +1,13 @@
 import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { format } from 'date-fns'
+import React from 'react'
 
-export const TransactionTable = ({ transactions }) => {
+export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
+  const handleTransactionClick = (transaction) => {
+    handleTransactionSelect(transaction)
+  }
+
   return (
     <Box sx={{ minWidth: 800 }}>
       {
@@ -35,6 +40,7 @@ export const TransactionTable = ({ transactions }) => {
                       hover
                       key={transaction.id}
                       sx={{ '&:hover': { cursor: 'pointer' } }}
+                      onClick={() => handleTransactionClick(transaction)}
                     >
                       <TableCell>
                         {transaction.description}

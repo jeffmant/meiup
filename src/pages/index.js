@@ -32,16 +32,43 @@ const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(
 const Page = () => {
   const [transactionType, setTransactionType] = useState('revenue')
   const [transactions, setTransactions] = useState([])
+  const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionAlert, setTransactionAlert] = useState(null)
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const { user } = useAuth()
 
-  const handleTransactionSaved = async (status) => {
-    if (status) {
-      setTransactionAlert({ type: 'success', message: 'Transação criada com sucesso!' })
+  const handleTransactionSelect = (transaction) => {
+    setSelectedTransaction(transaction)
+  }
+
+  const cancelTransactionSelect = () => {
+    setSelectedTransaction(null)
+  }
+
+  async function handleTransactionSaved (status) {
+    if (status === 'OK') {
+      if (!selectedTransaction) {
+        setTransactionAlert({ type: 'success', message: 'Transação criada com sucesso!' })
+      } else {
+        setTransactionAlert({ type: 'success', message: 'Transação atualizada com sucesso!' })
+      }
+      await getTransactions()
+    } else if (status === 'Fail') {
+      if (!selectedTransaction) {
+        setTransactionAlert({ type: 'error', message: 'Houve um erro ao criar a transação' })
+      } else {
+        setTransactionAlert({ type: 'error', message: 'Houve um erro ao atualizar a transação' })
+      }
+      await getTransactions()
+    } else if (status === 'DeleteOK') {
+      setTransactionAlert({ type: 'success', message: 'Transação deletada com sucesso!' })
+      await getTransactions()
+    } else if (status === 'DeleteFail') {
+      setTransactionAlert({ type: 'error', message: 'Houve um erro ao deletar a transação' })
       await getTransactions()
     } else {
-      setTransactionAlert({ type: 'error', message: 'Houve um erro ao criar a transação.' })
+      // Edição cancelada
+      await getTransactions()
     }
   }
 
@@ -253,10 +280,15 @@ const Page = () => {
                   <TransactionsModal
                     sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
                     handleTransactionSaved={handleTransactionSaved}
+                    transaction={selectedTransaction}
+                    cancelTransactionSelect={cancelTransactionSelect}
                   />
                   {
                     lgUp
-                      ? <TransactionTable transactions={transactions || []} />
+                      ? <TransactionTable
+                          handleTransactionSelect={handleTransactionSelect}
+                          transactions={transactions || []}
+                        />
                       : <TransactionCardList transactions={transactions || []} />
                   }
                 </CardContent>
