@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {
   Button,
+  Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
@@ -11,15 +12,17 @@ import {
   TextField,
   Modal,
   CircularProgress,
-  useMediaQuery
+  useMediaQuery,
+  Typography
 } from '@mui/material'
 import Box from '@mui/material/Box'
 import { formatCurrency } from 'src/utils/masks'
 import { useAuth } from 'src/hooks/use-auth'
 import createTransactionDoc from 'src/utils/create-transaction-doc'
 import updateTransactionDoc from 'src/utils/update-transaction'
+import deleteTransaction from 'src/utils/delete-transaction'
 
-const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
+const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransactionSaved }) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const { user } = useAuth()
   const companyId = user?.company?.id
@@ -36,6 +39,8 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
   })
 
   const [savingDoc, setSavingDoc] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
   const resetModalStateAndClose = () => {
     setModalState({
       open: false,
@@ -70,6 +75,22 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
 
   const handleClose = () => {
     resetModalStateAndClose()
+    cancelTransactionSelect()
+  }
+
+  const handleDelete = async () => {
+    if (transaction) {
+      try {
+        await deleteTransaction(transaction.id)
+        handleTransactionSaved('DeleteOK')
+        setConfirmDelete(false)
+        handleClose()
+      } catch (error) {
+        handleTransactionSaved('DeleteFail')
+        setConfirmDelete(false)
+        handleClose()
+      }
+    }
   }
 
   const handleSave = async () => {
@@ -85,9 +106,10 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
       } else {
         await createTransactionDoc(transactionData, docId)
       }
-
+      handleTransactionSaved('OK')
       handleClose()
     } catch (error) {
+      handleTransactionSaved('Fail')
       handleClose()
       console.log('Houve um erro ao salvar a transação: ', error)
     }
@@ -119,11 +141,7 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
   return (
     <div style={{ display: 'flex', justifyContent: lgUp ? 'flex-end' : 'center' }}>
       {!transaction && (
-        <Button
-          variant='contained'
-          onClick={handleOpen}
-          sx={{ mb: 2 }}
-        >
+        <Button variant='contained' onClick={handleOpen} sx={{ mb: 2 }}>
           Nova Transação
         </Button>
       )}
@@ -144,13 +162,10 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
           }}
         >
           <Box>
-            <DialogTitle>Nova Transação</DialogTitle>
+            <DialogTitle>{transaction ? 'Editar Transação' : 'Nova Transação'}</DialogTitle>
           </Box>
           <DialogContent>
-            <FormControl
-              fullWidth
-              sx={{ mb: 2 }}
-            >
+            <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel id='select-type-label'>Tipo</InputLabel>
               <Select
                 labelId='select-type-label'
@@ -164,16 +179,18 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
               </Select>
             </FormControl>
 
-            {modalState.type && <TextField
-              fullWidth
-              value={modalState.party}
-              label={modalState.type === 'cost' ? 'Fornecedor' : 'Cliente'}
-              id='party'
-              InputProps={{
-                readOnly: true
-              }}
-              sx={{ mb: 2 }}
-                                />}
+            {modalState.type && (
+              <TextField
+                fullWidth
+                value={modalState.party}
+                label={modalState.type === 'cost' ? 'Fornecedor' : 'Cliente'}
+                id='party'
+                InputProps={{
+                  readOnly: true
+                }}
+                sx={{ mb: 2 }}
+              />
+            )}
 
             <TextField
               fullWidth
@@ -223,6 +240,11 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
             </FormControl>
           </DialogContent>
           <DialogActions>
+            {transaction && (
+              <Button variant='contained' color='error' onClick={() => setConfirmDelete(true)}>
+                Excluir
+              </Button>
+            )}
             <Button onClick={handleClose} variant='outlined' sx={{ mr: 1 }}>
               Cancelar
             </Button>
@@ -236,6 +258,16 @@ const TransactionsModal = ({ handleTransactionSaved, transaction }) => {
                 </Button>
                 )}
           </DialogActions>
+          <Dialog open={confirmDelete} onClose={() => setConfirmDelete(false)}>
+            <DialogTitle>Confirmação de Exclusão</DialogTitle>
+            <DialogContent>
+              <Typography>Deseja realmente excluir esta transação?</Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setConfirmDelete(false)}>Cancelar</Button>
+              <Button onClick={handleDelete}>Confirmar</Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </Modal>
     </div>
