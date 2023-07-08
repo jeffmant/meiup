@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export const getExternalCompanyInfoByCNPJ = async ({ cnpj }) => {
   try {
-    const { data: company } = await axios.get(`http://localhost:3000/api/cnpj/${cnpj}`, {
+    const { data: company } = await axios.get(`/api/cnpj/${cnpj}`, {
       headers: {
         'Content-Type': 'application/json'
       }
