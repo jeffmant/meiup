@@ -52,7 +52,10 @@ const Page = () => {
         formik.values.cnpj = ''
         setIsLoading(false)
         console.error(error)
-        window.alert(error.message)
+        setRegisterAlert({
+          type: 'error',
+          message: error.message
+        })
       } else {
         setCnpjIsValid(success)
         setCompanyData(company)
