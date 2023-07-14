@@ -96,7 +96,7 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
   const handleSave = async () => {
     const { open, ...data } = modalState
 
-    const transactionData = { ...data, companyId, createdAt: new Date().toISOString() }
+    const transactionData = { ...data, companyId }
 
     setSavingDoc(true)
 

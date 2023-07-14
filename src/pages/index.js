@@ -24,21 +24,30 @@ import { useEffect, useState } from 'react'
 import { getCompanyTransactions } from './api/transaction'
 import { useAuth } from 'src/hooks/use-auth'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
+import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 
 const receivesMonth = 15000
 const receivesYear = 63000
 const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(2)
+const currentMonth = new Date().getMonth()
 
 const Page = () => {
   const [transactionType, setTransactionType] = useState('revenue')
   const [transactions, setTransactions] = useState([])
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionAlert, setTransactionAlert] = useState(null)
+  const [transactionMonth, setTransactionMonth] = useState(currentMonth)
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const { user } = useAuth()
+  console.log(transactionMonth)
 
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
+  }
+
+  const handleTransactionMonth = async (month) => {
+    setTransactionMonth(month)
+    await getTransactions()
   }
 
   const cancelTransactionSelect = () => {
@@ -74,7 +83,11 @@ const Page = () => {
 
   async function getTransactions () {
     if (user?.company?.id) {
-      const transactions = await getCompanyTransactions({ companyId: user?.company?.id, type: transactionType })
+      const transactions = await getCompanyTransactions({
+        companyId: user?.company?.id,
+        type: transactionType,
+        month: transactionMonth
+      })
       setTransactions(transactions)
       return transactions
     }
@@ -113,18 +126,9 @@ const Page = () => {
               p: 2
             }}
           >
-            <Stack
-              alignItems='center'
-              direction='row'
-              justifyContent='space-between'
-              spacing={4}
-            >
+            <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
               <div>
-                <Typography
-                  color='text.secondary'
-                  variant='overline'
-                  align='center'
-                >
+                <Typography color='text.secondary' variant='overline' align='center'>
                   Receita no mês
                 </Typography>
               </div>
@@ -134,73 +138,14 @@ const Page = () => {
                 </Typography>
               </div>
             </Stack>
-            {
-              lgUp && (
-                <>
-                  <Divider
-                    orientation='vertical'
-                    flexItem
-                    sx={{ borderWidth: '1px', borderColor: '#c6c6c6' }}
-                  />
+            {lgUp && (
+              <>
+                <Divider
+                  orientation='vertical'
+                  flexItem
+                  sx={{ borderWidth: '1px', borderColor: '#c6c6c6' }}
+                />
 
-                  <Stack
-                    alignItems='center'
-                    direction='row'
-                    justifyContent='space-between'
-                    spacing={4}
-                  >
-                    <div>
-                      <Typography
-                        color='text.secondary'
-                        gutterBottom
-                        variant='overline'
-                        align='center'
-                      >
-                        Receita Anual
-                      </Typography>
-                    </div>
-                    <div>
-                      <Typography
-                        variant='h4'
-                        sx={{ mb: 2 }}
-                      >
-                        {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                      </Typography>
-                      {receivesPercentageFromYearLimit}% do teto
-                    </div>
-                  </Stack>
-
-                  <LinearProgress
-                    value={receivesPercentageFromYearLimit}
-                    variant='determinate'
-                    color={
-                    receivesPercentageFromYearLimit <= 35
-                      ? 'success'
-                      : receivesPercentageFromYearLimit > 35 &&
-                        receivesPercentageFromYearLimit <= 75
-                        ? 'info'
-                        : receivesPercentageFromYearLimit > 75 &&
-                        receivesPercentageFromYearLimit <= 100
-                          ? 'error'
-                          : ''
-                  }
-                  />
-                </>
-              )
-            }
-          </Card>
-          {
-            !lgUp && (
-              <Card sx={{
-                display: 'flex',
-                direction: 'column',
-                justifyContent: 'space-around',
-                height: '100%',
-                backgroundColor: '#ececec',
-                mb: 2,
-                p: 2
-              }}
-              >
                 <Stack
                   alignItems='center'
                   direction='row'
@@ -218,16 +163,17 @@ const Page = () => {
                     </Typography>
                   </div>
                   <div>
-                    <Typography
-                      variant='h4'
-                      sx={{ mb: 2 }}
-                    >
+                    <Typography variant='h4' sx={{ mb: 2 }}>
                       {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                     </Typography>
-                    <LinearProgress
-                      value={receivesPercentageFromYearLimit}
-                      variant='determinate'
-                      color={
+                    {receivesPercentageFromYearLimit}% do teto
+                  </div>
+                </Stack>
+
+                <LinearProgress
+                  value={receivesPercentageFromYearLimit}
+                  variant='determinate'
+                  color={
                     receivesPercentageFromYearLimit <= 35
                       ? 'success'
                       : receivesPercentageFromYearLimit > 35 &&
@@ -238,17 +184,53 @@ const Page = () => {
                           ? 'error'
                           : ''
                   }
-                    />
-                    {receivesPercentageFromYearLimit}% do teto
-                  </div>
-                </Stack>
-              </Card>
-            )
-          }
-          <Grid
-            container
-            spacing={3}
-          >
+                />
+              </>
+            )}
+          </Card>
+          {!lgUp && (
+            <Card
+              sx={{
+                display: 'flex',
+                direction: 'column',
+                justifyContent: 'space-around',
+                height: '100%',
+                backgroundColor: '#ececec',
+                mb: 2,
+                p: 2
+              }}
+            >
+              <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
+                <div>
+                  <Typography color='text.secondary' gutterBottom variant='overline' align='center'>
+                    Receita Anual
+                  </Typography>
+                </div>
+                <div>
+                  <Typography variant='h4' sx={{ mb: 2 }}>
+                    {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                  </Typography>
+                  <LinearProgress
+                    value={receivesPercentageFromYearLimit}
+                    variant='determinate'
+                    color={
+                      receivesPercentageFromYearLimit <= 35
+                        ? 'success'
+                        : receivesPercentageFromYearLimit > 35 &&
+                          receivesPercentageFromYearLimit <= 75
+                          ? 'info'
+                          : receivesPercentageFromYearLimit > 75 &&
+                          receivesPercentageFromYearLimit <= 100
+                            ? 'error'
+                            : ''
+                    }
+                  />
+                  {receivesPercentageFromYearLimit}% do teto
+                </div>
+              </Stack>
+            </Card>
+          )}
+          <Grid container spacing={3}>
             <Grid xs={12}>
               <Card
                 sx={{
@@ -264,33 +246,39 @@ const Page = () => {
                   value={transactionType}
                   variant='fullWidth'
                 >
-                  <Tab
-                    label='Receitas'
-                    value='revenue'
-                    disableRipple
-                  />
-                  <Tab
-                    label='Despesas'
-                    value='cost'
-                    disableRipple
-                  />
+                  <Tab label='Receitas' value='revenue' disableRipple />
+                  <Tab label='Despesas' value='cost' disableRipple />
                 </Tabs>
 
                 <CardContent>
-                  <TransactionsModal
-                    sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
-                    handleTransactionSaved={handleTransactionSaved}
-                    transaction={selectedTransaction}
-                    cancelTransactionSelect={cancelTransactionSelect}
-                  />
-                  {
-                    lgUp
-                      ? <TransactionTable
-                          handleTransactionSelect={handleTransactionSelect}
-                          transactions={transactions || []}
-                        />
-                      : <TransactionCardList transactions={transactions || []} />
-                  }
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      maxHeight: '65px',
+                      alignItems: 'center',
+                      gap: '10px'
+                    }}
+                  >
+                    <TransactionMonthSelector handleTransactionMonth={handleTransactionMonth} />
+                    <TransactionsModal
+                      sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
+                      handleTransactionSaved={handleTransactionSaved}
+                      transaction={selectedTransaction}
+                      cancelTransactionSelect={cancelTransactionSelect}
+                    />
+                  </Box>
+                  {lgUp
+                    ? (
+                      <TransactionTable
+                        handleTransactionSelect={handleTransactionSelect}
+                        transactions={transactions || []}
+                      />
+                      )
+                    : (
+                      <TransactionCardList transactions={transactions || []} />
+                      )}
                 </CardContent>
 
                 <CardActions sx={{ justifyContent: 'center' }}>
@@ -306,8 +294,15 @@ const Page = () => {
                     />
                   </Box> */}
                   {transactionAlert && (
-                    <Snackbar open={!!transactionAlert} autoHideDuration={3000} onClose={() => setTransactionAlert(null)}>
-                      <Alert onClose={() => setTransactionAlert(null)} severity={transactionAlert.type}>
+                    <Snackbar
+                      open={!!transactionAlert}
+                      autoHideDuration={3000}
+                      onClose={() => setTransactionAlert(null)}
+                    >
+                      <Alert
+                        onClose={() => setTransactionAlert(null)}
+                        severity={transactionAlert.type}
+                      >
                         {transactionAlert.message}
                       </Alert>
                     </Snackbar>
