@@ -3,9 +3,10 @@ import { db } from 'src/firebase/config'
 
 async function createTransactionDoc (docData) {
   const docRef = collection(db, 'transactions')
+  const createdAt = Timestamp.fromDate(new Date(docData.date))
 
   try {
-    await addDoc(docRef, { ...docData, createdAt: Timestamp.fromDate(new Date()) })
+    await addDoc(docRef, { ...docData, createdAt })
     console.log('Documento criado com sucesso!')
   } catch {
     console.log('Houve um erro ao criar o documento.')

@@ -39,7 +39,6 @@ const Page = () => {
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const { user } = useAuth()
-  console.log(transactionMonth)
 
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
@@ -47,8 +46,15 @@ const Page = () => {
 
   const handleTransactionMonth = async (month) => {
     setTransactionMonth(month)
-    await getTransactions()
   }
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      await getTransactions()
+    }
+
+    fetchTransactions()
+  }, [transactionMonth])
 
   const cancelTransactionSelect = () => {
     setSelectedTransaction(null)
@@ -76,7 +82,6 @@ const Page = () => {
       setTransactionAlert({ type: 'error', message: 'Houve um erro ao deletar a transação' })
       await getTransactions()
     } else {
-      // Edição cancelada
       await getTransactions()
     }
   }

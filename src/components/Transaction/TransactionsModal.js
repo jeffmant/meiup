@@ -27,6 +27,7 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
   const { user } = useAuth()
   const companyId = user?.company?.id
   const docId = transaction?.id
+  const currentDate = new Date().toISOString().split('T')[0]
 
   const [modalState, setModalState] = useState({
     open: false,
@@ -35,6 +36,7 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
     description: '',
     amount: '',
     category: '',
+    date: currentDate,
     status: ''
   })
 
@@ -49,6 +51,7 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
       description: '',
       amount: '',
       category: '',
+      date: currentDate,
       status: ''
     })
   }
@@ -132,6 +135,10 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
 
   const handleCategoryChange = (event) => {
     setModalState({ ...modalState, category: event.target.value })
+  }
+
+  const handleDateChange = (event) => {
+    setModalState({ ...modalState, date: event.target.value })
   }
 
   const handleStatusChange = (event) => {
@@ -224,6 +231,15 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
                 <MenuItem value='venda'>Venda</MenuItem>
               </Select>
             </FormControl>
+
+            <TextField
+              fullWidth
+              type='date'
+              value={modalState.date}
+              label='Data'
+              onChange={handleDateChange}
+              sx={{ mb: 2 }}
+            />
 
             <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel id='select-status-label'>Status</InputLabel>

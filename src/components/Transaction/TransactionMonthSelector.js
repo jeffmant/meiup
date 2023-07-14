@@ -37,7 +37,7 @@ const TransactionMonthSelector = ({ handleTransactionMonth }) => {
 
   return (
     <div>
-      <Button variant='contained' onClick={handleOpenMenu} sx={{ mb: 2 }}>
+      <Button variant='outlined' onClick={handleOpenMenu} sx={{ mb: 2 }}>
         {selectedMonth}
       </Button>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
