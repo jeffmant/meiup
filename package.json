@@ -7,7 +7,7 @@
   "private": false,
   "scripts": {
     "dev": "node --require ./src/server/index.js ./node_modules/.bin/next dev -p 3001",
-    "start": "node --require ./src/server/index.js ./node_modules/.bin/next start -p 3001",
+    "start": "node ./src/server/index.js",
     "build": "next build",
     "export": "next export",
     "lint": "standard",
