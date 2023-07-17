@@ -1,12 +1,10 @@
 {
-  "name": "material-kit-react",
-  "version": "3.0.0",
-  "author": "Devias",
-  "licence": "MIT",
-  "homepage": "https://devias.io",
-  "private": false,
+  "name": "meumei.app",
+  "version": "1.0.0",
+  "author": "clubdev",
+  "homepage": "https://meumei.app",
   "scripts": {
-    "dev": "node --require ./src/server/index.js ./node_modules/.bin/next dev -p 3001",
+    "dev": "node ./src/server/index.js",
     "start": "node ./src/server/index.js",
     "build": "next build",
     "export": "next export",
