@@ -1,8 +1,8 @@
 import { collection, doc, deleteDoc } from 'firebase/firestore'
-import { db } from 'src/firebase/config'
+import { firestoreDB } from 'src/firebase/config'
 
 async function deleteTransaction (docId) {
-  const transactionRef = doc(collection(db, 'transactions'), docId)
+  const transactionRef = doc(collection(firestoreDB, 'transactions'), docId)
 
   try {
     // deletar documento

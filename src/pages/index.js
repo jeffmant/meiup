@@ -21,10 +21,10 @@ import { TransactionCardList } from 'src/components/Transaction/TransactionCardL
 import { Stack } from '@mui/system'
 import { TransactionTable } from 'src/components/Transaction/TransactionTable'
 import { useEffect, useState } from 'react'
-import { getCompanyTransactions } from './api/transaction'
 import { useAuth } from 'src/hooks/use-auth'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
+import { getCompanyTransactions } from 'src/firebase/helpers/company.helper'
 
 const receivesMonth = 15000
 const receivesYear = 63000
@@ -61,28 +61,24 @@ const Page = () => {
   }
 
   async function handleTransactionSaved (status) {
+    await getTransactions()
+
     if (status === 'OK') {
       if (!selectedTransaction) {
         setTransactionAlert({ type: 'success', message: 'Transação criada com sucesso!' })
       } else {
         setTransactionAlert({ type: 'success', message: 'Transação atualizada com sucesso!' })
       }
-      await getTransactions()
     } else if (status === 'Fail') {
       if (!selectedTransaction) {
         setTransactionAlert({ type: 'error', message: 'Houve um erro ao criar a transação' })
       } else {
         setTransactionAlert({ type: 'error', message: 'Houve um erro ao atualizar a transação' })
       }
-      await getTransactions()
     } else if (status === 'DeleteOK') {
       setTransactionAlert({ type: 'success', message: 'Transação deletada com sucesso!' })
-      await getTransactions()
     } else if (status === 'DeleteFail') {
       setTransactionAlert({ type: 'error', message: 'Houve um erro ao deletar a transação' })
-      await getTransactions()
-    } else {
-      await getTransactions()
     }
   }
 
@@ -91,10 +87,11 @@ const Page = () => {
       const transactions = await getCompanyTransactions({
         companyId: user?.company?.id,
         type: transactionType,
-        month: transactionMonth
+        month: transactionMonth,
+        // TODO: Create year select
+        year: new Date().getFullYear()
       })
       setTransactions(transactions)
-      return transactions
     }
   }
 

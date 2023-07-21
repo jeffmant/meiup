@@ -4,8 +4,8 @@
   "author": "clubdev",
   "homepage": "https://meumei.app",
   "scripts": {
-    "dev": "node ./src/server/index.js",
-    "start": "node ./src/server/index.js",
+    "dev": "next dev",
+    "start": "next start",
     "build": "next build",
     "export": "next export",
     "lint": "standard",

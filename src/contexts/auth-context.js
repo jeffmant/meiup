@@ -1,14 +1,11 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { login, logout, register } from '../pages/api/auth'
 import Cookies from 'js-cookie'
-import { saveCompanyDataToFirestore, getCompanyByUserId } from 'src/pages/api/utils'
+import { saveCompanyDataToFirestore, getCompanyByUserId } from '../firebase/helpers/company.helper'
 import { updateDoc, doc } from 'firebase/firestore'
-import firebaseApp, { db } from 'src/firebase/config'
-import { getAuth } from 'firebase/auth'
+import { firebaseAuth, firestoreDB } from 'src/firebase/config'
 import jwtDecode from 'jwt-decode'
-
-const firebaseAuth = getAuth(firebaseApp)
+import { signin, signout, signup } from 'src/firebase/helpers/auth.helper'
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -138,7 +135,7 @@ export const AuthProvider = (props) => {
 
   const signIn = async ({ email, password }) => {
     try {
-      const { user: loggedUser } = await login({ email, password })
+      const loggedUser = await signin({ email, password })
 
       const company = await getCompanyByUserId({ userId: loggedUser.uid })
 
@@ -172,7 +169,7 @@ export const AuthProvider = (props) => {
   }
 
   const signUp = async ({ email, password, companyData }) => {
-    const registeredUser = await register({ email, password, companyData })
+    const registeredUser = await signup({ email, password, companyData })
 
     if (registeredUser) {
       const company = await getCompanyByUserId({ userId: registeredUser.uid })
@@ -205,18 +202,17 @@ export const AuthProvider = (props) => {
     }
   }
 
-  const signOut = () => {
-    logout().then(() => {
-      Cookies.remove('accessToken')
-      dispatch({
-        type: HANDLERS.SIGN_OUT
-      })
+  const signOut = async () => {
+    await signout()
+    Cookies.remove('accessToken')
+    dispatch({
+      type: HANDLERS.SIGN_OUT
     })
   }
 
   const updateUserProfile = async ({ companyId, companyData }) => {
     try {
-      const updatedCompany = await updateDoc(doc(db, 'companies', companyId), companyData)
+      const updatedCompany = await updateDoc(doc(firestoreDB, 'companies', companyId), companyData)
       const loggedUser = firebaseAuth.currentUser
 
       const { accessToken, displayName: name, email, emailVerified, phoneNumber: phone, photoURL: avatar } = loggedUser
