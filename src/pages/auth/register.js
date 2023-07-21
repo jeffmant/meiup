@@ -17,7 +17,6 @@ import {
 import { useAuth } from 'src/hooks/use-auth'
 import { Layout as AuthLayout } from 'src/layouts/auth/layout'
 import { cnpjMask, removeMask } from 'src/utils/masks'
-import { getExternalCompanyInfoByCNPJ } from '../api/company'
 import { useState } from 'react'
 import { getCompanyByCnpj } from '../api/utils'
 
@@ -46,9 +45,16 @@ const Page = () => {
         router.push('/auth/login')
       }, 3000)
     } else {
-      const { error, success, data: company } = await getExternalCompanyInfoByCNPJ({ cnpj })
+      try {
+        const response = await fetch(`/api/company/${cnpj}`)
+        const company = await response.json()
 
-      if (error) {
+        setCnpjIsValid(true)
+        setCompanyData(company)
+        formik.values.email = company.email
+        formik.values.name = company.fantasyName
+        setIsLoading(false)
+      } catch (error) {
         formik.values.cnpj = ''
         setIsLoading(false)
         console.error(error)
@@ -56,12 +62,6 @@ const Page = () => {
           type: 'error',
           message: error.message
         })
-      } else {
-        setCnpjIsValid(success)
-        setCompanyData(company)
-        formik.values.email = company.email
-        formik.values.name = company.fantasyName
-        setIsLoading(false)
       }
     }
   }
