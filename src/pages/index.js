@@ -25,23 +25,30 @@ import { useAuth } from 'src/hooks/use-auth'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 import { getCompanyTransactions } from 'src/firebase/helpers/company.helper'
+import getMonthlyRevenue from 'src/utils/get-monthly-revenue'
 
-const receivesMonth = 15000
 const receivesYear = 63000
 const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(2)
 const currentMonth = new Date().getMonth()
 
 const Page = () => {
+  const { user } = useAuth()
   const [transactionType, setTransactionType] = useState('revenue')
   const [transactions, setTransactions] = useState([])
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionAlert, setTransactionAlert] = useState(null)
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
+  const [monthRevenue, setMonthRevenue] = useState(getMonthlyRevenue({ user }, transactionMonth))
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
-  const { user } = useAuth()
+
+  console.log(transactions)
 
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
+  }
+
+  const handleMonthRevenue = async () => {
+    await getMonthlyRevenue({ user }, transactionMonth).then((total) => setMonthRevenue(total))
   }
 
   const handleTransactionMonth = async (month) => {
@@ -55,6 +62,10 @@ const Page = () => {
 
     fetchTransactions()
   }, [transactionMonth])
+
+  useEffect(() => {
+    handleMonthRevenue()
+  }, [transactions, transactionMonth])
 
   const cancelTransactionSelect = () => {
     setSelectedTransaction(null)
@@ -136,7 +147,7 @@ const Page = () => {
               </div>
               <div>
                 <Typography variant='h4'>
-                  {receivesMonth.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                  {monthRevenue.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                 </Typography>
               </div>
             </Stack>
