@@ -1,9 +1,9 @@
-import { db } from 'src/firebase/config'
-import { setDoc, doc, collection, where, getDocs, query } from 'firebase/firestore'
+import { firestoreDB } from 'src/firebase/config'
+import { collection, where, getDocs, query, setDoc, doc, Timestamp } from 'firebase/firestore'
 
 // Consulta para buscar dados do documento da empresa
 export const getCompanyByCnpj = async ({ cnpj }) => {
-  const companyDocRef = query(collection(db, 'companies'), where('cnpj', '==', cnpj))
+  const companyDocRef = query(collection(firestoreDB, 'companies'), where('cnpj', '==', cnpj))
   const companyDocSnap = await getDocs(companyDocRef)
 
   if (!companyDocSnap.empty) {
@@ -18,7 +18,7 @@ export const getCompanyByCnpj = async ({ cnpj }) => {
 
 // Consulta para buscar dados do documento da empresa
 export const getCompanyByUserId = async ({ userId }) => {
-  const companyDocRef = query(collection(db, 'companies'), where('userId', '==', userId))
+  const companyDocRef = query(collection(firestoreDB, 'companies'), where('userId', '==', userId))
   const companyDocSnap = await getDocs(companyDocRef)
 
   if (!companyDocSnap.empty) {
@@ -35,7 +35,7 @@ export const getCompanyByUserId = async ({ userId }) => {
 export const saveCompanyDataToFirestore = async ({ companyData, userId }) => {
   try {
     // Criando uma referência para o documento da empresa no Firestore
-    const companiesCollectionRef = collection(db, 'companies')
+    const companiesCollectionRef = collection(firestoreDB, 'companies')
 
     // Salvando os dados da empresa obtidos em 'companyData' no documento
     // Caso a empresa ainda não tenha sido cadastrada ele irá criar um novo documento utilizando o cnpj fornecido como id
@@ -48,4 +48,28 @@ export const saveCompanyDataToFirestore = async ({ companyData, userId }) => {
   } catch (error) {
     console.error('Erro ao salvar dados da empresa no Firestore:', error)
   }
+}
+
+export const getCompanyTransactions = async ({ companyId, type, month, year }) => {
+  const startDate = new Date(year, month, 1)
+  const endDate = new Date(year, month + 1, 1)
+
+  const transactionsRef = collection(firestoreDB, 'transactions')
+
+  const q = query(
+    transactionsRef,
+    where('companyId', '==', companyId),
+    where('type', '==', type),
+    where('createdAt', '>=', Timestamp.fromDate(startDate)),
+    where('createdAt', '<', Timestamp.fromDate(endDate))
+  )
+
+  const querySnapshot = await getDocs(q)
+
+  const transactions = []
+  querySnapshot.forEach((doc) => {
+    transactions.push({ id: doc.id, ...doc.data() })
+  })
+
+  return transactions
 }

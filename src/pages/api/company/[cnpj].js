@@ -26,7 +26,7 @@ export default async function handler (req, res) {
 
     if (foundCnpj.natureza_juridica_codigo !== '2135') throw new Error('CNPJ não é MEI')
 
-    res.status(200).json({
+    const company = {
       cnpj: foundCnpj.normalizado_cnpj,
       companyName: foundCnpj.razao_social,
       fantasyName: foundCnpj.nome_fantasia,
@@ -42,6 +42,11 @@ export default async function handler (req, res) {
         state: foundCnpj.endereco_uf,
         block: foundCnpj.endereco_bairro
       }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: company
     })
   } catch (error) {
     console.error(error.message)

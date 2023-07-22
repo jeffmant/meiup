@@ -18,7 +18,7 @@ import { useAuth } from 'src/hooks/use-auth'
 import { Layout as AuthLayout } from 'src/layouts/auth/layout'
 import { cnpjMask, removeMask } from 'src/utils/masks'
 import { useState } from 'react'
-import { getCompanyByCnpj } from '../api/utils'
+import { getCompanyByCnpj } from 'src/firebase/helpers/company.helper'
 
 const Page = () => {
   const router = useRouter()
@@ -32,9 +32,9 @@ const Page = () => {
   const [registerAlert, setRegisterAlert] = useState(null)
 
   const validateCNPJ = async ({ cnpj }) => {
-    const companyAlreadyExists = await getCompanyByCnpj({ cnpj })
+    const company = await getCompanyByCnpj({ cnpj })
 
-    if (companyAlreadyExists) {
+    if (company) {
       formik.values.cnpj = ''
       setIsLoading(false)
       setRegisterAlert({
@@ -45,23 +45,15 @@ const Page = () => {
         router.push('/auth/login')
       }, 3000)
     } else {
-      try {
-        const response = await fetch(`/api/company/${cnpj}`)
-        const company = await response.json()
+      const response = await fetch(`/api/company/${cnpj}`)
+      const { data: externalCompanyInfo } = await response.json()
 
+      if (externalCompanyInfo) {
         setCnpjIsValid(true)
-        setCompanyData(company)
-        formik.values.email = company.email
-        formik.values.name = company.fantasyName
+        setCompanyData(externalCompanyInfo)
+        formik.values.email = externalCompanyInfo.email
+        formik.values.name = externalCompanyInfo.fantasyName
         setIsLoading(false)
-      } catch (error) {
-        formik.values.cnpj = ''
-        setIsLoading(false)
-        console.error(error)
-        setRegisterAlert({
-          type: 'error',
-          message: error.message
-        })
       }
     }
   }

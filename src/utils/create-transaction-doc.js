@@ -1,8 +1,8 @@
 import { collection, addDoc, Timestamp } from 'firebase/firestore'
-import { db } from 'src/firebase/config'
+import { firestoreDB } from 'src/firebase/config'
 
 async function createTransactionDoc (docData) {
-  const docRef = collection(db, 'transactions')
+  const docRef = collection(firestoreDB, 'transactions')
   const createdAt = Timestamp.fromDate(new Date(docData.date))
 
   try {
