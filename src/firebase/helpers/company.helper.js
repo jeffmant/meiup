@@ -12,7 +12,7 @@ export const getCompanyByCnpj = async ({ cnpj }) => {
       id: companyDocSnap.docs[0].id
     }
   } else {
-    return console.log('O documento da empresa não foi encontrado.')
+    console.log('O documento da empresa não foi encontrado.')
   }
 }
 
@@ -27,7 +27,7 @@ export const getCompanyByUserId = async ({ userId }) => {
       id: companyDocSnap.docs[0].id
     }
   } else {
-    return console.log('O documento da empresa não foi encontrado.')
+    console.log('O documento da empresa não foi encontrado.')
   }
 }
 

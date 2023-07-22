@@ -12,8 +12,6 @@ export default async function getMonthlyRevenue ({ user }, transactionMonth) {
     })
   }
 
-  console.log('Total antes:', total)
-
   transactions.forEach((transaction) => {
     const { amount, type } = transaction
     const numericAmount = Number(
@@ -28,7 +26,6 @@ export default async function getMonthlyRevenue ({ user }, transactionMonth) {
     } else {
       total -= numericAmount
     }
-    console.log(total)
   })
 
   return total

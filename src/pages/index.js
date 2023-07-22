@@ -41,8 +41,6 @@ const Page = () => {
   const [monthRevenue, setMonthRevenue] = useState(getMonthlyRevenue({ user }, transactionMonth))
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
 
-  console.log(transactions)
-
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
   }
