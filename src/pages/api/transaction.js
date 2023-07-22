@@ -10,13 +10,16 @@ export const getCompanyTransactions = async ({ companyId, type, month, page = 1,
   const endDate = new Date(year, month + 1, 1)
 
   try {
-    const q = query(
+    let q = query(
       transactionsRef,
       where('companyId', '==', companyId),
-      where('type', '==', type),
       where('createdAt', '>=', Timestamp.fromDate(startDate)),
       where('createdAt', '<', Timestamp.fromDate(endDate))
     )
+
+    if (type) {
+      q = query(q, where('type', '==', type))
+    }
 
     const querySnapshot = await getDocs(q)
 
