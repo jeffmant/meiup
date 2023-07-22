@@ -56,13 +56,16 @@ export const getCompanyTransactions = async ({ companyId, type, month, year }) =
 
   const transactionsRef = collection(firestoreDB, 'transactions')
 
-  const q = query(
+  let q = query(
     transactionsRef,
     where('companyId', '==', companyId),
-    where('type', '==', type),
     where('createdAt', '>=', Timestamp.fromDate(startDate)),
     where('createdAt', '<', Timestamp.fromDate(endDate))
   )
+
+  if (type) {
+    q = query(q, where('type', '==', type))
+  }
 
   const querySnapshot = await getDocs(q)
 
