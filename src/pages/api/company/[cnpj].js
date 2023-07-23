@@ -24,7 +24,7 @@ export default async function handler (req, res) {
 
     const foundCnpj = data[0]
 
-    if (foundCnpj.natureza_juridica_codigo !== '2135') throw new Error('CNPJ não é MEI')
+    if (foundCnpj.natureza_juridica_codigo !== '2135') throw new Error('Este CNPJ não é MEI')
 
     const company = {
       cnpj: foundCnpj.normalizado_cnpj,

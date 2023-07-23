@@ -11,6 +11,7 @@ const NotificationBar = () => {
       <Snackbar
         open={isOpen}
         autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         onClose={() => {
           notificationCtx.clear()
           setIsOpen(false)
