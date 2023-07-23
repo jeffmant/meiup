@@ -3,7 +3,7 @@ import { TransactionCard } from './TransactionCard'
 import { format } from 'date-fns'
 import { Typography } from '@mui/material'
 
-export const TransactionCardList = ({ transactions = [] }) => {
+export const TransactionCardList = ({ transactions = [], handleTransactionSelect }) => {
   return (
     <Box>
       {transactions?.length
@@ -16,6 +16,7 @@ export const TransactionCardList = ({ transactions = [] }) => {
                 description={transaction.description}
                 status={transaction.status}
                 createdAt={format(new Date(transaction.createdAt.seconds * 1000), 'dd/MM/yyyy')}
+                onClick={() => handleTransactionSelect(transaction)}
               />
             ))
           )

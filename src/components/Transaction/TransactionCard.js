@@ -3,19 +3,22 @@ import { Stack } from '@mui/system'
 
 export const TransactionCard = ({
   amount,
-  partyName
+  partyName,
+  onClick
 }) => {
   return (
-    <Card sx={{
-      width: '100%',
-      backgroundColor:
+    <Card
+      onClick={onClick}
+      sx={{
+        width: '100%',
+        backgroundColor:
       '#fefefe',
-      mb: 2,
-      '&:hover': {
-        backgroundColor: '#ececec',
-        cursor: 'pointer'
-      }
-    }}
+        mb: 2,
+        '&:hover': {
+          backgroundColor: '#ececec',
+          cursor: 'pointer'
+        }
+      }}
     >
       <CardContent>
         <Stack
