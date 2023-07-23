@@ -12,20 +12,19 @@ import {
   Tabs,
   Typography,
   useMediaQuery,
-  Alert,
-  Snackbar,
   Divider
 } from '@mui/material'
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
 import { Stack } from '@mui/system'
 import { TransactionTable } from 'src/components/Transaction/TransactionTable'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 import { getCompanyTransactions } from 'src/firebase/helpers/company.helper'
 import getMonthlyRevenue from 'src/utils/get-monthly-revenue'
+import NotificationContext from 'src/contexts/notification.context'
 
 const receivesYear = 63000
 const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(2)
@@ -36,10 +35,11 @@ const Page = () => {
   const [transactionType, setTransactionType] = useState('revenue')
   const [transactions, setTransactions] = useState([])
   const [selectedTransaction, setSelectedTransaction] = useState(null)
-  const [transactionAlert, setTransactionAlert] = useState(null)
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
   const [monthRevenue, setMonthRevenue] = useState(getMonthlyRevenue({ user }, transactionMonth))
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
+
+  const notificationCtx = useContext(NotificationContext)
 
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
@@ -74,20 +74,20 @@ const Page = () => {
 
     if (status === 'OK') {
       if (!selectedTransaction) {
-        setTransactionAlert({ type: 'success', message: 'Transação criada com sucesso!' })
+        notificationCtx.success('Transação criada com sucesso!')
       } else {
-        setTransactionAlert({ type: 'success', message: 'Transação atualizada com sucesso!' })
+        notificationCtx.success('Transação atualizada com sucesso!')
       }
     } else if (status === 'Fail') {
       if (!selectedTransaction) {
-        setTransactionAlert({ type: 'error', message: 'Houve um erro ao criar a transação' })
+        notificationCtx.error('Houve um erro ao criar a transação')
       } else {
-        setTransactionAlert({ type: 'error', message: 'Houve um erro ao atualizar a transação' })
+        notificationCtx.error('Houve um erro ao criar a transação')
       }
     } else if (status === 'DeleteOK') {
-      setTransactionAlert({ type: 'success', message: 'Transação deletada com sucesso!' })
+      notificationCtx.success('Transação deletada com sucesso!')
     } else if (status === 'DeleteFail') {
-      setTransactionAlert({ type: 'error', message: 'Houve um erro ao deletar a transação' })
+      notificationCtx.error('Houve um erro ao deletar a transação')
     }
   }
 
@@ -137,9 +137,18 @@ const Page = () => {
               p: 2
             }}
           >
-            <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
+            <Stack
+              alignItems='center'
+              direction='row'
+              justifyContent='space-between'
+              spacing={4}
+            >
               <div>
-                <Typography color='text.secondary' variant='overline' align='center'>
+                <Typography
+                  color='text.secondary'
+                  variant='overline'
+                  align='center'
+                >
                   Receita no mês
                 </Typography>
               </div>
@@ -174,7 +183,10 @@ const Page = () => {
                     </Typography>
                   </div>
                   <div>
-                    <Typography variant='h4' sx={{ mb: 2 }}>
+                    <Typography
+                      variant='h4'
+                      sx={{ mb: 2 }}
+                    >
                       {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                     </Typography>
                     {receivesPercentageFromYearLimit}% do teto
@@ -211,14 +223,27 @@ const Page = () => {
                 p: 2
               }}
             >
-              <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
+              <Stack
+                alignItems='center'
+                direction='row'
+                justifyContent='space-between'
+                spacing={4}
+              >
                 <div>
-                  <Typography color='text.secondary' gutterBottom variant='overline' align='center'>
+                  <Typography
+                    color='text.secondary'
+                    gutterBottom
+                    variant='overline'
+                    align='center'
+                  >
                     Receita Anual
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant='h4' sx={{ mb: 2 }}>
+                  <Typography
+                    variant='h4'
+                    sx={{ mb: 2 }}
+                  >
                     {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                   </Typography>
                   <LinearProgress
@@ -241,7 +266,10 @@ const Page = () => {
               </Stack>
             </Card>
           )}
-          <Grid container spacing={3}>
+          <Grid
+            container
+            spacing={3}
+          >
             <Grid xs={12}>
               <Card
                 sx={{
@@ -257,8 +285,16 @@ const Page = () => {
                   value={transactionType}
                   variant='fullWidth'
                 >
-                  <Tab label='Receitas' value='revenue' disableRipple />
-                  <Tab label='Despesas' value='cost' disableRipple />
+                  <Tab
+                    label='Receitas'
+                    value='revenue'
+                    disableRipple
+                  />
+                  <Tab
+                    label='Despesas'
+                    value='cost'
+                    disableRipple
+                  />
                 </Tabs>
 
                 <CardContent>
@@ -266,7 +302,7 @@ const Page = () => {
                     sx={{
                       display: 'flex',
                       flexDirection: 'row',
-                      justifyContent: 'flex-end',
+                      justifyContent: 'space-between',
                       maxHeight: '65px',
                       alignItems: 'center',
                       gap: '10px'
@@ -288,7 +324,10 @@ const Page = () => {
                       />
                       )
                     : (
-                      <TransactionCardList transactions={transactions || []} />
+                      <TransactionCardList
+                        transactions={transactions || []}
+                        handleTransactionSelect={handleTransactionSelect}
+                      />
                       )}
                 </CardContent>
 
@@ -304,20 +343,6 @@ const Page = () => {
                       size='small'
                     />
                   </Box> */}
-                  {transactionAlert && (
-                    <Snackbar
-                      open={!!transactionAlert}
-                      autoHideDuration={3000}
-                      onClose={() => setTransactionAlert(null)}
-                    >
-                      <Alert
-                        onClose={() => setTransactionAlert(null)}
-                        severity={transactionAlert.type}
-                      >
-                        {transactionAlert.message}
-                      </Alert>
-                    </Snackbar>
-                  )}
                 </CardActions>
               </Card>
             </Grid>

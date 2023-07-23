@@ -1,5 +1,4 @@
 import {
-  Alert,
   Box,
   Button,
   Card,
@@ -9,18 +8,19 @@ import {
   Divider,
   TextField,
   Unstable_Grid2 as Grid,
-  CircularProgress,
-  Snackbar
+  CircularProgress
 } from '@mui/material'
 import { useAuth } from 'src/hooks/use-auth'
 import { cnpjMask, maskCPF, maskPhone, removeMask } from 'src/utils/masks'
 import { useFormik } from 'formik'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
+import NotificationContext from 'src/contexts/notification.context'
 
 export const AccountProfileDetails = () => {
   const { user, updateUserProfile } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
-  const [updateAlert, setUpdateAlert] = useState(null)
+
+  const notificationCtx = useContext(NotificationContext)
 
   const formik = useFormik({
     initialValues: {
@@ -40,15 +40,9 @@ export const AccountProfileDetails = () => {
             phone: removeMask(values.phone || '')
           }
         })
-        setUpdateAlert({
-          type: 'success',
-          message: 'Informações de cadastro atualizadas com sucesso!'
-        })
+        notificationCtx.success('Informações de cadastro atualizadas com sucesso!')
       } catch (error) {
-        setUpdateAlert({
-          type: 'error',
-          message: 'Não foi possível atualizar o cadastro agora.'
-        })
+        notificationCtx.error('Não foi possível atualizar o cadastro agora.')
       } finally {
         setIsLoading(false)
       }
@@ -56,14 +50,27 @@ export const AccountProfileDetails = () => {
   })
 
   return (
-    <form autoComplete='off' noValidate onSubmit={formik.handleSubmit}>
+    <form
+      autoComplete='off'
+      noValidate
+      onSubmit={formik.handleSubmit}
+    >
       <Card>
-        <CardHeader subheader='mantenha seu perfil atualizado ;)' title='perfil' />
+        <CardHeader
+          subheader='mantenha seu perfil atualizado ;)'
+          title='perfil'
+        />
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>
-            <Grid container spacing={3}>
+            <Grid
+              container
+              spacing={3}
+            >
               {/* Company Info */}
-              <Grid xs={12} md={6}>
+              <Grid
+                xs={12}
+                md={6}
+              >
                 <TextField
                   fullWidth
                   label='nome fantasia'
@@ -76,7 +83,10 @@ export const AccountProfileDetails = () => {
                   readOnly
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid
+                xs={12}
+                md={6}
+              >
                 <TextField
                   error={!!(formik.touched.cnpj && formik.errors.cnpj)}
                   fullWidth
@@ -91,7 +101,10 @@ export const AccountProfileDetails = () => {
                 />
               </Grid>
 
-              <Grid xs={12} md={6}>
+              <Grid
+                xs={12}
+                md={6}
+              >
                 <TextField
                   type='email'
                   fullWidth
@@ -106,7 +119,10 @@ export const AccountProfileDetails = () => {
                 />
               </Grid>
 
-              <Grid xs={12} md={6}>
+              <Grid
+                xs={12}
+                md={6}
+              >
                 <TextField
                   fullWidth
                   label='cpf'
@@ -118,7 +134,10 @@ export const AccountProfileDetails = () => {
                 />
               </Grid>
 
-              <Grid xs={12} md={6}>
+              <Grid
+                xs={12}
+                md={6}
+              >
                 <TextField
                   fullWidth
                   label='celular'
@@ -134,18 +153,15 @@ export const AccountProfileDetails = () => {
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant='contained' type='submit' disabled={isLoading}>
+          <Button
+            variant='contained'
+            type='submit'
+            disabled={isLoading}
+          >
             {isLoading ? <CircularProgress /> : 'salvar'}
           </Button>
         </CardActions>
       </Card>
-      {updateAlert && (
-        <Snackbar open={!!updateAlert} autoHideDuration={3000} onClose={() => setUpdateAlert(null)}>
-          <Alert onClose={() => setUpdateAlert(null)} severity={updateAlert.type}>
-            {updateAlert.message}
-          </Alert>
-        </Snackbar>
-      )}
     </form>
   )
 }

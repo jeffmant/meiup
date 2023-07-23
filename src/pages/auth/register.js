@@ -10,15 +10,14 @@ import {
   Link,
   Stack,
   TextField,
-  Typography,
-  Alert,
-  Snackbar
+  Typography
 } from '@mui/material'
 import { useAuth } from 'src/hooks/use-auth'
 import { Layout as AuthLayout } from 'src/layouts/auth/layout'
 import { cnpjMask, removeMask } from 'src/utils/masks'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { getCompanyByCnpj } from 'src/firebase/helpers/company.helper'
+import NotificationContext from 'src/contexts/notification.context'
 
 const Page = () => {
   const router = useRouter()
@@ -29,7 +28,8 @@ const Page = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [cnpjIsValid, setCnpjIsValid] = useState(false)
   const [companyData, setCompanyData] = useState(null)
-  const [registerAlert, setRegisterAlert] = useState(null)
+
+  const notificationCtx = useContext(NotificationContext)
 
   const validateCNPJ = async ({ cnpj }) => {
     const company = await getCompanyByCnpj({ cnpj })
@@ -37,24 +37,27 @@ const Page = () => {
     if (company) {
       formik.values.cnpj = ''
       setIsLoading(false)
-      setRegisterAlert({
-        type: 'warning',
-        message: 'Este MEI já está cadastrado. Vamos fazer o login?'
-      })
+
+      notificationCtx.warning('Este MEI já está cadastrado. Vamos fazer o login?')
       setTimeout(() => {
         router.push('/auth/login')
       }, 3000)
     } else {
       const response = await fetch(`/api/company/${cnpj}`)
-      const { data: externalCompanyInfo } = await response.json()
+      const { error, data: externalCompanyInfo } = await response.json()
+
+      if (error) {
+        formik.values.cnpj = ''
+        notificationCtx.error(error)
+      }
 
       if (externalCompanyInfo) {
         setCnpjIsValid(true)
         setCompanyData(externalCompanyInfo)
         formik.values.email = externalCompanyInfo.email
         formik.values.name = externalCompanyInfo.fantasyName
-        setIsLoading(false)
       }
+      setIsLoading(false)
     }
   }
 
@@ -90,10 +93,7 @@ const Page = () => {
           })
           .then(() => {
             setIsLoading(false)
-            setRegisterAlert({
-              type: 'success',
-              message: 'Cadastro realizado com sucesso!'
-            })
+            notificationCtx.success('Cadastro realizado com sucesso!')
             setTimeout(() => {
               router.push('/')
             }, 3000)
@@ -103,10 +103,7 @@ const Page = () => {
           })
       } catch (err) {
         setIsLoading(false)
-        setRegisterAlert({
-          type: 'error',
-          message: err.message
-        })
+        notificationCtx.error(err.message)
         helpers.setStatus({ success: false })
         helpers.setErrors({ submit: err.message })
         helpers.setSubmitting(false)
@@ -136,11 +133,17 @@ const Page = () => {
           }}
         >
           <div>
-            <Typography variant='h5' sx={{ py: 4 }}>
+            <Typography
+              variant='h5'
+              sx={{ py: 4 }}
+            >
               você vai se juntar ao time? ;)
             </Typography>
 
-            <form noValidate onSubmit={formik.handleSubmit}>
+            <form
+              noValidate
+              onSubmit={formik.handleSubmit}
+            >
               <Stack spacing={3}>
                 <TextField
                   error={!!(formik.touched.cnpj && formik.errors.cnpj)}
@@ -203,7 +206,11 @@ const Page = () => {
                 )}
               </Stack>
               {formik.errors.submit && (
-                <Typography color='error' sx={{ mt: 3 }} variant='body2'>
+                <Typography
+                  color='error'
+                  sx={{ mt: 3 }}
+                  variant='body2'
+                >
                   {formik.errors.submit}
                 </Typography>
               )}
@@ -255,24 +262,18 @@ const Page = () => {
             >
               {' '}
               {!isLoading && !cnpjIsValid && (
-                <Link component={NextLink} href='/auth/login' underline='hover' variant='subtitle2'>
+                <Link
+                  component={NextLink}
+                  href='/auth/login'
+                  underline='hover'
+                  variant='subtitle2'
+                >
                   já tenho conta, quero fazer login
                 </Link>
               )}
             </Box>
           </div>
         </Box>
-        {registerAlert && (
-          <Snackbar
-            open={!!registerAlert}
-            autoHideDuration={3000}
-            onClose={() => setRegisterAlert(null)}
-          >
-            <Alert onClose={() => setRegisterAlert(null)} severity={registerAlert.type}>
-              {registerAlert.message}
-            </Alert>
-          </Snackbar>
-        )}
       </Box>
     </>
   )
