@@ -76,3 +76,63 @@ export const getCompanyTransactions = async ({ companyId, type, month, year }) =
 
   return transactions
 }
+
+export const getCompanyMonthlyRevenue = async (companyId, month, year) => {
+  const startDate = new Date(year, month, 1)
+  const endDate = new Date(year, month + 1, 1)
+
+  const transactionsRef = collection(firestoreDB, 'transactions')
+
+  const q = query(
+    transactionsRef,
+    where('companyId', '==', companyId),
+    where('createdAt', '>=', Timestamp.fromDate(startDate)),
+    where('createdAt', '<', Timestamp.fromDate(endDate))
+  )
+
+  const querySnapshot = await getDocs(q)
+
+  let monthlyRevenue = 0
+  querySnapshot.forEach((doc) => {
+    const transaction = doc.data()
+    const amount = Number(
+      transaction.amount
+        .replace(/[^0-9.,]+/g, '')
+        .replace(/\./g, '')
+        .replace(',', '.')
+    )
+    monthlyRevenue += transaction.type === 'revenue' ? amount : -amount
+  })
+
+  return monthlyRevenue
+}
+
+export const getCompanyAnnualRevenue = async (companyId, year) => {
+  const startDate = new Date(year, 0, 1)
+  const endDate = new Date(year + 1, 0, 1)
+
+  const transactionsRef = collection(firestoreDB, 'transactions')
+
+  const q = query(
+    transactionsRef,
+    where('companyId', '==', companyId),
+    where('createdAt', '>=', Timestamp.fromDate(startDate)),
+    where('createdAt', '<', Timestamp.fromDate(endDate))
+  )
+
+  const querySnapshot = await getDocs(q)
+
+  let annualRevenue = 0
+  querySnapshot.forEach((doc) => {
+    const transaction = doc.data()
+    const amount = Number(
+      transaction.amount
+        .replace(/[^0-9.,]+/g, '')
+        .replace(/\./g, '')
+        .replace(',', '.')
+    )
+    annualRevenue += transaction.type === 'revenue' ? amount : -amount
+  })
+
+  return annualRevenue
+}

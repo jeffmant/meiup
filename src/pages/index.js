@@ -22,21 +22,34 @@ import { useContext, useEffect, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
-import { getCompanyTransactions } from 'src/firebase/helpers/company.helper'
-import getMonthlyRevenue from 'src/utils/get-monthly-revenue'
+import {
+  getCompanyAnnualRevenue,
+  getCompanyMonthlyRevenue,
+  getCompanyTransactions
+} from 'src/firebase/helpers/company.helper'
 import NotificationContext from 'src/contexts/notification.context'
+import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
 
 const receivesYear = 63000
 const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(2)
 const currentMonth = new Date().getMonth()
+const currentYear = new Date().getFullYear()
 
 const Page = () => {
   const { user } = useAuth()
+  const companyId = user?.company?.id
   const [transactionType, setTransactionType] = useState('revenue')
   const [transactions, setTransactions] = useState([])
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
-  const [monthRevenue, setMonthRevenue] = useState(getMonthlyRevenue({ user }, transactionMonth))
+  const [transactionYear, setTransactionYear] = useState(currentYear)
+  const [monthRevenue, setMonthRevenue] = useState(
+    getCompanyMonthlyRevenue(companyId, transactionMonth, currentYear)
+  )
+  const [annualRevenue, setAnnualRevenue] = useState(
+    getCompanyAnnualRevenue(companyId, currentYear)
+  )
+
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
 
   const notificationCtx = useContext(NotificationContext)
@@ -46,11 +59,23 @@ const Page = () => {
   }
 
   const handleMonthRevenue = async () => {
-    await getMonthlyRevenue({ user }, transactionMonth).then((total) => setMonthRevenue(total))
+    await getCompanyMonthlyRevenue(companyId, transactionMonth, transactionYear).then((total) =>
+      setMonthRevenue(total)
+    )
+  }
+
+  const handleAnnualRevenue = async () => {
+    await getCompanyAnnualRevenue(companyId, transactionYear).then((total) => {
+      setAnnualRevenue(total)
+    })
   }
 
   const handleTransactionMonth = async (month) => {
     setTransactionMonth(month)
+  }
+
+  const handleTransactionYear = async (year) => {
+    setTransactionYear(year)
   }
 
   useEffect(() => {
@@ -59,11 +84,15 @@ const Page = () => {
     }
 
     fetchTransactions()
-  }, [transactionMonth])
+  }, [transactionMonth, transactionYear])
 
   useEffect(() => {
     handleMonthRevenue()
   }, [transactions, transactionMonth])
+
+  useEffect(() => {
+    handleAnnualRevenue()
+  }, [transactions, transactionYear])
 
   const cancelTransactionSelect = () => {
     setSelectedTransaction(null)
@@ -97,8 +126,7 @@ const Page = () => {
         companyId: user?.company?.id,
         type: transactionType,
         month: transactionMonth,
-        // TODO: Create year select
-        year: new Date().getFullYear()
+        year: transactionYear
       })
       setTransactions(transactions)
     }
@@ -137,18 +165,9 @@ const Page = () => {
               p: 2
             }}
           >
-            <Stack
-              alignItems='center'
-              direction='row'
-              justifyContent='space-between'
-              spacing={4}
-            >
+            <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
               <div>
-                <Typography
-                  color='text.secondary'
-                  variant='overline'
-                  align='center'
-                >
+                <Typography color='text.secondary' variant='overline' align='center'>
                   Receita no mês
                 </Typography>
               </div>
@@ -183,11 +202,11 @@ const Page = () => {
                     </Typography>
                   </div>
                   <div>
-                    <Typography
-                      variant='h4'
-                      sx={{ mb: 2 }}
-                    >
-                      {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                    <Typography variant='h4' sx={{ mb: 2 }}>
+                      {annualRevenue.toLocaleString('pt-br', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      })}
                     </Typography>
                     {receivesPercentageFromYearLimit}% do teto
                   </div>
@@ -223,27 +242,14 @@ const Page = () => {
                 p: 2
               }}
             >
-              <Stack
-                alignItems='center'
-                direction='row'
-                justifyContent='space-between'
-                spacing={4}
-              >
+              <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
                 <div>
-                  <Typography
-                    color='text.secondary'
-                    gutterBottom
-                    variant='overline'
-                    align='center'
-                  >
+                  <Typography color='text.secondary' gutterBottom variant='overline' align='center'>
                     Receita Anual
                   </Typography>
                 </div>
                 <div>
-                  <Typography
-                    variant='h4'
-                    sx={{ mb: 2 }}
-                  >
+                  <Typography variant='h4' sx={{ mb: 2 }}>
                     {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                   </Typography>
                   <LinearProgress
@@ -266,10 +272,7 @@ const Page = () => {
               </Stack>
             </Card>
           )}
-          <Grid
-            container
-            spacing={3}
-          >
+          <Grid container spacing={3}>
             <Grid xs={12}>
               <Card
                 sx={{
@@ -285,16 +288,8 @@ const Page = () => {
                   value={transactionType}
                   variant='fullWidth'
                 >
-                  <Tab
-                    label='Receitas'
-                    value='revenue'
-                    disableRipple
-                  />
-                  <Tab
-                    label='Despesas'
-                    value='cost'
-                    disableRipple
-                  />
+                  <Tab label='Receitas' value='revenue' disableRipple />
+                  <Tab label='Despesas' value='cost' disableRipple />
                 </Tabs>
 
                 <CardContent>
@@ -308,7 +303,17 @@ const Page = () => {
                       gap: '10px'
                     }}
                   >
-                    <TransactionMonthSelector handleTransactionMonth={handleTransactionMonth} />
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
+                        gap: '10px'
+                      }}
+                    >
+                      <TransactionMonthSelector handleTransactionMonth={handleTransactionMonth} />
+                      <TransactionYearSelector handleTransactionYear={handleTransactionYear} />
+                    </Box>
                     <TransactionsModal
                       sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
                       handleTransactionSaved={handleTransactionSaved}

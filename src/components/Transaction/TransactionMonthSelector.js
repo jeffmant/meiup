@@ -37,38 +37,15 @@ const TransactionMonthSelector = ({ handleTransactionMonth }) => {
 
   return (
     <div>
-      <Button
-        variant='outlined'
-        onClick={handleOpenMenu}
-        sx={{ mb: 2, width: 100 }}
-      >
+      <Button variant='outlined' onClick={handleOpenMenu} sx={{ mb: 2, width: 100 }}>
         {selectedMonth}
       </Button>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-      >
-        {
-          months.map((month, index) => (
-            <MenuItem
-              key={month}
-              onClick={() => handleMonthSelect(index)}
-            >{month}
-            </MenuItem>
-          ))
-        }
-        {/* <MenuItem onClick={() => handleMonthSelect(1)}>Fevereiro</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(2)}>Março</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(3)}>Abril</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(4)}>Maio</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(5)}>Junho</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(6)}>Julho</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(7)}>Agosto</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(8)}>Setembro</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(9)}>Outubro</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(10)}>Novembro</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(11)}>Dezembro</MenuItem> */}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+        {months.map((month, index) => (
+          <MenuItem key={month} onClick={() => handleMonthSelect(index)}>
+            {month}
+          </MenuItem>
+        ))}
       </Menu>
     </div>
   )

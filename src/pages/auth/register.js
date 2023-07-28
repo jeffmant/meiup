@@ -3,15 +3,7 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Link,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material'
+import { Box, Button, CircularProgress, Link, Stack, TextField, Typography } from '@mui/material'
 import { useAuth } from 'src/hooks/use-auth'
 import { Layout as AuthLayout } from 'src/layouts/auth/layout'
 import { cnpjMask, removeMask } from 'src/utils/masks'
@@ -133,17 +125,11 @@ const Page = () => {
           }}
         >
           <div>
-            <Typography
-              variant='h5'
-              sx={{ py: 4 }}
-            >
+            <Typography variant='h5' sx={{ py: 4 }}>
               você vai se juntar ao time? ;)
             </Typography>
 
-            <form
-              noValidate
-              onSubmit={formik.handleSubmit}
-            >
+            <form noValidate onSubmit={formik.handleSubmit}>
               <Stack spacing={3}>
                 <TextField
                   error={!!(formik.touched.cnpj && formik.errors.cnpj)}
@@ -206,11 +192,7 @@ const Page = () => {
                 )}
               </Stack>
               {formik.errors.submit && (
-                <Typography
-                  color='error'
-                  sx={{ mt: 3 }}
-                  variant='body2'
-                >
+                <Typography color='error' sx={{ mt: 3 }} variant='body2'>
                   {formik.errors.submit}
                 </Typography>
               )}
@@ -262,12 +244,7 @@ const Page = () => {
             >
               {' '}
               {!isLoading && !cnpjIsValid && (
-                <Link
-                  component={NextLink}
-                  href='/auth/login'
-                  underline='hover'
-                  variant='subtitle2'
-                >
+                <Link component={NextLink} href='/auth/login' underline='hover' variant='subtitle2'>
                   já tenho conta, quero fazer login
                 </Link>
               )}
