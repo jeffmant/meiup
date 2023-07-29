@@ -136,3 +136,8 @@ export const getCompanyAnnualRevenue = async (companyId, year) => {
 
   return annualRevenue
 }
+
+export async function getCompanyAnnualRevenuePercentage (annualRevenue) {
+  const annualRevenuePercentage = ((annualRevenue * 100) / 81000).toFixed(2)
+  return annualRevenuePercentage
+}

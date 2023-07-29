@@ -6,7 +6,7 @@ import {
   CardContent,
   Container,
   Unstable_Grid2 as Grid,
-  LinearProgress,
+  // LinearProgress,
   // Pagination,
   Tab,
   Tabs,
@@ -24,14 +24,14 @@ import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 import {
   getCompanyAnnualRevenue,
+  getCompanyAnnualRevenuePercentage,
   getCompanyMonthlyRevenue,
   getCompanyTransactions
 } from 'src/firebase/helpers/company.helper'
 import NotificationContext from 'src/contexts/notification.context'
 import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
 
-const receivesYear = 63000
-const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(2)
+// const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(2)
 const currentMonth = new Date().getMonth()
 const currentYear = new Date().getFullYear()
 
@@ -49,6 +49,8 @@ const Page = () => {
   const [annualRevenue, setAnnualRevenue] = useState(
     getCompanyAnnualRevenue(companyId, currentYear)
   )
+
+  const [revenuePercentageFromYearLimit, setRevenuePercentageFromYearLimit] = useState(0)
 
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
 
@@ -70,6 +72,12 @@ const Page = () => {
     })
   }
 
+  const handleRevenueLimit = async () => {
+    await getCompanyAnnualRevenuePercentage(annualRevenue).then((revenuePercentage) => {
+      setRevenuePercentageFromYearLimit(revenuePercentage)
+    })
+  }
+
   const handleTransactionMonth = async (month) => {
     setTransactionMonth(month)
   }
@@ -83,15 +91,18 @@ const Page = () => {
       await getTransactions()
     }
 
+    handleRevenueLimit()
     fetchTransactions()
   }, [transactionMonth, transactionYear])
 
   useEffect(() => {
     handleMonthRevenue()
+    handleRevenueLimit()
   }, [transactions, transactionMonth])
 
   useEffect(() => {
     handleAnnualRevenue()
+    handleRevenueLimit()
   }, [transactions, transactionYear])
 
   const cancelTransactionSelect = () => {
@@ -208,25 +219,23 @@ const Page = () => {
                         currency: 'BRL'
                       })}
                     </Typography>
-                    {receivesPercentageFromYearLimit}% do teto
+                    {revenuePercentageFromYearLimit}% do teto
                   </div>
                 </Stack>
 
-                <LinearProgress
-                  value={receivesPercentageFromYearLimit}
-                  variant='determinate'
+                {/* <LinearProgress
+                  value={revenuePercentageFromYearLimit}
+                  variant="determinate"
                   color={
-                    receivesPercentageFromYearLimit <= 35
-                      ? 'success'
-                      : receivesPercentageFromYearLimit > 35 &&
-                        receivesPercentageFromYearLimit <= 75
-                        ? 'info'
-                        : receivesPercentageFromYearLimit > 75 &&
-                        receivesPercentageFromYearLimit <= 100
-                          ? 'error'
-                          : ''
+                    revenuePercentageFromYearLimit <= 35
+                      ? "success"
+                      : revenuePercentageFromYearLimit > 35 && revenuePercentageFromYearLimit <= 75
+                      ? "info"
+                      : revenuePercentageFromYearLimit > 75 && revenuePercentageFromYearLimit <= 100
+                      ? "error"
+                      : ""
                   }
-                />
+                /> */}
               </>
             )}
           </Card>
@@ -250,24 +259,24 @@ const Page = () => {
                 </div>
                 <div>
                   <Typography variant='h4' sx={{ mb: 2 }}>
-                    {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                    {annualRevenue.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                   </Typography>
-                  <LinearProgress
-                    value={receivesPercentageFromYearLimit}
-                    variant='determinate'
+                  {/* <LinearProgress
+                    value={revenuePercentageFromYearLimit}
+                    variant="determinate"
                     color={
-                      receivesPercentageFromYearLimit <= 35
-                        ? 'success'
-                        : receivesPercentageFromYearLimit > 35 &&
-                          receivesPercentageFromYearLimit <= 75
-                          ? 'info'
-                          : receivesPercentageFromYearLimit > 75 &&
-                          receivesPercentageFromYearLimit <= 100
-                            ? 'error'
-                            : ''
+                      revenuePercentageFromYearLimit <= 35
+                        ? "success"
+                        : revenuePercentageFromYearLimit > 35 &&
+                          revenuePercentageFromYearLimit <= 75
+                        ? "info"
+                        : revenuePercentageFromYearLimit > 75 &&
+                          revenuePercentageFromYearLimit <= 100
+                        ? "error"
+                        : ""
                     }
-                  />
-                  {receivesPercentageFromYearLimit}% do teto
+                  /> */}
+                  {revenuePercentageFromYearLimit}% do teto
                 </div>
               </Stack>
             </Card>
