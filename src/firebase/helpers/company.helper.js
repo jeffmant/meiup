@@ -76,3 +76,68 @@ export const getCompanyTransactions = async ({ companyId, type, month, year }) =
 
   return transactions
 }
+
+export const getCompanyMonthlyStats = async (companyId, month, year) => {
+  const startDate = new Date(year, month, 1)
+  const endDate = new Date(year, month + 1, 1)
+
+  const transactionsRef = collection(firestoreDB, 'transactions')
+
+  const q = query(
+    transactionsRef,
+    where('companyId', '==', companyId),
+    where('createdAt', '>=', Timestamp.fromDate(startDate)),
+    where('createdAt', '<', Timestamp.fromDate(endDate))
+  )
+
+  const querySnapshot = await getDocs(q)
+
+  let monthlyRevenue = 0
+  let monthlyCost = 0
+
+  querySnapshot.forEach((doc) => {
+    const transaction = doc.data()
+    if (transaction.type === 'revenue') {
+      monthlyRevenue += transaction.amount
+    } else if (transaction.type === 'cost') {
+      monthlyCost += transaction.amount
+    }
+  })
+
+  return { monthlyRevenue, monthlyCost }
+}
+
+export const getCompanyAnnualStats = async (companyId, year) => {
+  const startDate = new Date(year, 0, 1)
+  const endDate = new Date(year + 1, 0, 1)
+
+  const transactionsRef = collection(firestoreDB, 'transactions')
+
+  const q = query(
+    transactionsRef,
+    where('companyId', '==', companyId),
+    where('createdAt', '>=', Timestamp.fromDate(startDate)),
+    where('createdAt', '<', Timestamp.fromDate(endDate))
+  )
+
+  const querySnapshot = await getDocs(q)
+
+  let annualRevenue = 0
+  let annualCost = 0
+
+  querySnapshot.forEach((doc) => {
+    const transaction = doc.data()
+    if (transaction.type === 'revenue') {
+      annualRevenue += transaction.amount
+    } else if (transaction.type === 'cost') {
+      annualCost += transaction.amount
+    }
+  })
+
+  return { annualRevenue, annualCost }
+}
+
+export function getCompanyAnnualRevenuePercentage (annualRevenue) {
+  const annualRevenuePercentage = ((annualRevenue * 100) / 81000).toFixed(2)
+  return annualRevenuePercentage
+}

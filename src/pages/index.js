@@ -21,54 +21,68 @@ import { TransactionTable } from 'src/components/Transaction/TransactionTable'
 import { useContext, useEffect, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
-import { getCompanyTransactions } from 'src/firebase/helpers/company.helper'
+import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
+import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
+import {
+  getCompanyAnnualRevenuePercentage,
+  getCompanyAnnualStats,
+  getCompanyMonthlyStats,
+  getCompanyTransactions
+} from 'src/firebase/helpers/company.helper'
 import NotificationContext from 'src/contexts/notification.context'
-import getMonthlyStats from 'src/utils/get-monthly-stats'
-
-const months = [
-  'Janeiro',
-  'Fevereiro',
-  'Março',
-  'Abril',
-  'Maio',
-  'Junho',
-  'Julho',
-  'Agosto',
-  'Setembro',
-  'Outubro',
-  'Novembro',
-  'Dezembro'
-]
 
 const currentMonth = new Date().getMonth()
+const currentYear = new Date().getFullYear()
 
 const Page = () => {
   const { user } = useAuth()
+  const companyId = user?.company?.id
   const [transactionType, setTransactionType] = useState('all')
   const [transactions, setTransactions] = useState([])
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
+  const [transactionYear, setTransactionYear] = useState(currentYear)
   const [monthRevenue, setMonthRevenue] = useState(0)
   const [monthCost, setMonthCost] = useState(0)
+  const [annualRevenue, setAnnualRevenue] = useState(0)
+  const [annualCost, setAnnualCost] = useState(0)
+  const [revenuePercentageFromYearLimit, setRevenuePercentageFromYearLimit] = useState(0)
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
 
   const notificationCtx = useContext(NotificationContext)
+
+  console.log('annualRevenue: ', annualRevenue)
+  console.log('annualCost: ', annualCost)
+  console.log('revenuePercentageFromYearLimit: ', revenuePercentageFromYearLimit)
 
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
   }
 
-  const handleMonthStats = async () => {
-    const { totalMontlyCost, totalMontlyRevenue } = await getMonthlyStats({ user }, transactionMonth)
-    setMonthCost(totalMontlyCost)
-    setMonthRevenue(totalMontlyRevenue)
+  const handleRevenueLimit = async () => {
+    const limitYearPercentage = getCompanyAnnualRevenuePercentage(annualRevenue)
+    setRevenuePercentageFromYearLimit(limitYearPercentage)
   }
 
-  console.log('revenue: ', monthRevenue)
-  console.log('cost: ', monthCost)
+  const handleMonthlyStats = async () => {
+    const { monthlyRevenue, monthlyCost } = await getCompanyMonthlyStats(companyId, transactionMonth, transactionYear)
+    setMonthRevenue(monthlyRevenue)
+    setMonthCost(monthlyCost)
+  }
+
+  const handleAnnualStats = async () => {
+    const { annualRevenue, annualCost } = await getCompanyAnnualStats(companyId, transactionYear)
+    setAnnualRevenue(annualRevenue)
+    setAnnualCost(annualCost)
+    handleRevenueLimit()
+  }
 
   const handleTransactionMonth = async (month) => {
     setTransactionMonth(month)
+  }
+
+  const handleTransactionYear = async (year) => {
+    setTransactionYear(year)
   }
 
   useEffect(() => {
@@ -77,12 +91,15 @@ const Page = () => {
     }
 
     fetchTransactions()
-  }, [transactionMonth])
+  }, [transactionMonth, transactionYear])
 
   useEffect(() => {
-    console.log(transactions)
-    handleMonthStats()
+    handleMonthlyStats()
   }, [transactions, transactionMonth])
+
+  useEffect(() => {
+    handleAnnualStats()
+  }, [transactions, transactionYear])
 
   const cancelTransactionSelect = () => {
     setSelectedTransaction(null)
@@ -116,8 +133,7 @@ const Page = () => {
         companyId: user?.company?.id,
         type: transactionType,
         month: transactionMonth,
-        // TODO: Create year select
-        year: new Date().getFullYear()
+        year: transactionYear
       })
       setTransactions(transactions)
     }
@@ -193,12 +209,7 @@ const Page = () => {
                 p: 2
               }}
             >
-              <Stack
-                alignItems='center'
-                direction='row'
-                justifyContent='space-between'
-                spacing={4}
-              >
+              <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
                 <div>
                   <Typography
                     color='text.secondary'
@@ -242,22 +253,12 @@ const Page = () => {
                   >
                     <Stack>
                       <Stack sx={{ flexDirection: 'row' }}>
-                        <FormControl fullWidth sx={{ mr: 2, width: '128px' }}>
-                          <InputLabel id='select-type-label'>Mês</InputLabel>
-                          <Select
-                            labelId='select-type-label'
-                            id='select-type'
-                            value={transactionMonth}
-                            label='Mês'
-                            onChange={(e) => handleTransactionMonth(e.target.value)}
-                          >
-                            {
-                              months.map((month, index) => (
-                                <MenuItem key={index} value={months.indexOf(month)}>{month}</MenuItem>
-                              ))
-                            }
-                          </Select>
-                        </FormControl>
+                        <Stack sx={{ mr: 2 }}>
+                          <TransactionMonthSelector handleTransactionMonth={handleTransactionMonth} />
+                        </Stack>
+                        <Stack sx={{ mr: 2 }}>
+                          <TransactionYearSelector handleTransactionYear={handleTransactionYear} />
+                        </Stack>
 
                         <FormControl fullWidth sx={{ width: '128px' }}>
                           <InputLabel id='select-type-label'>Tipo</InputLabel>
