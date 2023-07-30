@@ -58,17 +58,6 @@ const TransactionMonthSelector = ({ handleTransactionMonth }) => {
             </MenuItem>
           ))
         }
-        {/* <MenuItem onClick={() => handleMonthSelect(1)}>Fevereiro</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(2)}>Março</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(3)}>Abril</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(4)}>Maio</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(5)}>Junho</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(6)}>Julho</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(7)}>Agosto</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(8)}>Setembro</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(9)}>Outubro</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(10)}>Novembro</MenuItem>
-        <MenuItem onClick={() => handleMonthSelect(11)}>Dezembro</MenuItem> */}
       </Menu>
     </div>
   )

@@ -41,7 +41,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>entrar | meumei</title>
+        <title>entrar | meiup</title>
       </Head>
       <Box
         sx={{

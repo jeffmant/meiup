@@ -114,7 +114,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>criar conta | meumei</title>
+        <title>criar conta | meiup</title>
       </Head>
       <Box
         sx={{

@@ -63,7 +63,7 @@ export const getCompanyTransactions = async ({ companyId, type, month, year }) =
     where('createdAt', '<', Timestamp.fromDate(endDate))
   )
 
-  if (type) {
+  if (type && type !== 'all') {
     q = query(q, where('type', '==', type))
   }
 

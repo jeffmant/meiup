@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 import { Typography } from '@mui/material'
 
 export const TransactionCardList = ({ transactions = [], handleTransactionSelect }) => {
+  console.log(transactions)
   return (
     <Box>
       {transactions?.length
@@ -13,15 +14,14 @@ export const TransactionCardList = ({ transactions = [], handleTransactionSelect
                 key={transaction.id}
                 amount={transaction.amount}
                 partyName={transaction.party}
-                description={transaction.description}
-                status={transaction.status}
+                type={transaction.type}
                 createdAt={format(new Date(transaction.createdAt.seconds * 1000), 'dd/MM/yyyy')}
                 onClick={() => handleTransactionSelect(transaction)}
               />
             ))
           )
         : (
-          <Typography>Ops! Nenhuma Transação foi encontrada.</Typography>
+          <Typography sx={{ mt: 16 }} align='center'>Ops! Nenhuma Transação foi encontrada.</Typography>
           )}
     </Box>
   )

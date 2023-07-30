@@ -5,7 +5,7 @@ import { Logo } from 'src/components/logo'
 
 export const Layout = (props) => {
   const { children } = props
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
+  const smUp = useMediaQuery((theme) => theme.breakpoints.up('sm'))
 
   return (
     <Box
@@ -23,7 +23,7 @@ export const Layout = (props) => {
           xs={12}
           lg={6}
           sx={{
-            backgroundColor: 'background.paper',
+            backgroundColor: 'neutral.900',
             display: 'flex',
             flexDirection: 'column',
             position: 'relative'
@@ -54,7 +54,7 @@ export const Layout = (props) => {
           {children}
         </Grid>
         {
-          lgUp && (
+          smUp && (
             <Grid
               xs={12}
               lg={6}

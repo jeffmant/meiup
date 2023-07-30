@@ -5,14 +5,14 @@ import {
   CardActions,
   CardContent,
   Container,
+  FormControl,
   Unstable_Grid2 as Grid,
-  LinearProgress,
-  // Pagination,
-  Tab,
-  Tabs,
+  InputLabel,
+  MenuItem,
+  Select,
   Typography,
-  useMediaQuery,
-  Divider
+  useMediaQuery
+  // Pagination
 } from '@mui/material'
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
@@ -21,23 +21,36 @@ import { TransactionTable } from 'src/components/Transaction/TransactionTable'
 import { useContext, useEffect, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
-import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 import { getCompanyTransactions } from 'src/firebase/helpers/company.helper'
-import getMonthlyRevenue from 'src/utils/get-monthly-revenue'
 import NotificationContext from 'src/contexts/notification.context'
+import getMonthlyStats from 'src/utils/get-monthly-stats'
 
-const receivesYear = 63000
-const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(2)
+const months = [
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro'
+]
+
 const currentMonth = new Date().getMonth()
 
 const Page = () => {
   const { user } = useAuth()
-  const [transactionType, setTransactionType] = useState('revenue')
+  const [transactionType, setTransactionType] = useState('all')
   const [transactions, setTransactions] = useState([])
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
-  const [monthRevenue, setMonthRevenue] = useState(getMonthlyRevenue({ user }, transactionMonth))
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
+  const [monthRevenue, setMonthRevenue] = useState(0)
+  const [monthCost, setMonthCost] = useState(0)
+  const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
 
   const notificationCtx = useContext(NotificationContext)
 
@@ -45,9 +58,14 @@ const Page = () => {
     setSelectedTransaction(transaction)
   }
 
-  const handleMonthRevenue = async () => {
-    await getMonthlyRevenue({ user }, transactionMonth).then((total) => setMonthRevenue(total))
+  const handleMonthStats = async () => {
+    const { totalMontlyCost, totalMontlyRevenue } = await getMonthlyStats({ user }, transactionMonth)
+    setMonthCost(totalMontlyCost)
+    setMonthRevenue(totalMontlyRevenue)
   }
+
+  console.log('revenue: ', monthRevenue)
+  console.log('cost: ', monthCost)
 
   const handleTransactionMonth = async (month) => {
     setTransactionMonth(month)
@@ -62,7 +80,8 @@ const Page = () => {
   }, [transactionMonth])
 
   useEffect(() => {
-    handleMonthRevenue()
+    console.log(transactions)
+    handleMonthStats()
   }, [transactions, transactionMonth])
 
   const cancelTransactionSelect = () => {
@@ -104,9 +123,8 @@ const Page = () => {
     }
   }
 
-  const handleTransactionType = async () => {
-    const newTransactionType = transactionType === 'cost' ? 'revenue' : 'cost'
-    setTransactionType(newTransactionType)
+  const handleTransactionType = async (e) => {
+    setTransactionType(e.target.value)
   }
 
   useEffect(() => {
@@ -116,7 +134,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>meumei</title>
+        <title>meiup</title>
       </Head>
       <Box
         component='main'
@@ -126,100 +144,52 @@ const Page = () => {
         }}
       >
         <Container maxWidth='xl'>
-          <Card
-            sx={{
-              display: 'flex',
-              direction: 'column',
-              justifyContent: 'space-around',
-              height: '100%',
-              backgroundColor: '#ececec',
-              mb: 2,
-              p: 2
-            }}
+          <Stack
+            alignItems='center'
+            direction={mdUp ? 'row' : 'column'}
+            justifyContent={mdUp ? 'space-between' : 'center'}
+            spacing={4}
+            sx={{ mb: 2 }}
           >
-            <Stack
-              alignItems='center'
-              direction='row'
-              justifyContent='space-between'
-              spacing={4}
-            >
-              <div>
-                <Typography
-                  color='text.secondary'
-                  variant='overline'
-                  align='center'
-                >
-                  Receita no mês
-                </Typography>
-              </div>
-              <div>
-                <Typography variant='h4'>
-                  {monthRevenue.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                </Typography>
-              </div>
-            </Stack>
-            {lgUp && (
-              <>
-                <Divider
-                  orientation='vertical'
-                  flexItem
-                  sx={{ borderWidth: '1px', borderColor: '#c6c6c6' }}
-                />
-
-                <Stack
-                  alignItems='center'
-                  direction='row'
-                  justifyContent='space-between'
-                  spacing={4}
-                >
-                  <div>
-                    <Typography
-                      color='text.secondary'
-                      gutterBottom
-                      variant='overline'
-                      align='center'
-                    >
-                      Receita Anual
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography
-                      variant='h4'
-                      sx={{ mb: 2 }}
-                    >
-                      {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                    </Typography>
-                    {receivesPercentageFromYearLimit}% do teto
-                  </div>
-                </Stack>
-
-                <LinearProgress
-                  value={receivesPercentageFromYearLimit}
-                  variant='determinate'
-                  color={
-                    receivesPercentageFromYearLimit <= 35
-                      ? 'success'
-                      : receivesPercentageFromYearLimit > 35 &&
-                        receivesPercentageFromYearLimit <= 75
-                        ? 'info'
-                        : receivesPercentageFromYearLimit > 75 &&
-                        receivesPercentageFromYearLimit <= 100
-                          ? 'error'
-                          : ''
-                  }
-                />
-              </>
-            )}
-          </Card>
-          {!lgUp && (
             <Card
               sx={{
                 display: 'flex',
                 direction: 'column',
                 justifyContent: 'space-around',
                 height: '100%',
-                backgroundColor: '#ececec',
-                mb: 2,
+                width: 512,
+                p: 2
+              }}
+            >
+              <Stack
+                alignItems='center'
+                direction='row'
+                justifyContent='space-between'
+                spacing={4}
+              >
+                <div>
+                  <Typography
+                    color='text.secondary'
+                    variant='overline'
+                    align='center'
+                  >
+                    Receitas
+                  </Typography>
+                </div>
+                <div>
+                  <Typography variant='h4'>
+                    {monthRevenue.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                  </Typography>
+                </div>
+              </Stack>
+            </Card>
+            <Card
+              sx={{
+                display: 'flex',
+                direction: 'column',
+                justifyContent: 'space-around',
+                height: '100%',
+                width: 512,
                 p: 2
               }}
             >
@@ -236,36 +206,17 @@ const Page = () => {
                     variant='overline'
                     align='center'
                   >
-                    Receita Anual
+                    Despesas
                   </Typography>
                 </div>
                 <div>
-                  <Typography
-                    variant='h4'
-                    sx={{ mb: 2 }}
-                  >
-                    {receivesYear.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                  <Typography variant='h4'>
+                    {monthCost.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                   </Typography>
-                  <LinearProgress
-                    value={receivesPercentageFromYearLimit}
-                    variant='determinate'
-                    color={
-                      receivesPercentageFromYearLimit <= 35
-                        ? 'success'
-                        : receivesPercentageFromYearLimit > 35 &&
-                          receivesPercentageFromYearLimit <= 75
-                          ? 'info'
-                          : receivesPercentageFromYearLimit > 75 &&
-                          receivesPercentageFromYearLimit <= 100
-                            ? 'error'
-                            : ''
-                    }
-                  />
-                  {receivesPercentageFromYearLimit}% do teto
                 </div>
               </Stack>
             </Card>
-          )}
+          </Stack>
           <Grid
             container
             spacing={3}
@@ -275,48 +226,73 @@ const Page = () => {
                 sx={{
                   minHeight: '70vh',
                   height: '100%',
-                  width: '100%',
-                  backgroundColor: '#ececec'
+                  width: '100%'
                 }}
               >
-                <Tabs
-                  onChange={handleTransactionType}
-                  sx={{ mx: 4 }}
-                  value={transactionType}
-                  variant='fullWidth'
-                >
-                  <Tab
-                    label='Receitas'
-                    value='revenue'
-                    disableRipple
-                  />
-                  <Tab
-                    label='Despesas'
-                    value='cost'
-                    disableRipple
-                  />
-                </Tabs>
-
                 <CardContent>
                   <Box
                     sx={{
                       display: 'flex',
-                      flexDirection: 'row',
+                      flexDirection: mdUp ? 'row' : 'column',
                       justifyContent: 'space-between',
                       maxHeight: '65px',
                       alignItems: 'center',
                       gap: '10px'
                     }}
                   >
-                    <TransactionMonthSelector handleTransactionMonth={handleTransactionMonth} />
-                    <TransactionsModal
-                      sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
-                      handleTransactionSaved={handleTransactionSaved}
-                      transaction={selectedTransaction}
-                      cancelTransactionSelect={cancelTransactionSelect}
-                    />
+                    <Stack>
+                      <Stack sx={{ flexDirection: 'row' }}>
+                        <FormControl fullWidth sx={{ mr: 2, width: '128px' }}>
+                          <InputLabel id='select-type-label'>Mês</InputLabel>
+                          <Select
+                            labelId='select-type-label'
+                            id='select-type'
+                            value={transactionMonth}
+                            label='Mês'
+                            onChange={(e) => handleTransactionMonth(e.target.value)}
+                          >
+                            {
+                              months.map((month, index) => (
+                                <MenuItem key={index} value={months.indexOf(month)}>{month}</MenuItem>
+                              ))
+                            }
+                          </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth sx={{ width: '128px' }}>
+                          <InputLabel id='select-type-label'>Tipo</InputLabel>
+                          <Select
+                            labelId='select-type-label'
+                            id='select-type'
+                            value={transactionType}
+                            label='Tipo'
+                            onChange={handleTransactionType}
+                          >
+                            <MenuItem value='all'>Todos</MenuItem>
+                            <MenuItem value='revenue'>Receita</MenuItem>
+                            <MenuItem value='cost'>Despesa</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Stack>
+                    </Stack>
+                    <Stack
+                      sx={{
+                        flexDirection: 'row'
+                      }}
+                    >
+                      <TransactionsModal
+                        sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
+                        handleTransactionSaved={handleTransactionSaved}
+                        transaction={selectedTransaction}
+                        cancelTransactionSelect={cancelTransactionSelect}
+                      />
+                    </Stack>
+
                   </Box>
-                  {lgUp
+
+                  <Typography sx={{ mt: 8 }} variant='h5'>Transações</Typography>
+
+                  {mdUp
                     ? (
                       <TransactionTable
                         handleTransactionSelect={handleTransactionSelect}
@@ -339,7 +315,7 @@ const Page = () => {
                     }}
                   >
                     <Pagination
-                      count={2}
+                      count={transactions.length}
                       size='small'
                     />
                   </Box> */}

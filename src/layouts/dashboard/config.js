@@ -1,16 +1,17 @@
-import RocketLaunchIcon from '@heroicons/react/24/solid/RocketLaunchIcon'
+import BuildingStorefrontIcon from '@heroicons/react/24/solid/BuildingStorefrontIcon'
 import ArchiveBoxIcon from '@heroicons/react/24/solid/ArchiveBoxIcon'
 import BanknotesIcon from '@heroicons/react/24/solid/BanknotesIcon'
 import BookOpenIcon from '@heroicons/react/24/solid/BookOpenIcon'
+import UserIcon from '@heroicons/react/24/solid/UserIcon'
 import { SvgIcon } from '@mui/material'
 
 export const items = [
   {
-    title: 'Transações',
+    title: 'Início',
     path: '/',
     icon: (
       <SvgIcon fontSize='small'>
-        <RocketLaunchIcon />
+        <BuildingStorefrontIcon />
       </SvgIcon>
     )
   },
@@ -41,6 +42,16 @@ export const items = [
     icon: (
       <SvgIcon fontSize='small'>
         <BookOpenIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Configurações',
+    path: '/account',
+    disabled: false,
+    icon: (
+      <SvgIcon fontSize='small'>
+        <UserIcon />
       </SvgIcon>
     )
   }

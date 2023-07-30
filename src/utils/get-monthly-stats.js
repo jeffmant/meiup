@@ -1,7 +1,8 @@
 import { getCompanyTransactions } from '../firebase/helpers/company.helper'
 
-export default async function getMonthlyRevenue ({ user }, transactionMonth) {
-  let total = 0
+export default async function getMonthlyStats ({ user }, transactionMonth) {
+  let totalMontlyRevenue = 0
+  let totalMontlyCost = 0
   let transactions = []
 
   if (user?.company?.id) {
@@ -14,19 +15,13 @@ export default async function getMonthlyRevenue ({ user }, transactionMonth) {
 
   transactions.forEach((transaction) => {
     const { amount, type } = transaction
-    const numericAmount = Number(
-      amount
-        .replace(/[^0-9.,]+/g, '')
-        .replace(/\./g, '')
-        .replace(',', '.')
-    )
 
     if (type === 'revenue') {
-      total += numericAmount
+      totalMontlyRevenue += amount
     } else {
-      total -= numericAmount
+      totalMontlyCost += amount
     }
   })
 
-  return total
+  return { totalMontlyRevenue, totalMontlyCost }
 }

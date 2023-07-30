@@ -1,8 +1,8 @@
-# meumei :)
+# meiup :)
 
 ## Description
 
-Este é o repositório oficial do frontend web da plataforma **meumei**
+Este é o repositório oficial do frontend web da plataforma **meiup**
 
 ## Installation
 

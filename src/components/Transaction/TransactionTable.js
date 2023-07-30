@@ -1,7 +1,9 @@
-import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { SvgIcon, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { format } from 'date-fns'
 import React from 'react'
+import ArrowUpRightIcon from '@heroicons/react/24/solid/ArrowUpRightIcon'
+import ArrowDownLeftIcon from '@heroicons/react/24/solid/ArrowDownLeftIcon'
 
 export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
   const handleTransactionClick = (transaction) => {
@@ -9,14 +11,14 @@ export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
   }
 
   return (
-    <Box sx={{ minWidth: 800 }}>
+    <Box sx={{ minWidth: 800, mt: 2 }}>
       {transactions?.length > 0
         ? (
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Descrição</TableCell>
-                <TableCell>Cliente</TableCell>
+                <TableCell>Tipo</TableCell>
+                <TableCell>Cliente | Fornecedor</TableCell>
                 <TableCell>Valor</TableCell>
                 <TableCell sortDirection='desc'>Data</TableCell>
               </TableRow>
@@ -35,7 +37,13 @@ export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
                     sx={{ '&:hover': { cursor: 'pointer' } }}
                     onClick={() => handleTransactionClick(transaction)}
                   >
-                    <TableCell>{transaction.description}</TableCell>
+                    <TableCell>
+                      <SvgIcon fontSize='small'>
+                        {
+                          transaction.type === 'revenue' ? <ArrowUpRightIcon color='green' /> : <ArrowDownLeftIcon color='red' />
+                        }
+                      </SvgIcon>
+                    </TableCell>
                     <TableCell>{transaction.party}</TableCell>
                     <TableCell>{`R$${transaction.amount}`}</TableCell>
                     <TableCell>{createdAt}</TableCell>
@@ -46,7 +54,11 @@ export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
           </Table>
           )
         : (
-          <Typography>Ops! Nenhuma Transação foi Encontrada.</Typography>
+          <Typography
+            sx={{ mt: 8 }}
+            align='center'
+          >Ops! Nenhuma Transação foi encontrada.
+          </Typography>
           )}
     </Box>
   )
