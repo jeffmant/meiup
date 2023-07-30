@@ -3,7 +3,6 @@ import { usePathname } from 'next/navigation'
 import PropTypes from 'prop-types'
 import {
   Box,
-  Divider,
   Drawer,
   Stack,
   useMediaQuery
@@ -50,7 +49,6 @@ export const SideNav = (props) => {
             <Logo dark />
           </Box>
         </Box>
-        <Divider sx={{ borderColor: 'neutral.700' }} />
         <Box
           component='nav'
           sx={{
@@ -85,7 +83,6 @@ export const SideNav = (props) => {
             })}
           </Stack>
         </Box>
-        <Divider sx={{ borderColor: 'neutral.700' }} />
       </Box>
     </Scrollbar>
   )
@@ -97,7 +94,7 @@ export const SideNav = (props) => {
         open
         PaperProps={{
           sx: {
-            backgroundColor: 'neutral.800',
+            backgroundColor: 'neutral.700',
             color: 'common.white',
             width: 280
           }
@@ -116,7 +113,7 @@ export const SideNav = (props) => {
       open={open}
       PaperProps={{
         sx: {
-          backgroundColor: 'neutral.800',
+          backgroundColor: 'neutral.700',
           color: 'common.white',
           width: 280
         }

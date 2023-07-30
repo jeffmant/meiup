@@ -63,7 +63,7 @@ export const getCompanyTransactions = async ({ companyId, type, month, year }) =
     where('createdAt', '<', Timestamp.fromDate(endDate))
   )
 
-  if (type) {
+  if (type && type !== 'all') {
     q = query(q, where('type', '==', type))
   }
 
@@ -77,7 +77,7 @@ export const getCompanyTransactions = async ({ companyId, type, month, year }) =
   return transactions
 }
 
-export const getCompanyMonthlyRevenue = async (companyId, month, year) => {
+export const getCompanyMonthlyStats = async (companyId, month, year) => {
   const startDate = new Date(year, month, 1)
   const endDate = new Date(year, month + 1, 1)
 
@@ -93,21 +93,21 @@ export const getCompanyMonthlyRevenue = async (companyId, month, year) => {
   const querySnapshot = await getDocs(q)
 
   let monthlyRevenue = 0
+  let monthlyCost = 0
+
   querySnapshot.forEach((doc) => {
     const transaction = doc.data()
-    const amount = Number(
-      transaction.amount
-        .replace(/[^0-9.,]+/g, '')
-        .replace(/\./g, '')
-        .replace(',', '.')
-    )
-    monthlyRevenue += transaction.type === 'revenue' ? amount : -amount
+    if (transaction.type === 'revenue') {
+      monthlyRevenue += transaction.amount
+    } else if (transaction.type === 'cost') {
+      monthlyCost += transaction.amount
+    }
   })
 
-  return monthlyRevenue
+  return { monthlyRevenue, monthlyCost }
 }
 
-export const getCompanyAnnualRevenue = async (companyId, year) => {
+export const getCompanyAnnualStats = async (companyId, year) => {
   const startDate = new Date(year, 0, 1)
   const endDate = new Date(year + 1, 0, 1)
 
@@ -123,21 +123,21 @@ export const getCompanyAnnualRevenue = async (companyId, year) => {
   const querySnapshot = await getDocs(q)
 
   let annualRevenue = 0
+  let annualCost = 0
+
   querySnapshot.forEach((doc) => {
     const transaction = doc.data()
-    const amount = Number(
-      transaction.amount
-        .replace(/[^0-9.,]+/g, '')
-        .replace(/\./g, '')
-        .replace(',', '.')
-    )
-    annualRevenue += transaction.type === 'revenue' ? amount : -amount
+    if (transaction.type === 'revenue') {
+      annualRevenue += transaction.amount
+    } else if (transaction.type === 'cost') {
+      annualCost += transaction.amount
+    }
   })
 
-  return annualRevenue
+  return { annualRevenue, annualCost }
 }
 
-export async function getCompanyAnnualRevenuePercentage (annualRevenue) {
+export function getCompanyAnnualRevenuePercentage (annualRevenue) {
   const annualRevenuePercentage = ((annualRevenue * 100) / 81000).toFixed(2)
   return annualRevenuePercentage
 }

@@ -1,9 +1,13 @@
-import { Card, CardContent, Typography } from '@mui/material'
+import ArrowDownLeftIcon from '@heroicons/react/24/solid/ArrowDownLeftIcon'
+import ArrowUpRightIcon from '@heroicons/react/24/solid/ArrowUpRightIcon'
+import { Card, CardContent, SvgIcon, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 
 export const TransactionCard = ({
+  type,
   amount,
   partyName,
+  createdAt,
   onClick
 }) => {
   return (
@@ -11,11 +15,9 @@ export const TransactionCard = ({
       onClick={onClick}
       sx={{
         width: '100%',
-        backgroundColor:
-      '#fefefe',
+        mt: 2,
         mb: 2,
         '&:hover': {
-          backgroundColor: '#ececec',
           cursor: 'pointer'
         }
       }}
@@ -27,6 +29,13 @@ export const TransactionCard = ({
           justifyContent='space-between'
           spacing={1}
         >
+          <Stack>
+            <SvgIcon fontSize='small'>
+              {
+                  type === 'revenue' ? <ArrowUpRightIcon color='green' /> : <ArrowDownLeftIcon color='red' />
+                }
+            </SvgIcon>
+          </Stack>
           <Stack
             spacing={1}
             sx={{ maxWidth: 50 }}
@@ -36,6 +45,9 @@ export const TransactionCard = ({
                 {partyName}
               </Typography>
             </Stack>
+          </Stack>
+          <Stack>
+            {createdAt}
           </Stack>
           <Stack spacing={1}>
             <Typography variant='p'>

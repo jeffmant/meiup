@@ -33,11 +33,8 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
     open: false,
     type: '',
     party: '',
-    description: '',
     amount: '',
-    category: '',
-    date: currentDate,
-    status: ''
+    date: currentDate
   })
 
   const [savingDoc, setSavingDoc] = useState(false)
@@ -48,11 +45,8 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
       open: false,
       type: '',
       party: '',
-      description: '',
       amount: '',
-      category: '',
-      date: currentDate,
-      status: ''
+      date: currentDate
     })
   }
 
@@ -63,14 +57,6 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
       resetModalStateAndClose()
     }
   }, [transaction])
-
-  useEffect(() => {
-    if (modalState.type === 'revenue') {
-      setModalState({ ...modalState, party: 'Cliente' })
-    } else if (modalState.type === 'cost') {
-      setModalState({ ...modalState, party: 'Fornecedor' })
-    }
-  }, [modalState.type])
 
   const handleOpen = () => {
     setModalState({ ...modalState, open: true })
@@ -123,26 +109,16 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
     setModalState({ ...modalState, type: event.target.value })
   }
 
-  const handleDescriptionChange = (event) => {
-    setModalState({ ...modalState, description: event.target.value })
+  const handlePartyChange = (event) => {
+    setModalState({ ...modalState, party: event.target.value })
   }
 
   const handleAmountChange = (event) => {
-    const inputValue = event.target.value.replace(/[^\d]/g, '')
-    const formattedValue = formatCurrency(inputValue)
-    setModalState({ ...modalState, amount: formattedValue })
-  }
-
-  const handleCategoryChange = (event) => {
-    setModalState({ ...modalState, category: event.target.value })
+    setModalState({ ...modalState, amount: +event.target.value })
   }
 
   const handleDateChange = (event) => {
     setModalState({ ...modalState, date: event.target.value })
-  }
-
-  const handleStatusChange = (event) => {
-    setModalState({ ...modalState, status: event.target.value })
   }
 
   return (
@@ -191,46 +167,19 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
                 fullWidth
                 value={modalState.party}
                 label={modalState.type === 'cost' ? 'Fornecedor' : 'Cliente'}
+                onChange={handlePartyChange}
                 id='party'
-                InputProps={{
-                  readOnly: true
-                }}
                 sx={{ mb: 2 }}
               />
             )}
 
             <TextField
               fullWidth
-              value={modalState.description}
-              label='Descrição'
-              onChange={handleDescriptionChange}
-              multiline
-              rows={4}
-              sx={{ mb: 2 }}
-            />
-
-            <TextField
-              fullWidth
-              value={formatCurrency(modalState.amount)}
+              value={modalState.amount?.length > 1 ? formatCurrency(modalState.amount) : ''}
               label='Valor'
               onChange={handleAmountChange}
               sx={{ mb: 2 }}
             />
-
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel id='select-category-label'>Categoria</InputLabel>
-              <Select
-                labelId='select-category-label'
-                id='select-category'
-                value={modalState.category}
-                label='Categoria'
-                onChange={handleCategoryChange}
-              >
-                <MenuItem value='reposicao'>Reposição</MenuItem>
-                <MenuItem value='manutencao'>Manutenção</MenuItem>
-                <MenuItem value='venda'>Venda</MenuItem>
-              </Select>
-            </FormControl>
 
             <TextField
               fullWidth
@@ -241,19 +190,6 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
               sx={{ mb: 2 }}
             />
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel id='select-status-label'>Status</InputLabel>
-              <Select
-                labelId='select-status-label'
-                id='select-status'
-                value={modalState.status}
-                label='Status'
-                onChange={handleStatusChange}
-              >
-                <MenuItem value='emited'>Emitida</MenuItem>
-                <MenuItem value='canceled'>Cancelada</MenuItem>
-              </Select>
-            </FormControl>
           </DialogContent>
           <DialogActions>
             {transaction && (

@@ -1,28 +1,23 @@
 import PropTypes from 'prop-types'
-import { Avatar, Box, IconButton, Stack, SvgIcon, Typography, useMediaQuery } from '@mui/material'
-import { alpha } from '@mui/material/styles'
+import { Box, IconButton, Stack, SvgIcon, useMediaQuery } from '@mui/material'
 import { usePopover } from 'src/hooks/use-popover'
 import { AccountPopover } from './account-popover'
-import { useAuth } from 'src/hooks/use-auth'
+
 import Bars3Icon from '@heroicons/react/24/solid/Bars3Icon'
 
 const SIDE_NAV_WIDTH = 280
-const TOP_NAV_HEIGHT = 64
+const TOP_NAV_HEIGHT = 16
 
 export const TopNav = (props) => {
   const { onNavOpen } = props
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const accountPopover = usePopover()
-  const { user } = useAuth()
 
   return (
     <>
       <Box
         component='header'
         sx={{
-          backdropFilter: 'blur(6px)',
-          backgroundColor: (theme) => alpha(theme.palette.background.default, 0.8),
-          boxShadow: '0px 4px 27px rgba(43,77,150,0.08)',
           position: 'sticky',
           left: {
             lg: `${SIDE_NAV_WIDTH}px`
@@ -53,23 +48,6 @@ export const TopNav = (props) => {
                 </SvgIcon>
               </IconButton>
             )}
-          </Stack>
-          <Stack
-            alignItems='center'
-            direction='row'
-            spacing={2}
-          >
-            <Typography>{user?.name}</Typography>
-            <Avatar
-              onClick={accountPopover.handleOpen}
-              ref={accountPopover.anchorRef}
-              sx={{
-                cursor: 'pointer',
-                height: 40,
-                width: 40
-              }}
-              src={user?.avatar}
-            />
           </Stack>
         </Stack>
       </Box>

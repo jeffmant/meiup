@@ -5,14 +5,14 @@ import {
   CardActions,
   CardContent,
   Container,
+  FormControl,
   Unstable_Grid2 as Grid,
-  // LinearProgress,
-  // Pagination,
-  Tab,
-  Tabs,
+  InputLabel,
+  MenuItem,
+  Select,
   Typography,
-  useMediaQuery,
-  Divider
+  useMediaQuery
+  // Pagination
 } from '@mui/material'
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
@@ -22,60 +22,59 @@ import { useContext, useEffect, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
+import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
 import {
-  getCompanyAnnualRevenue,
   getCompanyAnnualRevenuePercentage,
-  getCompanyMonthlyRevenue,
+  getCompanyAnnualStats,
+  getCompanyMonthlyStats,
   getCompanyTransactions
 } from 'src/firebase/helpers/company.helper'
 import NotificationContext from 'src/contexts/notification.context'
-import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
 
-// const receivesPercentageFromYearLimit = +((receivesYear * 100) / 81000).toFixed(2)
 const currentMonth = new Date().getMonth()
 const currentYear = new Date().getFullYear()
 
 const Page = () => {
   const { user } = useAuth()
   const companyId = user?.company?.id
-  const [transactionType, setTransactionType] = useState('revenue')
+  const [transactionType, setTransactionType] = useState('all')
   const [transactions, setTransactions] = useState([])
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
   const [transactionYear, setTransactionYear] = useState(currentYear)
-  const [monthRevenue, setMonthRevenue] = useState(
-    getCompanyMonthlyRevenue(companyId, transactionMonth, currentYear)
-  )
-  const [annualRevenue, setAnnualRevenue] = useState(
-    getCompanyAnnualRevenue(companyId, currentYear)
-  )
-
+  const [monthRevenue, setMonthRevenue] = useState(0)
+  const [monthCost, setMonthCost] = useState(0)
+  const [annualRevenue, setAnnualRevenue] = useState(0)
+  const [annualCost, setAnnualCost] = useState(0)
   const [revenuePercentageFromYearLimit, setRevenuePercentageFromYearLimit] = useState(0)
-
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
+  const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
 
   const notificationCtx = useContext(NotificationContext)
+
+  console.log('annualRevenue: ', annualRevenue)
+  console.log('annualCost: ', annualCost)
+  console.log('revenuePercentageFromYearLimit: ', revenuePercentageFromYearLimit)
 
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
   }
 
-  const handleMonthRevenue = async () => {
-    await getCompanyMonthlyRevenue(companyId, transactionMonth, transactionYear).then((total) =>
-      setMonthRevenue(total)
-    )
-  }
-
-  const handleAnnualRevenue = async () => {
-    await getCompanyAnnualRevenue(companyId, transactionYear).then((total) => {
-      setAnnualRevenue(total)
-    })
-  }
-
   const handleRevenueLimit = async () => {
-    await getCompanyAnnualRevenuePercentage(annualRevenue).then((revenuePercentage) => {
-      setRevenuePercentageFromYearLimit(revenuePercentage)
-    })
+    const limitYearPercentage = getCompanyAnnualRevenuePercentage(annualRevenue)
+    setRevenuePercentageFromYearLimit(limitYearPercentage)
+  }
+
+  const handleMonthlyStats = async () => {
+    const { monthlyRevenue, monthlyCost } = await getCompanyMonthlyStats(companyId, transactionMonth, transactionYear)
+    setMonthRevenue(monthlyRevenue)
+    setMonthCost(monthlyCost)
+  }
+
+  const handleAnnualStats = async () => {
+    const { annualRevenue, annualCost } = await getCompanyAnnualStats(companyId, transactionYear)
+    setAnnualRevenue(annualRevenue)
+    setAnnualCost(annualCost)
+    handleRevenueLimit()
   }
 
   const handleTransactionMonth = async (month) => {
@@ -91,18 +90,15 @@ const Page = () => {
       await getTransactions()
     }
 
-    handleRevenueLimit()
     fetchTransactions()
   }, [transactionMonth, transactionYear])
 
   useEffect(() => {
-    handleMonthRevenue()
-    handleRevenueLimit()
+    handleMonthlyStats()
   }, [transactions, transactionMonth])
 
   useEffect(() => {
-    handleAnnualRevenue()
-    handleRevenueLimit()
+    handleAnnualStats()
   }, [transactions, transactionYear])
 
   const cancelTransactionSelect = () => {
@@ -143,9 +139,8 @@ const Page = () => {
     }
   }
 
-  const handleTransactionType = async () => {
-    const newTransactionType = transactionType === 'cost' ? 'revenue' : 'cost'
-    setTransactionType(newTransactionType)
+  const handleTransactionType = async (e) => {
+    setTransactionType(e.target.value)
   }
 
   useEffect(() => {
@@ -155,7 +150,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>meumei</title>
+        <title>meiup</title>
       </Head>
       <Box
         component='main'
@@ -165,172 +160,140 @@ const Page = () => {
         }}
       >
         <Container maxWidth='xl'>
-          <Card
-            sx={{
-              display: 'flex',
-              direction: 'column',
-              justifyContent: 'space-around',
-              height: '100%',
-              backgroundColor: '#ececec',
-              mb: 2,
-              p: 2
-            }}
+          <Stack
+            alignItems='center'
+            direction={mdUp ? 'row' : 'column'}
+            justifyContent={mdUp ? 'space-between' : 'center'}
+            spacing={4}
+            sx={{ mb: 2 }}
           >
-            <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
-              <div>
-                <Typography color='text.secondary' variant='overline' align='center'>
-                  Receita no mês
-                </Typography>
-              </div>
-              <div>
-                <Typography variant='h4'>
-                  {monthRevenue.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
-                </Typography>
-              </div>
-            </Stack>
-            {lgUp && (
-              <>
-                <Divider
-                  orientation='vertical'
-                  flexItem
-                  sx={{ borderWidth: '1px', borderColor: '#c6c6c6' }}
-                />
-
-                <Stack
-                  alignItems='center'
-                  direction='row'
-                  justifyContent='space-between'
-                  spacing={4}
-                >
-                  <div>
-                    <Typography
-                      color='text.secondary'
-                      gutterBottom
-                      variant='overline'
-                      align='center'
-                    >
-                      Receita Anual
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography variant='h4' sx={{ mb: 2 }}>
-                      {annualRevenue.toLocaleString('pt-br', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      })}
-                    </Typography>
-                    {revenuePercentageFromYearLimit}% do teto
-                  </div>
-                </Stack>
-
-                {/* <LinearProgress
-                  value={revenuePercentageFromYearLimit}
-                  variant="determinate"
-                  color={
-                    revenuePercentageFromYearLimit <= 35
-                      ? "success"
-                      : revenuePercentageFromYearLimit > 35 && revenuePercentageFromYearLimit <= 75
-                      ? "info"
-                      : revenuePercentageFromYearLimit > 75 && revenuePercentageFromYearLimit <= 100
-                      ? "error"
-                      : ""
-                  }
-                /> */}
-              </>
-            )}
-          </Card>
-          {!lgUp && (
             <Card
               sx={{
                 display: 'flex',
                 direction: 'column',
                 justifyContent: 'space-around',
                 height: '100%',
-                backgroundColor: '#ececec',
-                mb: 2,
+                width: 512,
+                p: 2
+              }}
+            >
+              <Stack
+                alignItems='center'
+                direction='row'
+                justifyContent='space-between'
+                spacing={4}
+              >
+                <div>
+                  <Typography
+                    color='text.secondary'
+                    variant='overline'
+                    align='center'
+                  >
+                    Receitas
+                  </Typography>
+                </div>
+                <div>
+                  <Typography variant='h4'>
+                    {monthRevenue.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                  </Typography>
+                </div>
+              </Stack>
+            </Card>
+            <Card
+              sx={{
+                display: 'flex',
+                direction: 'column',
+                justifyContent: 'space-around',
+                height: '100%',
+                width: 512,
                 p: 2
               }}
             >
               <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
                 <div>
-                  <Typography color='text.secondary' gutterBottom variant='overline' align='center'>
-                    Receita Anual
+                  <Typography
+                    color='text.secondary'
+                    gutterBottom
+                    variant='overline'
+                    align='center'
+                  >
+                    Despesas
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant='h4' sx={{ mb: 2 }}>
-                    {annualRevenue.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                  <Typography variant='h4'>
+                    {monthCost.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                   </Typography>
-                  {/* <LinearProgress
-                    value={revenuePercentageFromYearLimit}
-                    variant="determinate"
-                    color={
-                      revenuePercentageFromYearLimit <= 35
-                        ? "success"
-                        : revenuePercentageFromYearLimit > 35 &&
-                          revenuePercentageFromYearLimit <= 75
-                        ? "info"
-                        : revenuePercentageFromYearLimit > 75 &&
-                          revenuePercentageFromYearLimit <= 100
-                        ? "error"
-                        : ""
-                    }
-                  /> */}
-                  {revenuePercentageFromYearLimit}% do teto
                 </div>
               </Stack>
             </Card>
-          )}
-          <Grid container spacing={3}>
+          </Stack>
+          <Grid
+            container
+            spacing={3}
+          >
             <Grid xs={12}>
               <Card
                 sx={{
                   minHeight: '70vh',
                   height: '100%',
-                  width: '100%',
-                  backgroundColor: '#ececec'
+                  width: '100%'
                 }}
               >
-                <Tabs
-                  onChange={handleTransactionType}
-                  sx={{ mx: 4 }}
-                  value={transactionType}
-                  variant='fullWidth'
-                >
-                  <Tab label='Receitas' value='revenue' disableRipple />
-                  <Tab label='Despesas' value='cost' disableRipple />
-                </Tabs>
-
                 <CardContent>
                   <Box
                     sx={{
                       display: 'flex',
-                      flexDirection: 'row',
+                      flexDirection: mdUp ? 'row' : 'column',
                       justifyContent: 'space-between',
                       maxHeight: '65px',
                       alignItems: 'center',
                       gap: '10px'
                     }}
                   >
-                    <Box
+                    <Stack>
+                      <Stack sx={{ flexDirection: 'row' }}>
+                        <Stack sx={{ mr: 2 }}>
+                          <TransactionMonthSelector handleTransactionMonth={handleTransactionMonth} />
+                        </Stack>
+                        <Stack sx={{ mr: 2 }}>
+                          <TransactionYearSelector handleTransactionYear={handleTransactionYear} />
+                        </Stack>
+
+                        <FormControl fullWidth sx={{ width: '128px' }}>
+                          <InputLabel id='select-type-label'>Tipo</InputLabel>
+                          <Select
+                            labelId='select-type-label'
+                            id='select-type'
+                            value={transactionType}
+                            label='Tipo'
+                            onChange={handleTransactionType}
+                          >
+                            <MenuItem value='all'>Todos</MenuItem>
+                            <MenuItem value='revenue'>Receita</MenuItem>
+                            <MenuItem value='cost'>Despesa</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Stack>
+                    </Stack>
+                    <Stack
                       sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-around',
-                        gap: '10px'
+                        flexDirection: 'row'
                       }}
                     >
-                      <TransactionMonthSelector handleTransactionMonth={handleTransactionMonth} />
-                      <TransactionYearSelector handleTransactionYear={handleTransactionYear} />
-                    </Box>
-                    <TransactionsModal
-                      sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
-                      handleTransactionSaved={handleTransactionSaved}
-                      transaction={selectedTransaction}
-                      cancelTransactionSelect={cancelTransactionSelect}
-                    />
+                      <TransactionsModal
+                        sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
+                        handleTransactionSaved={handleTransactionSaved}
+                        transaction={selectedTransaction}
+                        cancelTransactionSelect={cancelTransactionSelect}
+                      />
+                    </Stack>
+
                   </Box>
-                  {lgUp
+
+                  <Typography sx={{ mt: 8 }} variant='h5'>Transações</Typography>
+
+                  {mdUp
                     ? (
                       <TransactionTable
                         handleTransactionSelect={handleTransactionSelect}
@@ -353,7 +316,7 @@ const Page = () => {
                     }}
                   >
                     <Pagination
-                      count={2}
+                      count={transactions.length}
                       size='small'
                     />
                   </Box> */}

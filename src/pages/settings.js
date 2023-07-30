@@ -18,7 +18,7 @@ const Page = () => {
     <>
       <Head>
         <title>
-          configurações | meumei
+          configurações | meiup
         </title>
       </Head>
       <Box
