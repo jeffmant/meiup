@@ -98,13 +98,13 @@ export const getCompanyMonthlyStats = async (companyId, month, year) => {
   querySnapshot.forEach((doc) => {
     const transaction = doc.data()
     if (transaction.type === 'revenue') {
-      monthlyRevenue += transaction.amount
+      monthlyRevenue += +transaction.amount
     } else if (transaction.type === 'cost') {
-      monthlyCost += transaction.amount
+      monthlyCost += +transaction.amount
     }
   })
 
-  return { monthlyRevenue, monthlyCost }
+  return { monthlyRevenue: monthlyRevenue.toFixed(2), monthlyCost: monthlyCost.toFixed(2) }
 }
 
 export const getCompanyAnnualStats = async (companyId, year) => {
@@ -128,13 +128,13 @@ export const getCompanyAnnualStats = async (companyId, year) => {
   querySnapshot.forEach((doc) => {
     const transaction = doc.data()
     if (transaction.type === 'revenue') {
-      annualRevenue += transaction.amount
+      annualRevenue += +transaction.amount
     } else if (transaction.type === 'cost') {
-      annualCost += transaction.amount
+      annualCost += +transaction.amount
     }
   })
 
-  return { annualRevenue, annualCost }
+  return { annualRevenue: annualRevenue.toFixed(2), annualCost: annualCost.toFixed(2) }
 }
 
 export function getCompanyAnnualRevenuePercentage (annualRevenue) {

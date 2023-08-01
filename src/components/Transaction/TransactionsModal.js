@@ -85,7 +85,8 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
   const handleSave = async () => {
     const { open, ...data } = modalState
 
-    const transactionData = { ...data, companyId }
+    const transactionData = { ...data, companyId, amount: Number(+(modalState.amount.replace(',', '.'))).toFixed(2) }
+    console.log('transactionData -> ', transactionData)
 
     setSavingDoc(true)
 
@@ -114,8 +115,10 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
   }
 
   const handleAmountChange = (event) => {
-    setModalState({ ...modalState, amount: +event.target.value })
+    setModalState({ ...modalState, amount: event.target.value })
   }
+
+  console.log(modalState.amount)
 
   const handleDateChange = (event) => {
     setModalState({ ...modalState, date: event.target.value })
@@ -175,7 +178,7 @@ const TransactionsModal = ({ transaction, cancelTransactionSelect, handleTransac
 
             <TextField
               fullWidth
-              value={modalState.amount?.length > 1 ? formatCurrency(modalState.amount) : ''}
+              value={formatCurrency(modalState.amount)}
               label='Valor'
               onChange={handleAmountChange}
               sx={{ mb: 2 }}
