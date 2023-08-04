@@ -37,12 +37,26 @@ const TransactionMonthSelector = ({ handleTransactionMonth }) => {
 
   return (
     <div>
-      <Button variant='outlined' onClick={handleOpenMenu} sx={{ mb: 2, width: 100 }}>
+      <Button
+        variant='outlined'
+        onClick={handleOpenMenu}
+        sx={{ mb: 2, width: 100 }}
+      >
         {selectedMonth}
       </Button>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleCloseMenu}
+      >
         {months.map((month, index) => (
-          <MenuItem key={month} onClick={() => handleMonthSelect(index)}>
+          <MenuItem
+            key={month}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleMonthSelect(index)
+            }}
+          >
             {month}
           </MenuItem>
         ))}

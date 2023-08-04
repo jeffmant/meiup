@@ -74,7 +74,19 @@ export const getCompanyTransactions = async ({ companyId, type, month, year }) =
     transactions.push({ id: doc.id, ...doc.data() })
   })
 
-  return transactions
+  let monthlyRevenue = 0
+  let monthlyCost = 0
+
+  querySnapshot.forEach((doc) => {
+    const transaction = doc.data()
+    if (transaction.type === 'revenue') {
+      monthlyRevenue += +transaction.amount
+    } else if (transaction.type === 'cost') {
+      monthlyCost += +transaction.amount
+    }
+  })
+
+  return { transactions, monthlyRevenue: monthlyRevenue.toFixed(2), monthlyCost: monthlyCost.toFixed(2) }
 }
 
 export const getCompanyMonthlyStats = async (companyId, month, year) => {

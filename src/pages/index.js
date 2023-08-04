@@ -24,9 +24,6 @@ import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
 import {
-  getCompanyAnnualRevenuePercentage,
-  getCompanyAnnualStats,
-  getCompanyMonthlyStats,
   getCompanyTransactions
 } from 'src/firebase/helpers/company.helper'
 import NotificationContext from 'src/contexts/notification.context'
@@ -36,7 +33,6 @@ const currentYear = new Date().getFullYear()
 
 const Page = () => {
   const { user } = useAuth()
-  const companyId = user?.company?.id
   const [transactionType, setTransactionType] = useState('all')
   const [transactions, setTransactions] = useState([])
   const [selectedTransaction, setSelectedTransaction] = useState(null)
@@ -44,62 +40,34 @@ const Page = () => {
   const [transactionYear, setTransactionYear] = useState(currentYear)
   const [monthRevenue, setMonthRevenue] = useState(0)
   const [monthCost, setMonthCost] = useState(0)
-  const [annualRevenue, setAnnualRevenue] = useState(0)
-  const [annualCost, setAnnualCost] = useState(0)
-  const [revenuePercentageFromYearLimit, setRevenuePercentageFromYearLimit] = useState(0)
+
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
 
   const notificationCtx = useContext(NotificationContext)
 
-  console.log('annualRevenue: ', annualRevenue)
-  console.log('annualCost: ', annualCost)
-  console.log('revenuePercentageFromYearLimit: ', revenuePercentageFromYearLimit)
+  useEffect(() => {
+    getTransactions()
+  }, [])
 
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
   }
 
-  const handleRevenueLimit = async () => {
-    const limitYearPercentage = getCompanyAnnualRevenuePercentage(annualRevenue)
-    setRevenuePercentageFromYearLimit(limitYearPercentage)
-  }
-
-  const handleMonthlyStats = async () => {
-    const { monthlyRevenue, monthlyCost } = await getCompanyMonthlyStats(companyId, transactionMonth, transactionYear)
-    setMonthRevenue(monthlyRevenue)
-    setMonthCost(monthlyCost)
-  }
-
-  const handleAnnualStats = async () => {
-    const { annualRevenue, annualCost } = await getCompanyAnnualStats(companyId, transactionYear)
-    setAnnualRevenue(annualRevenue)
-    setAnnualCost(annualCost)
-    handleRevenueLimit()
-  }
-
   const handleTransactionMonth = async (month) => {
     setTransactionMonth(month)
+    await getTransactions()
   }
 
   const handleTransactionYear = async (year) => {
     setTransactionYear(year)
+    await getTransactions()
   }
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      await getTransactions()
-    }
-
-    fetchTransactions()
-  }, [transactionMonth, transactionYear])
-
-  useEffect(() => {
-    handleMonthlyStats()
-  }, [transactions, transactionMonth])
-
-  useEffect(() => {
-    handleAnnualStats()
-  }, [transactions, transactionYear])
+  const handleTransactionType = async (e) => {
+    e.stopPropagation()
+    setTransactionType(e.target.value)
+    await getTransactions()
+  }
 
   const cancelTransactionSelect = () => {
     setSelectedTransaction(null)
@@ -128,24 +96,19 @@ const Page = () => {
   }
 
   async function getTransactions () {
+    console.log('getTransactions')
     if (user?.company?.id) {
-      const transactions = await getCompanyTransactions({
+      const { transactions, monthlyRevenue, monthlyCost } = await getCompanyTransactions({
         companyId: user?.company?.id,
         type: transactionType,
         month: transactionMonth,
         year: transactionYear
       })
       setTransactions(transactions)
+      setMonthRevenue(monthlyRevenue)
+      setMonthCost(monthlyCost)
     }
   }
-
-  const handleTransactionType = async (e) => {
-    setTransactionType(e.target.value)
-  }
-
-  useEffect(() => {
-    getTransactions()
-  }, [transactionType])
 
   return (
     <>

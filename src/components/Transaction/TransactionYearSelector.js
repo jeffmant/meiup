@@ -29,12 +29,26 @@ const TransactionYearSelector = ({ handleTransactionYear }) => {
 
   return (
     <div>
-      <Button variant='outlined' onClick={handleOpenMenu} sx={{ mb: 2, width: 100 }}>
+      <Button
+        variant='outlined'
+        onClick={handleOpenMenu}
+        sx={{ mb: 2, width: 100 }}
+      >
         {selectedYear}
       </Button>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleCloseMenu}
+      >
         {years.map((year) => (
-          <MenuItem key={year} onClick={() => handleYearSelect(year)}>
+          <MenuItem
+            key={year}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleYearSelect(year)
+            }}
+          >
             {year}
           </MenuItem>
         ))}
