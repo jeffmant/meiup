@@ -1,5 +1,7 @@
+'use client'
 import { SignUp } from '@clerk/nextjs'
+import { AuthContainer } from '../../auth.styles'
 
 export default function Page () {
-  return <SignUp />
+  return <AuthContainer><SignUp /></AuthContainer>
 }

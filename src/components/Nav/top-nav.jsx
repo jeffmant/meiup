@@ -1,7 +1,7 @@
-import { Box, IconButton, Stack, SvgIcon, alpha, useMediaQuery } from '@mui/material'
+import { Box, IconButton, Stack, SvgIcon, Typography, alpha, useMediaQuery } from '@mui/material'
 import PropTypes from 'prop-types'
 
-import { UserButton } from '@clerk/nextjs'
+import { UserButton, useUser } from '@clerk/nextjs'
 import Bars3Icon from '@heroicons/react/24/solid/Bars3Icon'
 
 const SIDE_NAV_WIDTH = 280
@@ -9,6 +9,7 @@ const TOP_NAV_HEIGHT = 16
 
 export const TopNav = (props) => {
   const { onNavOpen } = props
+  const { user } = useUser()
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
 
   return (
@@ -57,8 +58,12 @@ export const TopNav = (props) => {
             direction='row'
             spacing={2}
             alignItems='center'
+            sx={{ p: 2 }}
           >
-            <UserButton afterSignOutUrl='/' />
+            <>
+              <Typography>{user.fullName}</Typography>
+              <UserButton afterSignOutUrl='/' />
+            </>
           </Stack>
         </Stack>
       </Box>
