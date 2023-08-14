@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export default async function handler (req, res) {
+export default async function GET (req, res) {
   const {
     NEXT_PUBLIC_INFOSIMPLES_BASE_URL,
     NEXT_PUBLIC_INFOSIMPLES_TOKEN
