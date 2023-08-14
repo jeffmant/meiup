@@ -1,25 +1,25 @@
-'use client'
-import { ThemeProvider } from '@emotion/react'
-import { CssBaseline } from '@mui/material'
+import { ptBR } from '@clerk/localizations'
+import { ClerkProvider } from '@clerk/nextjs'
 import NotificationBar from 'src/components/Notification/Notification'
 import { NotificationProvider } from 'src/contexts/notification.context'
-import { createTheme } from 'src/theme'
+
+export const metadata = {
+  title: 'meiup',
+  description: ''
+}
 
 export default function RootLayout ({
   children
 }) {
-  const theme = createTheme()
-
   return (
     <html lang='en'>
       <body>
-        <NotificationProvider>
-          <NotificationBar />
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
+        <ClerkProvider localization={ptBR}>
+          <NotificationProvider>
+            <NotificationBar />
             {children}
-          </ThemeProvider>
-        </NotificationProvider>
+          </NotificationProvider>
+        </ClerkProvider>
       </body>
     </html>
   )

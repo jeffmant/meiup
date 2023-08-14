@@ -1,6 +1,7 @@
-import React, { useContext, useState } from 'react'
-import NotificationContext from '../../contexts/notification.context'
+'use client'
 import { Alert, Snackbar } from '@mui/material'
+import { useContext, useState } from 'react'
+import NotificationContext from '../../contexts/notification.context'
 
 const NotificationBar = () => {
   const notificationCtx = useContext(NotificationContext)
