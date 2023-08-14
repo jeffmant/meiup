@@ -30,7 +30,8 @@ const LayoutContainer = styled('div')({
   width: '100%'
 })
 
-export default function Template ({ children }) {
+export default function DashboardLayout ({ children }) {
+  console.log('root layout')
   const theme = createTheme()
   const pathname = usePathname()
   const [openNav, setOpenNav] = useState(false)
