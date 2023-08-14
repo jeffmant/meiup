@@ -1,10 +1,9 @@
-import { Box } from '@mui/system'
-import { TransactionCard } from './TransactionCard'
-import { format } from 'date-fns'
 import { Typography } from '@mui/material'
+import { Box } from '@mui/system'
+import { format } from 'date-fns'
+import { TransactionCard } from './TransactionCard'
 
 export const TransactionCardList = ({ transactions = [], handleTransactionSelect }) => {
-  console.log(transactions)
   return (
     <Box>
       {transactions?.length
@@ -21,7 +20,11 @@ export const TransactionCardList = ({ transactions = [], handleTransactionSelect
             ))
           )
         : (
-          <Typography sx={{ mt: 16 }} align='center'>Ops! Nenhuma Transação foi encontrada.</Typography>
+          <Typography
+            sx={{ mt: 16 }}
+            align='center'
+          >Ops! Nenhuma Transação foi encontrada.
+          </Typography>
           )}
     </Box>
   )

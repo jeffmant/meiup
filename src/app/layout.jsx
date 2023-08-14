@@ -1,7 +1,5 @@
 import { ptBR } from '@clerk/localizations'
 import { ClerkProvider } from '@clerk/nextjs'
-import NotificationBar from 'src/components/Notification/Notification'
-import { NotificationProvider } from 'src/contexts/notification.context'
 
 export const metadata = {
   title: 'meiup',
@@ -15,10 +13,7 @@ export default function RootLayout ({
     <html lang='en'>
       <body>
         <ClerkProvider localization={ptBR}>
-          <NotificationProvider>
-            <NotificationBar />
-            {children}
-          </NotificationProvider>
+          {children}
         </ClerkProvider>
       </body>
     </html>

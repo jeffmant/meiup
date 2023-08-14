@@ -1,4 +1,5 @@
 import { createTheme as createMuiTheme } from '@mui/material'
+import { ptBR } from '@mui/x-date-pickers/locales'
 import { createComponents } from './create-components'
 import { createPalette } from './create-palette'
 import { createShadows } from './create-shadows'
@@ -27,5 +28,5 @@ export function createTheme () {
       borderRadius: 8
     },
     typography
-  })
+  }, ptBR)
 }

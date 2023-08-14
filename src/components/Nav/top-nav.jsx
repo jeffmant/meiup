@@ -1,4 +1,4 @@
-import { Box, IconButton, Stack, SvgIcon, useMediaQuery } from '@mui/material'
+import { Box, IconButton, Stack, SvgIcon, alpha, useMediaQuery } from '@mui/material'
 import PropTypes from 'prop-types'
 
 import { UserButton } from '@clerk/nextjs'
@@ -16,13 +16,19 @@ export const TopNav = (props) => {
       <Box
         component='header'
         sx={{
+          backdropFilter: 'blur(6px)',
+          backgroundColor: (theme) => alpha(theme.palette.background.default, 0.8),
           position: 'sticky',
           left: {
             lg: `${SIDE_NAV_WIDTH}px`
           },
           top: 0,
+          width: {
+            lg: `calc(100% - ${SIDE_NAV_WIDTH}px)`
+          },
           zIndex: (theme) => theme.zIndex.appBar
         }}
+
       >
         <Stack
           alignItems='center'
@@ -47,9 +53,15 @@ export const TopNav = (props) => {
               </IconButton>
             )}
           </Stack>
+          <Stack
+            direction='row'
+            spacing={2}
+            alignItems='center'
+          >
+            <UserButton afterSignOutUrl='/' />
+          </Stack>
         </Stack>
       </Box>
-      <UserButton afterSignOutUrl='/' />
     </>
   )
 }

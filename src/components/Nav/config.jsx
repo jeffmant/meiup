@@ -1,7 +1,7 @@
-import BuildingStorefrontIcon from '@heroicons/react/24/solid/BuildingStorefrontIcon'
 import ArchiveBoxIcon from '@heroicons/react/24/solid/ArchiveBoxIcon'
 import BanknotesIcon from '@heroicons/react/24/solid/BanknotesIcon'
 import BookOpenIcon from '@heroicons/react/24/solid/BookOpenIcon'
+import BuildingStorefrontIcon from '@heroicons/react/24/solid/BuildingStorefrontIcon'
 import UserIcon from '@heroicons/react/24/solid/UserIcon'
 import { SvgIcon } from '@mui/material'
 
