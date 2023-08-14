@@ -23,8 +23,6 @@ const TransactionsModal = ({ transaction, openModal, handleCloseModal }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  console.log('TransactionsModal')
-
   const handleDelete = async () => {
     if (transaction) {
       try {
