@@ -2,7 +2,6 @@ import ArchiveBoxIcon from '@heroicons/react/24/solid/ArchiveBoxIcon'
 import BanknotesIcon from '@heroicons/react/24/solid/BanknotesIcon'
 import BookOpenIcon from '@heroicons/react/24/solid/BookOpenIcon'
 import BuildingStorefrontIcon from '@heroicons/react/24/solid/BuildingStorefrontIcon'
-import UserIcon from '@heroicons/react/24/solid/UserIcon'
 import { SvgIcon } from '@mui/material'
 
 export const items = [
@@ -42,16 +41,6 @@ export const items = [
     icon: (
       <SvgIcon fontSize='small'>
         <BookOpenIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Configurações',
-    path: '/account',
-    disabled: false,
-    icon: (
-      <SvgIcon fontSize='small'>
-        <UserIcon />
       </SvgIcon>
     )
   }
