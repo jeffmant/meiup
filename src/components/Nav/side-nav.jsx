@@ -37,7 +37,7 @@ export const SideNav = (props) => {
           height: '100%'
         }}
       >
-        <Box sx={{ p: 3, display: 'flex', justifyContent: 'flex-start' }}>
+        <Box sx={{ p: 3 }}>
           <Box
             component={NextLink}
             href='/'
@@ -49,7 +49,41 @@ export const SideNav = (props) => {
           >
             <Logo dark />
           </Box>
+          {/* <Box
+            sx={{
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              borderRadius: 1,
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'space-between',
+              mt: 2,
+              p: '12px'
+            }}
+          >
+            <div>
+              <Typography
+                color='inherit'
+                variant='subtitle1'
+              >
+                Company Name
+              </Typography>
+              <Typography
+                color='neutral.400'
+                variant='body2'
+              >
+                00.000.000/0001-00
+              </Typography>
+            </div>
+            <SvgIcon
+              fontSize='small'
+              sx={{ color: 'neutral.500' }}
+            >
+              <ChevronUpDownIcon />
+            </SvgIcon>
+          </Box> */}
         </Box>
+
         <Box
           component='nav'
           sx={{

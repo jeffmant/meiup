@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PartyType {
+  CUSTOMER
+  SUPPLIER
+}
+
+enum TransactionType {
+  RECEIPT
+  COST
+}
+
+model User {
+  id        String    @id @default(uuid())
+  role      Role      @default(USER)
+  firstName String
+  lastName  String?
+  email     String    @unique
+  phone     String?   @unique
+  document  String?   @unique
+  companies Society[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime
+}
+
+model Company {
+  id           String        @id @default(uuid())
+  name         String
+  fantasyName  String
+  document     String        @unique
+  society      Society       @relation(fields: [societyId], references: [id])
+  societyId    String
+  parties      Party[]
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime
+}
+
+model Society {
+  id        String    @id @default(uuid())
+  userId    String
+  User      User      @relation(fields: [userId], references: [id])
+  companies Company[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime
+}
+
+model Party {
+  id        String    @id @default(uuid())
+  name      String
+  email     String?
+  phone     String?
+  type      PartyType
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime
+}
+
+model Transaction {
+  id        String          @id @default(uuid())
+  type      TransactionType
+  company   Company         @relation(fields: [companyId], references: [id])
+  companyId String
+  value     Float
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  deletedAt DateTime
+}

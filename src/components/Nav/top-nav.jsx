@@ -61,7 +61,7 @@ export const TopNav = (props) => {
             sx={{ p: 2 }}
           >
             <>
-              <Typography>{user.fullName}</Typography>
+              <Typography>{user?.fullName}</Typography>
               <UserButton afterSignOutUrl='/' />
             </>
           </Stack>
