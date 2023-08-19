@@ -9,33 +9,61 @@ datasource db {
 }
 
 enum Role {
-  USER
-  ADMIN
+  user
+  admin
 }
 
 enum PartyType {
-  CUSTOMER
-  SUPPLIER
+  customer
+  supplier
 }
 
 enum TransactionType {
-  RECEIPT
-  COST
+  receipt
+  cost
+}
+
+enum CompanyType {
+  mei
+  me
 }
 
 model User {
-  id          String    @id @default(uuid())
-  clerkUserId String    @unique
-  role        Role      @default(USER)
-  firstName   String
-  lastName    String?
-  email       String    @unique
-  phone       String?   @unique
-  document    String?   @unique
-  companies   Society[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  id            String        @id @default(uuid())
+  clerkUserId   String        @unique
+  role          Role          @default(user)
+  firstName     String
+  lastName      String?
+  email         String        @unique
+  phone         String?       @unique
+  document      String?       @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+  userSocieties UserSociety[]
+}
+
+model UserSociety {
+  id        String  @id @default(uuid())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  society   Society @relation(fields: [societyId], references: [id])
+  societyId String
+
+  @@index([societyId])
+  @@index([userId])
+}
+
+model Society {
+  id            String        @id @default(uuid())
+  userSocieties UserSociety[]
+  company       Company       @relation(fields: [companyId], references: [id])
+  companyId     String        @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  @@index([companyId])
 }
 
 model Company {
@@ -43,27 +71,28 @@ model Company {
   name         String
   fantasyName  String
   document     String        @unique
-  society      Society       @relation(fields: [societyId], references: [id])
-  societyId    String
-  parties      Party[]
   transactions Transaction[]
+  parties      Party[]
+  address      Address?
+  addressId    String?
+  society      Society?
+  societyId    String?       @unique
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   deletedAt    DateTime?
-
-  @@index([societyId])
 }
 
-model Society {
-  id        String    @id @default(uuid())
-  userId    String
-  User      User      @relation(fields: [userId], references: [id])
-  companies Company[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  @@index([userId])
+model Address {
+  id        String  @id @default(uuid())
+  zipcode   String
+  street    String
+  number    Int
+  city      String
+  block     String
+  state     String
+  country   String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @unique
 }
 
 model Party {
