@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum PartyType {
+  customer
+  supplier
+}
+
+enum TransactionType {
+  receipt
+  cost
+}
+
+enum CompanyType {
+  mei
+  me
+}
+
+model User {
+  id            String        @id @default(uuid())
+  clerkUserId   String        @unique
+  role          Role          @default(user)
+  firstName     String
+  lastName      String?
+  email         String        @unique
+  phone         String?       @unique
+  document      String?       @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+  userSocieties UserSociety[]
+}
+
+model UserSociety {
+  id        String  @id @default(uuid())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  society   Society @relation(fields: [societyId], references: [id])
+  societyId String
+
+  @@index([societyId])
+  @@index([userId])
+}
+
+model Society {
+  id            String        @id @default(uuid())
+  userSocieties UserSociety[]
+  company       Company       @relation(fields: [companyId], references: [id])
+  companyId     String        @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  @@index([companyId])
+}
+
+model Company {
+  id             String        @id @default(uuid())
+  name           String
+  email          String?
+  phone          String?
+  fantasyName    String
+  document       String        @unique
+  status         Boolean       @default(false)
+  foundationDate DateTime?
+  transactions   Transaction[]
+  parties        Party[]
+  address        Address?
+  addressId      String?
+  society        Society?
+  societyId      String        @unique
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+}
+
+model Address {
+  id        String  @id @default(uuid())
+  zipcode   String
+  street    String
+  number    Int
+  city      String
+  block     String
+  state     String
+  country   String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @unique
+}
+
+model Party {
+  id        String    @id @default(uuid())
+  name      String
+  email     String?
+  phone     String?
+  type      PartyType
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([companyId])
+}
+
+model Transaction {
+  id        String          @id @default(uuid())
+  type      TransactionType
+  company   Company         @relation(fields: [companyId], references: [id])
+  companyId String
+  value     Float
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  deletedAt DateTime?
+
+  @@index([companyId])
+}
