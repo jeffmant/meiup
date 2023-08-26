@@ -80,7 +80,7 @@ model Company {
   address        Address?
   addressId      String?
   society        Society?
-  societyId      String        @unique
+  societyId      String?       @unique
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   deletedAt      DateTime?
