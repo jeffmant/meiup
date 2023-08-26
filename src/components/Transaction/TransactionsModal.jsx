@@ -17,15 +17,18 @@ import Box from '@mui/material/Box'
 import { useFormik } from 'formik'
 import { useState } from 'react'
 import { formatCurrency } from 'src/utils/masks'
+import { createTransaction, deleteTransaction, updateTransaction } from 'src/utils/transactions-utils'
 import * as Yup from 'yup'
 
-const TransactionsModal = ({ transaction, openModal, handleCloseModal }) => {
+const TransactionsModal = ({ transaction, refreshTransactions, openModal, handleCloseModal }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const handleDelete = async () => {
     if (transaction) {
       try {
+        await deleteTransaction(transaction)
+        await refreshTransactions()
         setConfirmDelete(false)
       } catch (error) {
         setConfirmDelete(false)
@@ -35,10 +38,10 @@ const TransactionsModal = ({ transaction, openModal, handleCloseModal }) => {
 
   const formik = useFormik({
     initialValues: {
-      type: 'revenue',
-      partyName: '',
-      amount: '',
-      date: ''
+      type: transaction ? transaction.type : 'revenue',
+      partyName: transaction ? transaction.partyName : '',
+      amount: transaction ? transaction.amount : '',
+      date: transaction ? transaction.date : ''
     },
     validationSchema: Yup.object({
       type: Yup.string().required(),
@@ -47,18 +50,38 @@ const TransactionsModal = ({ transaction, openModal, handleCloseModal }) => {
       date: Yup.date().required()
     }),
     onSubmit: async (values, helpers) => {
-      try {
-        console.log('Salvando...')
-        setIsLoading(true)
-        setTimeout(() => {
-          setIsLoading(false)
-        }, 3000)
-        console.log('transaction data -> ', values)
-      } catch (err) {
-        helpers.setStatus({ success: false })
-        console.log(err)
-      } finally {
-        formik.resetForm()
+      if (transaction) {
+        try {
+          console.log('Atualizando...')
+          setIsLoading(true)
+          await updateTransaction(values)
+          setTimeout(() => {
+            setIsLoading(false)
+          }, 3000)
+          console.log('transaction data -> ', values)
+          refreshTransactions()
+        } catch (err) {
+          helpers.setStatus({ success: false })
+          console.log(err)
+        } finally {
+          formik.resetForm()
+        }
+      } else {
+        try {
+          console.log('Salvando...')
+          setIsLoading(true)
+          await createTransaction(values)
+          setTimeout(() => {
+            setIsLoading(false)
+          }, 3000)
+          console.log('transaction data -> ', values)
+          refreshTransactions()
+        } catch (err) {
+          helpers.setStatus({ success: false })
+          console.log(err)
+        } finally {
+          formik.resetForm()
+        }
       }
     }
   })
