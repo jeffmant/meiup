@@ -8,8 +8,6 @@ import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { SideNav } from 'src/components/Nav/side-nav'
 import { TopNav } from 'src/components/Nav/top-nav'
-import NotificationBar from 'src/components/Notification/Notification'
-import { NotificationProvider } from 'src/contexts/notification.context'
 import { createTheme } from 'src/theme'
 
 const SIDE_NAV_WIDTH = 280
@@ -60,14 +58,11 @@ export default function DashboardLayout ({ children }) {
           open={openNav}
           onClose={() => setOpenNav(false)}
         />
-        <NotificationProvider>
-          <NotificationBar />
-          <LayoutRoot>
-            <LayoutContainer>
-              {children}
-            </LayoutContainer>
-          </LayoutRoot>
-        </NotificationProvider>
+        <LayoutRoot>
+          <LayoutContainer>
+            {children}
+          </LayoutContainer>
+        </LayoutRoot>
       </ThemeProvider>
     </LocalizationProvider>
   )

@@ -67,19 +67,23 @@ model Society {
 }
 
 model Company {
-  id           String        @id @default(uuid())
-  name         String
-  fantasyName  String
-  document     String        @unique
-  transactions Transaction[]
-  parties      Party[]
-  address      Address?
-  addressId    String?
-  society      Society?
-  societyId    String?       @unique
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  deletedAt    DateTime?
+  id             String        @id @default(uuid())
+  name           String
+  email          String?
+  phone          String?
+  fantasyName    String
+  document       String        @unique
+  status         Boolean       @default(false)
+  foundationDate DateTime?
+  transactions   Transaction[]
+  parties        Party[]
+  address        Address?
+  addressId      String?
+  society        Society?
+  societyId      String?       @unique
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
 }
 
 model Address {
