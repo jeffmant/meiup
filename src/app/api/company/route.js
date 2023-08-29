@@ -10,62 +10,66 @@ export async function POST (req) {
   const addressBody = companyBody.address
   delete companyBody.address
 
-  const prisma = new PrismaClient()
+  try {
+    const prisma = new PrismaClient()
 
-  await prisma.$transaction(async (tx) => {
-    const foundUser = await tx.user.findFirstOrThrow({ where: { clerkUserId } })
+    await prisma.$transaction(async (tx) => {
+      const foundUser = await tx.user.findFirstOrThrow({ where: { clerkUserId } })
 
-    const userSocieties = await tx.userSociety.findMany({
-      where: {
-        userId: foundUser.id
-      }
-    })
-
-    const userSocietiesIds = userSocieties.map(userSociety => userSociety.id)
-
-    const societyAlreadyExists = await tx.society.findFirst({
-      where: {
-        AND: {
-          company: { document: companyBody.document },
-          userSocieties: { some: { id: { in: userSocietiesIds } } }
+      const userSocieties = await tx.userSociety.findMany({
+        where: {
+          userId: foundUser.id
         }
+      })
+
+      const userSocietiesIds = userSocieties.map(userSociety => userSociety.id)
+
+      const societyAlreadyExists = await tx.society.findFirst({
+        where: {
+          AND: {
+            company: { document: companyBody.document },
+            userSocieties: { some: { id: { in: userSocietiesIds } } }
+          }
+        }
+      })
+
+      if (societyAlreadyExists) {
+        throw new Error('This society already exists')
       }
+
+      const createdCompany = await tx.company.create({
+        data: companyBody
+      })
+
+      await tx.address.create({
+        data: {
+          ...addressBody,
+          companyId: createdCompany.id
+        }
+      })
+
+      const createdSociety = await tx.society.create({
+        data: { companyId: createdCompany.id }
+      })
+
+      await tx.company.update({ where: { id: createdCompany.id }, data: { societyId: createdSociety.id } })
+
+      await tx.userSociety.create({
+        data: {
+          societyId: createdSociety.id,
+          userId: foundUser.id
+        }
+      })
     })
 
-    if (societyAlreadyExists) {
-      throw new Error('This society already exists')
-    }
-
-    const createdCompany = await tx.company.create({
-      data: companyBody
-    })
-
-    await tx.address.create({
-      data: {
-        ...addressBody,
-        companyId: createdCompany.id
-      }
-    })
-
-    const createdSociety = await tx.society.create({
-      data: { companyId: createdCompany.id }
-    })
-
-    await tx.company.update({ where: { id: createdCompany.id }, data: { societyId: createdSociety.id } })
-
-    await tx.userSociety.create({
-      data: {
-        societyId: createdSociety.id,
-        userId: foundUser.id
-      }
-    })
-  })
-
-  return NextResponse.json({
-    success: true,
-    status: 201,
-    message: 'Company created'
-  })
+    return NextResponse.json({}, { status: 201 })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json({
+      error: error.message || 'Internal Server Error'
+    },
+    { status: 500 })
+  }
 }
 
 export async function GET (req) {
@@ -92,10 +96,10 @@ export async function GET (req) {
       status: 200
     })
   } catch (error) {
+    console.log(error)
     return NextResponse.json({
       error: error.message || 'Internal Server Error'
-    }, {
-      status: error.statusCode || 500
-    })
+    },
+    { status: 500 })
   }
 }

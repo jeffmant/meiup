@@ -78,10 +78,10 @@ export async function GET (req) {
       status: 200
     })
   } catch (error) {
+    console.log(error)
     return NextResponse.json({
       error: error.message || 'Internal Server Error'
-    }, {
-      status: error.statusCode || 500
-    })
+    },
+    { status: 500 })
   }
 }
