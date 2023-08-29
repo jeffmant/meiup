@@ -17,29 +17,39 @@ import {
 } from '@mui/material'
 import { Stack } from '@mui/system'
 import Head from 'next/head'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 import { TransactionTable } from 'src/components/Transaction/TransactionTable'
 import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
+import { getAllTransactions } from 'src/utils/transactions-utils'
 
 const currentMonth = new Date().getMonth()
 const currentYear = new Date().getFullYear()
 
-const Dashboard = () => {
+const Dashboard = async () => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const [openTransactionModal, setOpenTransactionModal] = useState(false)
   const [transactionType, setTransactionType] = useState('all')
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
   const [transactionYear, setTransactionYear] = useState(currentYear)
+  const [transactions, setTransactions] = useState([])
 
-  const transactions = []
   const monthlyRevenue = 0
   const monthlyCost = 0
 
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
+
+  useEffect(() => {
+    refreshTransactions()
+  }, [])
+
+  const refreshTransactions = async () => {
+    const fetchedTransactions = await getAllTransactions()
+    setTransactions(fetchedTransactions)
+  }
 
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
@@ -265,7 +275,9 @@ const Dashboard = () => {
         sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
         openModal={openTransactionModal}
         transaction={selectedTransaction}
-        handleCloseModal={() => setOpenTransactionModal(false)}
+        refreshTransactions={refreshTransactions}
+        handleCloseModal={() =>
+          setOpenTransactionModal(false)}
       />
     </>
   )
