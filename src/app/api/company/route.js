@@ -75,14 +75,18 @@ export async function POST (req) {
 export async function GET (req) {
   try {
     const { searchParams } = new URL(req.url)
+    let params
 
     const userId = searchParams.get('userId')
+    if (userId) params = { ...params, id: userId }
+    const clerkUserId = searchParams.get('clerkUserId')
+    if (clerkUserId) params = { ...params, clerkUserId }
 
     // TODO: add params to query
 
     const prisma = new PrismaClient()
 
-    const foundUser = await prisma.user.findFirstOrThrow({ where: { id: userId } })
+    const foundUser = await prisma.user.findFirstOrThrow({ where: params })
 
     const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id } })
 

@@ -6,11 +6,15 @@ const prisma = new PrismaClient()
 
 export async function GET () {
   const { id: clerkUserId } = await currentUser()
-  const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId } })
-  const { companyId } = foundUser
   try {
-    const transactions = await prisma.transaction.findMany({ where: { companyId } })
-    console.log('Transactions encontradas: ', transactions)
+    const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId } })
+
+    const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id } })
+
+    const userCompanies = await prisma.company.findMany({ where: { societyId: { in: userSocieties.map(userSociety => userSociety.societyId) } } })
+
+    const transactions = await prisma.transaction.findMany({ where: { companyId: { in: userCompanies.map(userCompany => userCompany.id) } } })
+
     return NextResponse.json(
       { data: transactions },
       { status: 200 }
@@ -26,26 +30,31 @@ export async function GET () {
 
 export async function POST (req) {
   const { id: clerkUserId } = await currentUser()
-  const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId } })
-  const { companyId } = foundUser
+
   const transactionBody = await req.json()
 
   try {
-    const createdTransaction = await prisma.transaction.create({
+    const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId } })
+
+    const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id } })
+
+    const userCompanies = await prisma.company.findMany({ where: { societyId: { in: userSocieties.map(userSociety => userSociety.societyId) } } })
+
+    await prisma.transaction.create({
       data: {
         ...transactionBody,
-        companyId
+        value: +(String(transactionBody.value).replace(',', '')),
+        dueDate: new Date(transactionBody.dueDate),
+        companyId: userCompanies?.[0]?.id
       }
     })
-
-    console.log('Transação criada com sucesso: ', createdTransaction)
     return NextResponse.json(
       { data: 'Transaction created' },
       { status: 201 }
     )
   } catch (error) {
     console.log('Erro ao criar transação: ', error)
-    return NextResponse(
+    return NextResponse.json(
       { error: 'Erro ao criar transação: ' },
       { status: 500 }
     )
@@ -53,23 +62,23 @@ export async function POST (req) {
 };
 
 export async function DELETE (req) {
-  const transactionBody = await req.json()
+  const url = new URL(req.url)
+  const transactionId = url.searchParams.get('id')
 
   try {
     await prisma.transaction.delete({
       where: {
-        id: transactionBody.id
+        id: transactionId
       }
     })
-    console.log('Transaction deletada com sucesso!')
 
-    return NextResponse(
+    return NextResponse.json(
       { status: 200 }
     )
   } catch (error) {
     console.log('Erro ao deletar transaction: ', error)
 
-    return NextResponse(
+    return NextResponse.json(
       { error: 'Erro ao deletar transaction: ' },
       { status: 500 }
     )
@@ -77,31 +86,31 @@ export async function DELETE (req) {
 };
 
 export async function PATCH (req) {
+  const url = new URL(req.url)
+  const transactionId = url.searchParams.get('id')
   const transactionData = await req.json()
-  const { type, partyName, amount } = transactionData
+  const { type, partyName, value } = transactionData
 
   try {
     const updatedTransaction = await prisma.transaction.update({
       where: {
-        id: transactionData.id
+        id: transactionId
       },
       data: {
         type,
         partyName,
-        amount
+        value
       }
     })
 
-    console.log('Transação atualizada com sucesso!')
-    console.log('Updated data: ', updatedTransaction)
-
-    return NextResponse(
-      { status: 200 }
+    return NextResponse.json(
+      { status: 200 },
+      { data: updatedTransaction }
     )
   } catch (error) {
     console.log('Houve um erro ao atualizar a transação: ', error)
 
-    return NextResponse(
+    return NextResponse.json(
       { error: 'Erro ao deletar transaction: ' },
       { status: 500 }
     )
