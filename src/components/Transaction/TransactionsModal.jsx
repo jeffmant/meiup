@@ -1,3 +1,5 @@
+'use client'
+import { useAuth } from '@clerk/nextjs'
 import {
   Button,
   CircularProgress,
@@ -24,10 +26,13 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
   const [isLoading, setIsLoading] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
+  const { getToken } = useAuth()
+
   const handleDelete = async () => {
+    const accessToken = await getToken()
     if (transaction) {
       try {
-        await deleteTransaction(transaction)
+        await deleteTransaction(transaction.id, accessToken)
         await refreshTransactions()
         setConfirmDelete(false)
       } catch (error) {
@@ -36,54 +41,47 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
     }
   }
 
+  const handleSave = async (values) => {
+    const accessToken = await getToken()
+    if (transaction) {
+      try {
+        setIsLoading(true)
+        await updateTransaction(transaction.id, values, accessToken)
+        refreshTransactions()
+      } catch (err) {
+        console.log(err)
+      } finally {
+        formik.resetForm()
+        handleCloseModal()
+      }
+    } else {
+      try {
+        setIsLoading(true)
+        await createTransaction(values, accessToken)
+        refreshTransactions()
+      } catch (err) {
+        console.log(err)
+      } finally {
+        setIsLoading(false)
+        formik.resetForm()
+        handleCloseModal()
+      }
+    }
+  }
+
   const formik = useFormik({
     initialValues: {
-      type: transaction ? transaction.type : 'revenue',
-      partyName: transaction ? transaction.partyName : '',
-      amount: transaction ? transaction.amount : '',
-      date: transaction ? transaction.date : ''
+      type: transaction?.type || 'revenue',
+      partyName: transaction?.partyName || '',
+      value: transaction?.value.toString() || '',
+      dueDate: new Date(transaction?.dueDate) || new Date()
     },
     validationSchema: Yup.object({
       type: Yup.string().required(),
       partyName: Yup.string().required(),
-      amount: Yup.number().required(),
-      date: Yup.date().required()
-    }),
-    onSubmit: async (values, helpers) => {
-      if (transaction) {
-        try {
-          console.log('Atualizando...')
-          setIsLoading(true)
-          await updateTransaction(values)
-          setTimeout(() => {
-            setIsLoading(false)
-          }, 3000)
-          console.log('transaction data -> ', values)
-          refreshTransactions()
-        } catch (err) {
-          helpers.setStatus({ success: false })
-          console.log(err)
-        } finally {
-          formik.resetForm()
-        }
-      } else {
-        try {
-          console.log('Salvando...')
-          setIsLoading(true)
-          await createTransaction(values)
-          setTimeout(() => {
-            setIsLoading(false)
-          }, 3000)
-          console.log('transaction data -> ', values)
-          refreshTransactions()
-        } catch (err) {
-          helpers.setStatus({ success: false })
-          console.log(err)
-        } finally {
-          formik.resetForm()
-        }
-      }
-    }
+      value: Yup.string().required(),
+      dueDate: Yup.date().required()
+    })
   })
 
   return (
@@ -140,8 +138,8 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
 
             <TextField
               fullWidth
-              name='amount'
-              value={formatCurrency(formik.values.amount)}
+              name='value'
+              value={formatCurrency(formik.values.value)}
               label='Valor'
               onChange={formik.handleChange}
               sx={{ mb: 2 }}
@@ -150,8 +148,8 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
             <TextField
               fullWidth
               type='date'
-              name='date'
-              value={formik.values.date}
+              name='dueDate'
+              value={formik.values.dueDate}
               label='Data'
               onChange={formik.handleChange}
               sx={{ mb: 2 }}
@@ -187,18 +185,19 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
             >
               Cancelar
             </Button>
-            {isLoading
-              ? (
-                <CircularProgress />
-                )
-              : (
-                <Button
-                  variant='contained'
-                  type='submit'
-                >
-                  Salvar
-                </Button>
-                )}
+            <Button
+              disabled={!formik.isValid}
+              variant='contained'
+              onClick={async () => await handleSave(formik.values)}
+
+            >
+              {isLoading
+                ? <CircularProgress
+                    size={20}
+                    color='secondary'
+                  />
+                : 'Salvar'}
+            </Button>
           </DialogActions>
         </form>
         <Dialog

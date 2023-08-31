@@ -1,9 +1,8 @@
+import ArrowDownLeftIcon from '@heroicons/react/24/solid/ArrowDownLeftIcon'
+import ArrowUpRightIcon from '@heroicons/react/24/solid/ArrowUpRightIcon'
 import { SvgIcon, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { format } from 'date-fns'
-import React from 'react'
-import ArrowUpRightIcon from '@heroicons/react/24/solid/ArrowUpRightIcon'
-import ArrowDownLeftIcon from '@heroicons/react/24/solid/ArrowDownLeftIcon'
 
 export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
   const handleTransactionClick = (transaction) => {
@@ -26,7 +25,7 @@ export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
             <TableBody>
               {transactions.map((transaction) => {
                 const createdAt = format(
-                  new Date(transaction.createdAt.seconds * 1000),
+                  new Date(transaction.dueDate),
                   'dd/MM/yyyy'
                 )
 
@@ -44,8 +43,8 @@ export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
                         }
                       </SvgIcon>
                     </TableCell>
-                    <TableCell>{transaction.party}</TableCell>
-                    <TableCell>{`R$${transaction.amount}`}</TableCell>
+                    <TableCell>{transaction.partyName}</TableCell>
+                    <TableCell>{`R$${transaction.value}`}</TableCell>
                     <TableCell>{createdAt}</TableCell>
                   </TableRow>
                 )

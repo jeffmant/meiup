@@ -11,10 +11,10 @@ export const TransactionCardList = ({ transactions = [], handleTransactionSelect
             transactions.map((transaction) => (
               <TransactionCard
                 key={transaction.id}
-                amount={transaction.amount}
-                partyName={transaction.party}
+                value={transaction.value}
+                partyName={transaction.partyName}
                 type={transaction.type}
-                createdAt={format(new Date(transaction.createdAt.seconds * 1000), 'dd/MM/yyyy')}
+                dueDate={format(new Date(transaction.dueDate), 'dd/MM/yyyy')}
                 onClick={() => handleTransactionSelect(transaction)}
               />
             ))
