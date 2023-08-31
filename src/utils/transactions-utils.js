@@ -1,15 +1,11 @@
-import Cookies from 'js-cookie'
-
-const token = Cookies.get('_session')
-
-export async function createTransaction (values) {
+export async function createTransaction (transactionBody, accessToken) {
   try {
     const fetchResponse = await fetch('/api/transaction', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${accessToken}`
       },
-      body: JSON.stringify(values)
+      body: JSON.stringify(transactionBody)
     })
     const parsedResponse = await fetchResponse.json()
 
@@ -20,16 +16,14 @@ export async function createTransaction (values) {
   }
 };
 
-export async function getAllTransactions () {
+export async function getAllTransactions (accessToken) {
   try {
-    const fetchResponse = await fetch('/api/transaction', {
+    const { data: transactions } = await fetch('/api/transaction', {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${accessToken}`
       }
-    })
-
-    const transactions = await fetchResponse.json()
+    }).then(response => response.json())
 
     return transactions
   } catch (error) {
@@ -38,14 +32,13 @@ export async function getAllTransactions () {
   }
 }
 
-export async function deleteTransaction (transaction) {
+export async function deleteTransaction (transactionId, accessToken) {
   try {
-    const deleteResponse = await fetch('/api/transaction', {
+    const deleteResponse = await fetch(`/api/transaction/id=${transactionId}`, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(transaction)
+        Authorization: `Bearer ${accessToken}`
+      }
     })
 
     const parsedResponse = await deleteResponse.json()
@@ -56,14 +49,14 @@ export async function deleteTransaction (transaction) {
   };
 };
 
-export async function updateTransaction (values) {
+export async function updateTransaction (transactionId, transactionBody, accessToken) {
   try {
-    const updateResponse = await fetch('/api/transaction', {
+    const updateResponse = await fetch(`/api/transaction/id=${transactionId}`, {
       method: 'PATCH',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${accessToken}`
       },
-      body: JSON.stringify(values)
+      body: JSON.stringify(transactionBody)
     })
 
     const parsedResponse = await updateResponse.json()
