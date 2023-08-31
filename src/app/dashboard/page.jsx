@@ -1,4 +1,5 @@
 'use client'
+import { useAuth } from '@clerk/nextjs'
 import {
   Box,
   Button,
@@ -28,7 +29,7 @@ import { getAllTransactions } from 'src/utils/transactions-utils'
 const currentMonth = new Date().getMonth()
 const currentYear = new Date().getFullYear()
 
-const Dashboard = async () => {
+const Dashboard = () => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'))
   const [openTransactionModal, setOpenTransactionModal] = useState(false)
   const [transactionType, setTransactionType] = useState('all')
@@ -36,6 +37,8 @@ const Dashboard = async () => {
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
   const [transactionYear, setTransactionYear] = useState(currentYear)
   const [transactions, setTransactions] = useState([])
+
+  const { getToken } = useAuth()
 
   const monthlyRevenue = 0
   const monthlyCost = 0
@@ -47,12 +50,14 @@ const Dashboard = async () => {
   }, [])
 
   const refreshTransactions = async () => {
-    const fetchedTransactions = await getAllTransactions()
+    const accessToken = await getToken()
+    const fetchedTransactions = await getAllTransactions(accessToken)
     setTransactions(fetchedTransactions)
   }
 
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
+    setOpenTransactionModal(true)
   }
 
   const handleTransactionMonth = async (month) => {
@@ -256,7 +261,7 @@ const Dashboard = async () => {
                     }}
                   >
                     {
-                      transactions.length > 0 && (
+                      transactions?.length > 0 && (
                         <Pagination
                           count={transactions.length}
                           size='small'
