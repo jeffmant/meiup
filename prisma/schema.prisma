@@ -121,7 +121,7 @@ model Transaction {
   company   Company         @relation(fields: [companyId], references: [id])
   companyId String
   value     Float
-  dueDate   DateTime
+  dueDate   DateTime?
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
   deletedAt DateTime?

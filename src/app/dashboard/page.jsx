@@ -105,18 +105,9 @@ const Dashboard = () => {
                 p: 2
               }}
             >
-              <Stack
-                alignItems='center'
-                direction='row'
-                justifyContent='space-between'
-                spacing={4}
-              >
+              <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
                 <div>
-                  <Typography
-                    color='text.secondary'
-                    variant='overline'
-                    align='center'
-                  >
+                  <Typography color='text.secondary' variant='overline' align='center'>
                     Receitas
                   </Typography>
                 </div>
@@ -137,19 +128,9 @@ const Dashboard = () => {
                 p: 2
               }}
             >
-              <Stack
-                alignItems='center'
-                direction='row'
-                justifyContent='space-between'
-                spacing={4}
-              >
+              <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
                 <div>
-                  <Typography
-                    color='text.secondary'
-                    gutterBottom
-                    variant='overline'
-                    align='center'
-                  >
+                  <Typography color='text.secondary' gutterBottom variant='overline' align='center'>
                     Despesas
                   </Typography>
                 </div>
@@ -161,10 +142,7 @@ const Dashboard = () => {
               </Stack>
             </Card>
           </Stack>
-          <Grid
-            container
-            spacing={3}
-          >
+          <Grid container spacing={3}>
             <Grid xs={12}>
               <Card
                 sx={{
@@ -187,16 +165,15 @@ const Dashboard = () => {
                     <Stack>
                       <Stack sx={{ flexDirection: 'row' }}>
                         <Stack sx={{ mr: 2 }}>
-                          <TransactionMonthSelector handleTransactionMonth={handleTransactionMonth} />
+                          <TransactionMonthSelector
+                            handleTransactionMonth={handleTransactionMonth}
+                          />
                         </Stack>
                         <Stack sx={{ mr: 2 }}>
                           <TransactionYearSelector handleTransactionYear={handleTransactionYear} />
                         </Stack>
 
-                        <FormControl
-                          fullWidth
-                          sx={{ width: '128px' }}
-                        >
+                        <FormControl fullWidth sx={{ width: '128px' }}>
                           <InputLabel id='select-type-label'>Tipo</InputLabel>
                           <Select
                             labelId='select-type-label'
@@ -217,7 +194,9 @@ const Dashboard = () => {
                         flexDirection: 'row'
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: lgUp ? 'flex-end' : 'center' }}>
+                      <div
+                        style={{ display: 'flex', justifyContent: lgUp ? 'flex-end' : 'center' }}
+                      >
                         {!selectedTransaction && (
                           <Button
                             variant='contained'
@@ -229,13 +208,10 @@ const Dashboard = () => {
                         )}
                       </div>
                     </Stack>
-
                   </Box>
 
-                  <Typography
-                    sx={{ mt: 8 }}
-                    variant='h5'
-                  >Transações
+                  <Typography sx={{ mt: 8 }} variant='h5'>
+                    Transações
                   </Typography>
 
                   {mdUp
@@ -260,14 +236,9 @@ const Dashboard = () => {
                       justifyContent: 'center'
                     }}
                   >
-                    {
-                      transactions?.length > 0 && (
-                        <Pagination
-                          count={transactions.length}
-                          size='small'
-                        />
-                      )
-                    }
+                    {transactions?.length > 0 && (
+                      <Pagination count={transactions.length} size='small' />
+                    )}
                   </Box>
                 </CardActions>
               </Card>
@@ -281,8 +252,10 @@ const Dashboard = () => {
         openModal={openTransactionModal}
         transaction={selectedTransaction}
         refreshTransactions={refreshTransactions}
-        handleCloseModal={() =>
-          setOpenTransactionModal(false)}
+        handleCloseModal={() => {
+          setOpenTransactionModal(false)
+          setSelectedTransaction(null)
+        }}
       />
     </>
   )

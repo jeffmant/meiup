@@ -11,22 +11,20 @@ export async function GET () {
 
     const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id } })
 
-    const userCompanies = await prisma.company.findMany({ where: { societyId: { in: userSocieties.map(userSociety => userSociety.societyId) } } })
+    const userCompanies = await prisma.company.findMany({
+      where: { societyId: { in: userSocieties.map((userSociety) => userSociety.societyId) } }
+    })
 
-    const transactions = await prisma.transaction.findMany({ where: { companyId: { in: userCompanies.map(userCompany => userCompany.id) } } })
+    const transactions = await prisma.transaction.findMany({
+      where: { companyId: { in: userCompanies.map((userCompany) => userCompany.id) } }
+    })
 
-    return NextResponse.json(
-      { data: transactions },
-      { status: 200 }
-    )
+    return NextResponse.json({ data: transactions }, { status: 200 })
   } catch (error) {
     console.log('Erro ao buscar transactions: ', error)
-    return NextResponse.json(
-      { error: 'Erro ao buscar transactions: ' },
-      { status: 500 }
-    )
-  };
-};
+    return NextResponse.json({ error: 'Erro ao buscar transactions: ' }, { status: 500 })
+  }
+}
 
 export async function POST (req) {
   const { id: clerkUserId } = await currentUser()
@@ -38,28 +36,24 @@ export async function POST (req) {
 
     const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id } })
 
-    const userCompanies = await prisma.company.findMany({ where: { societyId: { in: userSocieties.map(userSociety => userSociety.societyId) } } })
+    const userCompanies = await prisma.company.findMany({
+      where: { societyId: { in: userSocieties.map((userSociety) => userSociety.societyId) } }
+    })
 
     await prisma.transaction.create({
       data: {
         ...transactionBody,
-        value: +(String(transactionBody.value).replace(',', '')),
+        value: +String(transactionBody.value).replace(',', ''),
         dueDate: new Date(transactionBody.dueDate),
         companyId: userCompanies?.[0]?.id
       }
     })
-    return NextResponse.json(
-      { data: 'Transaction created' },
-      { status: 201 }
-    )
-  } catch (error) {
-    console.log('Erro ao criar transação: ', error)
-    return NextResponse.json(
-      { error: 'Erro ao criar transação: ' },
-      { status: 500 }
-    )
-  };
-};
+    return NextResponse.json({ data: 'Transaction created' }, { status: 201 })
+  } catch (CreateError) {
+    console.log('Erro ao criar transação: ', CreateError)
+    return NextResponse.json({ error: 'Erro ao criar transação: ', CreateError }, { status: 500 })
+  }
+}
 
 export async function DELETE (req) {
   const url = new URL(req.url)
@@ -72,18 +66,13 @@ export async function DELETE (req) {
       }
     })
 
-    return NextResponse.json(
-      { status: 200 }
-    )
+    return NextResponse.json({ status: 200 })
   } catch (error) {
     console.log('Erro ao deletar transaction: ', error)
 
-    return NextResponse.json(
-      { error: 'Erro ao deletar transaction: ' },
-      { status: 500 }
-    )
-  };
-};
+    return NextResponse.json({ error: 'Erro ao deletar transaction: ' }, { status: 500 })
+  }
+}
 
 export async function PATCH (req) {
   const url = new URL(req.url)
@@ -103,16 +92,10 @@ export async function PATCH (req) {
       }
     })
 
-    return NextResponse.json(
-      { status: 200 },
-      { data: updatedTransaction }
-    )
+    return NextResponse.json({ status: 200 }, { data: updatedTransaction })
   } catch (error) {
     console.log('Houve um erro ao atualizar a transação: ', error)
 
-    return NextResponse.json(
-      { error: 'Erro ao deletar transaction: ' },
-      { status: 500 }
-    )
-  };
-};
+    return NextResponse.json({ error: 'Erro ao deletar transaction: ' }, { status: 500 })
+  }
+}

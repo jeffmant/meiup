@@ -19,7 +19,11 @@ import Box from '@mui/material/Box'
 import { useFormik } from 'formik'
 import { useState } from 'react'
 import { formatCurrency } from 'src/utils/masks'
-import { createTransaction, deleteTransaction, updateTransaction } from 'src/utils/transactions-utils'
+import {
+  createTransaction,
+  deleteTransaction,
+  updateTransaction
+} from 'src/utils/transactions-utils'
 import * as Yup from 'yup'
 
 const TransactionsModal = ({ transaction, refreshTransactions, openModal, handleCloseModal }) => {
@@ -104,15 +108,9 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
         <Box>
           <DialogTitle>{transaction ? 'Editar Transação' : 'Nova Transação'}</DialogTitle>
         </Box>
-        <form
-          noValidate
-          onSubmit={formik.handleSubmit}
-        >
+        <form noValidate onSubmit={formik.handleSubmit}>
           <DialogContent>
-            <FormControl
-              fullWidth
-              sx={{ mb: 2 }}
-            >
+            <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel id='select-type-label'>Tipo</InputLabel>
               <Select
                 name='type'
@@ -154,24 +152,15 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
               onChange={formik.handleChange}
               sx={{ mb: 2 }}
             />
-
           </DialogContent>
           <DialogActions>
             {formik.errors.submit && (
-              <Typography
-                color='error'
-                sx={{ mt: 3 }}
-                variant='body2'
-              >
+              <Typography color='error' sx={{ mt: 3 }} variant='body2'>
                 {formik.errors.submit}
               </Typography>
             )}
             {transaction && (
-              <Button
-                variant='contained'
-                color='error'
-                onClick={() => setConfirmDelete(true)}
-              >
+              <Button variant='contained' color='error' onClick={() => setConfirmDelete(true)}>
                 Excluir
               </Button>
             )}
@@ -189,21 +178,12 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
               disabled={!formik.isValid}
               variant='contained'
               onClick={async () => await handleSave(formik.values)}
-
             >
-              {isLoading
-                ? <CircularProgress
-                    size={20}
-                    color='secondary'
-                  />
-                : 'Salvar'}
+              {isLoading ? <CircularProgress size={20} color='secondary' /> : 'Salvar'}
             </Button>
           </DialogActions>
         </form>
-        <Dialog
-          open={confirmDelete}
-          onClose={() => setConfirmDelete(false)}
-        >
+        <Dialog open={confirmDelete} onClose={() => setConfirmDelete(false)}>
           <DialogTitle>Confirmação de Exclusão</DialogTitle>
           <DialogContent>
             <Typography>Deseja realmente excluir esta transação?</Typography>
