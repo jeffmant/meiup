@@ -19,7 +19,7 @@ enum PartyType {
 }
 
 enum TransactionType {
-  receipt
+  revenue
   cost
 }
 
@@ -116,10 +116,12 @@ model Party {
 
 model Transaction {
   id        String          @id @default(uuid())
+  partyName String
   type      TransactionType
   company   Company         @relation(fields: [companyId], references: [id])
   companyId String
   value     Float
+  dueDate   DateTime
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
   deletedAt DateTime?
