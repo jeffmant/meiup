@@ -42,6 +42,8 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
         setConfirmDelete(false)
       } catch (error) {
         setConfirmDelete(false)
+      } finally {
+        handleCloseModal()
       }
     }
   }

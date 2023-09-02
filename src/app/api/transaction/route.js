@@ -7,16 +7,16 @@ const prisma = new PrismaClient()
 export async function GET () {
   const { id: clerkUserId } = await currentUser()
   try {
-    const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId } })
+    const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId, deletedAt: null } })
 
-    const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id } })
+    const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id, deletedAt: null } })
 
     const userCompanies = await prisma.company.findMany({
-      where: { societyId: { in: userSocieties.map((userSociety) => userSociety.societyId) } }
+      where: { societyId: { in: userSocieties.map((userSociety) => userSociety.societyId) }, deletedAt: null }
     })
 
     const transactions = await prisma.transaction.findMany({
-      where: { companyId: { in: userCompanies.map((userCompany) => userCompany.id) } }
+      where: { companyId: { in: userCompanies.map((userCompany) => userCompany.id) }, deletedAt: null }
     })
 
     return NextResponse.json({ data: transactions }, { status: 200 })
@@ -32,12 +32,12 @@ export async function POST (req) {
   const transactionBody = await req.json()
 
   try {
-    const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId } })
+    const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId, deletedAt: null } })
 
-    const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id } })
+    const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id, deletedAt: null } })
 
     const userCompanies = await prisma.company.findMany({
-      where: { societyId: { in: userSocieties.map((userSociety) => userSociety.societyId) } }
+      where: { societyId: { in: userSocieties.map((userSociety) => userSociety.societyId) }, deletedAt: null }
     })
 
     await prisma.transaction.create({
@@ -60,9 +60,12 @@ export async function DELETE (req) {
   const transactionId = url.searchParams.get('id')
 
   try {
-    await prisma.transaction.delete({
+    await prisma.transaction.update({
       where: {
         id: transactionId
+      },
+      data: {
+        deletedAt: new Date()
       }
     })
 
@@ -83,7 +86,8 @@ export async function PATCH (req) {
   try {
     const updatedTransaction = await prisma.transaction.update({
       where: {
-        id: transactionId
+        id: transactionId,
+        createdAt: null
       },
       data: {
         type,

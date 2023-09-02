@@ -34,7 +34,7 @@ export async function getAllTransactions (accessToken) {
 
 export async function deleteTransaction (transactionId, accessToken) {
   try {
-    const deleteResponse = await fetch(`/api/transaction/id=${transactionId}`, {
+    const deleteResponse = await fetch(`/api/transaction/?id=${transactionId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -51,7 +51,7 @@ export async function deleteTransaction (transactionId, accessToken) {
 
 export async function updateTransaction (transactionId, transactionBody, accessToken) {
   try {
-    const updateResponse = await fetch(`/api/transaction/id=${transactionId}`, {
+    const updateResponse = await fetch(`/api/transaction/?id=${transactionId}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${accessToken}`

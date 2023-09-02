@@ -2,6 +2,8 @@ import { currentUser } from '@clerk/nextjs'
 import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
+const prisma = new PrismaClient({})
+
 export async function POST (req) {
   const { id: clerkUserId } = await currentUser()
 
@@ -11,14 +13,13 @@ export async function POST (req) {
   delete companyBody.address
 
   try {
-    const prisma = new PrismaClient()
-
     await prisma.$transaction(async (tx) => {
-      const foundUser = await tx.user.findFirstOrThrow({ where: { clerkUserId } })
+      const foundUser = await tx.user.findFirstOrThrow({ where: { clerkUserId, deletedAt: null } })
 
       const userSocieties = await tx.userSociety.findMany({
         where: {
-          userId: foundUser.id
+          userId: foundUser.id,
+          deletedAt: null
         }
       })
 
@@ -26,10 +27,9 @@ export async function POST (req) {
 
       const societyAlreadyExists = await tx.society.findFirst({
         where: {
-          AND: {
-            company: { document: companyBody.document },
-            userSocieties: { some: { id: { in: userSocietiesIds } } }
-          }
+          company: { document: companyBody.document },
+          userSocieties: { some: { id: { in: userSocietiesIds } } },
+          deletedAt: null
         }
       })
 
@@ -52,7 +52,7 @@ export async function POST (req) {
         data: { companyId: createdCompany.id }
       })
 
-      await tx.company.update({ where: { id: createdCompany.id }, data: { societyId: createdSociety.id } })
+      await tx.company.update({ where: { id: createdCompany.id, deletedAt: null }, data: { societyId: createdSociety.id } })
 
       await tx.userSociety.create({
         data: {
@@ -75,7 +75,7 @@ export async function POST (req) {
 export async function GET (req) {
   try {
     const { searchParams } = new URL(req.url)
-    let params
+    let params = { deletedAt: null }
 
     const userId = searchParams.get('userId')
     if (userId) params = { ...params, id: userId }
@@ -84,15 +84,13 @@ export async function GET (req) {
 
     // TODO: add params to query
 
-    const prisma = new PrismaClient()
-
     const foundUser = await prisma.user.findFirstOrThrow({ where: params })
 
-    const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id } })
+    const userSocieties = await prisma.userSociety.findMany({ where: { userId: foundUser.id, deletedAt: null } })
 
     const userSocietiesIds = userSocieties.map(userSociety => userSociety.societyId)
 
-    const userCompanies = await prisma.company.findMany({ where: { societyId: { in: userSocietiesIds } } })
+    const userCompanies = await prisma.company.findMany({ where: { societyId: { in: userSocietiesIds }, deletedAt: null } })
 
     return NextResponse.json({
       data: userCompanies

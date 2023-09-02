@@ -2,13 +2,13 @@ import { currentUser } from '@clerk/nextjs'
 import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
+const prisma = new PrismaClient({})
+
 export async function GET (_req) {
   try {
     const { id: clerkUserId } = await currentUser()
 
-    const prisma = new PrismaClient()
-
-    const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId } })
+    const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId, deletedAt: null } })
 
     return NextResponse.json({
       data: foundUser
@@ -28,8 +28,7 @@ export async function GET (_req) {
 export async function POST (req) {
   try {
     const userBody = await req.json()
-
-    const prisma = new PrismaClient()
+    let createdUser
 
     const foundUser = await prisma.user.findFirst({
       where: {
@@ -38,12 +37,24 @@ export async function POST (req) {
     })
 
     if (foundUser) {
-      throw new Error('User already exists')
+      if (foundUser.deletedAt !== null) {
+        createdUser = await prisma.user.update({
+          where: {
+            id: foundUser.id
+          },
+          data: {
+            deletedAt: null,
+            ...userBody
+          }
+        })
+      } else {
+        throw new Error('User already exists')
+      }
+    } else {
+      createdUser = await prisma.user.create({
+        data: userBody
+      })
     }
-
-    const createdUser = await prisma.user.create({
-      data: userBody
-    })
 
     return NextResponse.json({
       data: createdUser
