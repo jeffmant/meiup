@@ -23,32 +23,27 @@ export const TransactionTable = ({ transactions, handleTransactionSelect }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {transactions.map((transaction) => {
-                const createdAt = format(
-                  new Date(transaction.dueDate),
-                  'dd/MM/yyyy'
-                )
-
-                return (
-                  <TableRow
-                    hover
-                    key={transaction.id}
-                    sx={{ '&:hover': { cursor: 'pointer' } }}
-                    onClick={() => handleTransactionClick(transaction)}
-                  >
-                    <TableCell>
-                      <SvgIcon fontSize='small'>
-                        {
+              {transactions.map((transaction) => (
+                <TableRow
+                  hover
+                  key={transaction.id}
+                  sx={{ '&:hover': { cursor: 'pointer' } }}
+                  onClick={() => handleTransactionClick(transaction)}
+                >
+                  <TableCell>
+                    <SvgIcon fontSize='small'>
+                      {
                           transaction.type === 'revenue' ? <ArrowUpRightIcon color='green' /> : <ArrowDownLeftIcon color='red' />
                         }
-                      </SvgIcon>
-                    </TableCell>
-                    <TableCell>{transaction.partyName}</TableCell>
-                    <TableCell>{`R$${transaction.value}`}</TableCell>
-                    <TableCell>{createdAt}</TableCell>
-                  </TableRow>
-                )
-              })}
+                    </SvgIcon>
+                  </TableCell>
+                  <TableCell>{transaction.partyName}</TableCell>
+                  <TableCell>{transaction.value.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</TableCell>
+                  <TableCell>{format(new Date(transaction.dueDate), 'dd/MM/yyyy')}
+                  </TableCell>
+                </TableRow>
+              )
+              )}
             </TableBody>
           </Table>
           )

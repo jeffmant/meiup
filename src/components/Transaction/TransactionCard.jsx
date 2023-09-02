@@ -51,7 +51,7 @@ export const TransactionCard = ({
           </Stack>
           <Stack spacing={1}>
             <Typography variant='p'>
-              R$ {value}
+              {value.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
             </Typography>
           </Stack>
         </Stack>
