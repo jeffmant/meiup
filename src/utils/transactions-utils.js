@@ -14,7 +14,7 @@ export async function createTransaction (transactionBody, accessToken) {
     console.log('Erro ao realizar fetchPost: ', error)
     throw new Error(error)
   }
-};
+}
 
 export async function getAllTransactions (accessToken) {
   try {
@@ -23,7 +23,7 @@ export async function getAllTransactions (accessToken) {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
-    }).then(response => response.json())
+    }).then((response) => response.json())
 
     return transactions
   } catch (error) {
@@ -46,8 +46,8 @@ export async function deleteTransaction (transactionId, accessToken) {
   } catch (error) {
     console.log('Erro ao realizar fetchDelete: ', error)
     throw new Error(error)
-  };
-};
+  }
+}
 
 export async function updateTransaction (transactionId, transactionBody, accessToken) {
   try {
@@ -64,5 +64,5 @@ export async function updateTransaction (transactionId, transactionBody, accessT
   } catch (error) {
     console.log('Erro ao realizar fetchUpdate: ', error)
     throw new Error(error)
-  };
+  }
 }

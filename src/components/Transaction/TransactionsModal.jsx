@@ -16,8 +16,9 @@ import {
   Typography
 } from '@mui/material'
 import Box from '@mui/material/Box'
+import { format } from 'date-fns'
 import { useFormik } from 'formik'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { formatCurrency } from 'src/utils/masks'
 import {
   createTransaction,
@@ -73,12 +74,23 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
     }
   }
 
+  useEffect(() => {
+    if (transaction) {
+      formik.setValues({
+        type: transaction.type,
+        partyName: transaction.partyName,
+        value: String(transaction.value),
+        dueDate: format(new Date(transaction.dueDate), 'yyyy-MM-dd')
+      })
+    }
+  }, [transaction])
+
   const formik = useFormik({
     initialValues: {
-      type: transaction?.type || 'revenue',
-      partyName: transaction?.partyName || '',
-      value: transaction?.value.toString() || '',
-      dueDate: new Date(transaction?.dueDate) || new Date()
+      type: 'revenue',
+      partyName: '',
+      value: '',
+      dueDate: format(new Date(), 'yyyy-MM-dd')
     },
     validationSchema: Yup.object({
       type: Yup.string().required(),
