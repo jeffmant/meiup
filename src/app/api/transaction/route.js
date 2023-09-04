@@ -4,8 +4,9 @@ import { NextResponse } from 'next/server'
 
 const prisma = new PrismaClient()
 
-export async function GET () {
+export async function GET (req) {
   const { id: clerkUserId } = await currentUser()
+
   try {
     const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId, deletedAt: null } })
 

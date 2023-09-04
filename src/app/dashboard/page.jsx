@@ -7,12 +7,8 @@ import {
   CardActions,
   CardContent,
   Container,
-  FormControl,
   Unstable_Grid2 as Grid,
-  InputLabel,
-  MenuItem,
   Pagination,
-  Select,
   Typography,
   useMediaQuery
 } from '@mui/material'
@@ -22,6 +18,7 @@ import { useEffect, useState } from 'react'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 import { TransactionTable } from 'src/components/Transaction/TransactionTable'
+import TransactionTypeSelector from 'src/components/Transaction/TransactionTypeSelector'
 import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 import { getAllTransactions } from 'src/utils/transactions-utils'
@@ -70,9 +67,9 @@ const Dashboard = () => {
     console.log('selected year -> ', transactionYear)
   }
 
-  const handleTransactionType = async (e) => {
-    e.stopPropagation()
-    setTransactionType(e.target.value)
+  const handleTransactionType = async (type) => {
+    setTransactionType(type)
+    console.log('Selected Type: ', transactionType)
   }
 
   return (
@@ -105,9 +102,18 @@ const Dashboard = () => {
                 p: 2
               }}
             >
-              <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
+              <Stack
+                alignItems='center'
+                direction='row'
+                justifyContent='space-between'
+                spacing={4}
+              >
                 <div>
-                  <Typography color='text.secondary' variant='overline' align='center'>
+                  <Typography
+                    color='text.secondary'
+                    variant='overline'
+                    align='center'
+                  >
                     Receitas
                   </Typography>
                 </div>
@@ -128,9 +134,19 @@ const Dashboard = () => {
                 p: 2
               }}
             >
-              <Stack alignItems='center' direction='row' justifyContent='space-between' spacing={4}>
+              <Stack
+                alignItems='center'
+                direction='row'
+                justifyContent='space-between'
+                spacing={4}
+              >
                 <div>
-                  <Typography color='text.secondary' gutterBottom variant='overline' align='center'>
+                  <Typography
+                    color='text.secondary'
+                    gutterBottom
+                    variant='overline'
+                    align='center'
+                  >
                     Despesas
                   </Typography>
                 </div>
@@ -142,7 +158,10 @@ const Dashboard = () => {
               </Stack>
             </Card>
           </Stack>
-          <Grid container spacing={3}>
+          <Grid
+            container
+            spacing={3}
+          >
             <Grid xs={12}>
               <Card
                 sx={{
@@ -169,24 +188,15 @@ const Dashboard = () => {
                             handleTransactionMonth={handleTransactionMonth}
                           />
                         </Stack>
+
                         <Stack sx={{ mr: 2 }}>
                           <TransactionYearSelector handleTransactionYear={handleTransactionYear} />
                         </Stack>
 
-                        <FormControl fullWidth sx={{ width: '128px' }}>
-                          <InputLabel id='select-type-label'>Tipo</InputLabel>
-                          <Select
-                            labelId='select-type-label'
-                            id='select-type'
-                            value={transactionType}
-                            label='Tipo'
-                            onChange={handleTransactionType}
-                          >
-                            <MenuItem value='all'>Todos</MenuItem>
-                            <MenuItem value='revenue'>Receita</MenuItem>
-                            <MenuItem value='cost'>Despesa</MenuItem>
-                          </Select>
-                        </FormControl>
+                        <Stack sx={{ mr: 2 }}>
+                          <TransactionTypeSelector handleTransactionType={handleTransactionType} />
+                        </Stack>
+
                       </Stack>
                     </Stack>
                     <Stack
@@ -210,7 +220,10 @@ const Dashboard = () => {
                     </Stack>
                   </Box>
 
-                  <Typography sx={{ mt: 8 }} variant='h5'>
+                  <Typography
+                    sx={{ mt: 8 }}
+                    variant='h5'
+                  >
                     Transações
                   </Typography>
 
@@ -237,7 +250,10 @@ const Dashboard = () => {
                     }}
                   >
                     {transactions?.length > 0 && (
-                      <Pagination count={transactions.length} size='small' />
+                      <Pagination
+                        count={transactions.length}
+                        size='small'
+                      />
                     )}
                   </Box>
                 </CardActions>
