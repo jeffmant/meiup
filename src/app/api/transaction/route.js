@@ -6,6 +6,13 @@ const prisma = new PrismaClient()
 
 export async function GET (req) {
   const { id: clerkUserId } = await currentUser()
+  const { searchParams } = new URL(req.url)
+  const transactionType = searchParams.get('type')
+  const transactionMonth = searchParams.get('month')
+  const transactionYear = searchParams.get('year')
+
+  const startDate = new Date(transactionYear, transactionMonth, 1)
+  const endDate = new Date(transactionYear, transactionMonth, 0)
 
   try {
     const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId, deletedAt: null } })
@@ -16,9 +23,13 @@ export async function GET (req) {
       where: { societyId: { in: userSocieties.map((userSociety) => userSociety.societyId) }, deletedAt: null }
     })
 
-    const transactions = await prisma.transaction.findMany({
-      where: { companyId: { in: userCompanies.map((userCompany) => userCompany.id) }, deletedAt: null }
-    })
+    const transactionQuery = { where: { companyId: { in: userCompanies.map((userCompany) => userCompany.id) }, dueDate: { gte: startDate, lte: endDate }, deletedAt: null } }
+
+    if (transactionType !== 'all') {
+      transactionQuery.where.type = transactionType
+    };
+
+    const transactions = await prisma.transaction.findMany(transactionQuery)
 
     return NextResponse.json({ data: transactions }, { status: 200 })
   } catch (error) {

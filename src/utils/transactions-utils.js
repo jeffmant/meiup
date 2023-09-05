@@ -16,9 +16,9 @@ export async function createTransaction (transactionBody, accessToken) {
   }
 }
 
-export async function getAllTransactions (accessToken) {
+export async function getAllTransactions (accessToken, type, month, year) {
   try {
-    const { data: transactions } = await fetch('/api/transaction', {
+    const { data: transactions } = await fetch(`/api/transaction/?type=${type}&month=${month}&year=${year}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`

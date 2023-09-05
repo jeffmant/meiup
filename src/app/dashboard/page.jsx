@@ -42,13 +42,9 @@ const Dashboard = () => {
 
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
 
-  useEffect(() => {
-    refreshTransactions()
-  }, [])
-
   const refreshTransactions = async () => {
     const accessToken = await getToken()
-    const fetchedTransactions = await getAllTransactions(accessToken)
+    const fetchedTransactions = await getAllTransactions(accessToken, transactionType)
     setTransactions(fetchedTransactions)
   }
 
@@ -67,9 +63,14 @@ const Dashboard = () => {
     console.log('selected year -> ', transactionYear)
   }
 
+  useEffect(() => {
+    refreshTransactions()
+    console.log('useEffect refreshed the transactions')
+  }, [transactionYear, transactionMonth, transactionType])
+
   const handleTransactionType = async (type) => {
     setTransactionType(type)
-    console.log('Selected Type: ', transactionType)
+    refreshTransactions()
   }
 
   return (

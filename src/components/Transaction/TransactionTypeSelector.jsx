@@ -19,7 +19,7 @@ const TransactionTypeSelector = ({ handleTransactionType }) => {
     setAnchorEl(null)
   }
 
-  const handleTypeSelect = (value) => {
+  const handleTypeSelect = async (value) => {
     const type = types.find(type => type.value === value)
     if (type) {
       setSelectedType(type.label)
