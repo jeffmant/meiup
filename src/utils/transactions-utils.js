@@ -51,7 +51,7 @@ export async function deleteTransaction (transactionId, accessToken) {
 
 export async function updateTransaction (transactionId, transactionBody, accessToken) {
   try {
-    const updateResponse = await fetch(`/api/transaction/?id=${transactionId}`, {
+    const updateResponse = await fetch(`/api/transaction/${transactionId}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${accessToken}`
