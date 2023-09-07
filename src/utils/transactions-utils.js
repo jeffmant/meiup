@@ -16,16 +16,16 @@ export async function createTransaction (transactionBody, accessToken) {
   }
 }
 
-export async function getAllTransactions (accessToken, type, month, year) {
+export async function getAllTransactions (accessToken, type, month, year, page, limit) {
   try {
-    const { data: transactions } = await fetch(`/api/transaction/?type=${type}&month=${month}&year=${year}`, {
+    const { data: { totalPages, transactions, totalRevenues, totalCosts } } = await fetch(`/api/transaction/?type=${type}&month=${month}&year=${year}&page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
     }).then((response) => response.json())
 
-    return transactions
+    return { totalPages, transactions, totalRevenues, totalCosts }
   } catch (error) {
     console.log('Erro ao realizar fetchGet: ', error)
     throw new Error(error)

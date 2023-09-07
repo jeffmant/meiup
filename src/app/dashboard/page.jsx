@@ -34,18 +34,24 @@ const Dashboard = () => {
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
   const [transactionYear, setTransactionYear] = useState(currentYear)
   const [transactions, setTransactions] = useState([])
+  const [monthlyRevenue, setMonthlyRevenue] = useState(0)
+  const [monthlyCost, setMonthlyCost] = useState(0)
+  const [totalPages, setTotalPages] = useState([])
+  const [page, setPage] = useState(1)
+  const limit = 10
 
   const { getToken } = useAuth()
-
-  const monthlyRevenue = 0
-  const monthlyCost = 0
 
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
 
   const refreshTransactions = async () => {
     const accessToken = await getToken()
-    const fetchedTransactions = await getAllTransactions(accessToken, transactionType)
+    const { totalPages, transactions: fetchedTransactions, totalRevenues, totalCosts } =
+      await getAllTransactions(accessToken, transactionType, transactionMonth, transactionYear, page, limit)
     setTransactions(fetchedTransactions)
+    setTotalPages(totalPages)
+    setMonthlyRevenue(totalRevenues)
+    setMonthlyCost(totalCosts)
   }
 
   const handleTransactionSelect = (transaction) => {
@@ -55,18 +61,15 @@ const Dashboard = () => {
 
   const handleTransactionMonth = async (month) => {
     setTransactionMonth(month)
-    console.log('selected month -> ', transactionMonth)
   }
 
   const handleTransactionYear = async (year) => {
     setTransactionYear(year)
-    console.log('selected year -> ', transactionYear)
   }
 
   useEffect(() => {
     refreshTransactions()
-    console.log('useEffect refreshed the transactions')
-  }, [transactionYear, transactionMonth, transactionType])
+  }, [transactionYear, transactionMonth, transactionType, page])
 
   const handleTransactionType = async (type) => {
     setTransactionType(type)
@@ -250,9 +253,12 @@ const Dashboard = () => {
                       justifyContent: 'center'
                     }}
                   >
-                    {transactions?.length > 0 && (
+                    {totalPages > 1 && (
                       <Pagination
-                        count={transactions.length}
+                        onChange={(_e, value) => {
+                          setPage(value)
+                        }}
+                        count={totalPages}
                         size='small'
                       />
                     )}

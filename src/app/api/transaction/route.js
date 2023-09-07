@@ -1,18 +1,37 @@
 import { currentUser } from '@clerk/nextjs'
 import { PrismaClient } from '@prisma/client'
+import { endOfMonth, startOfMonth } from 'date-fns'
 import { NextResponse } from 'next/server'
 
 const prisma = new PrismaClient()
 
-export async function GET (req) {
+export async function GET (req, params) {
   const { id: clerkUserId } = await currentUser()
-  const { searchParams } = new URL(req.url)
-  const transactionType = searchParams.get('type')
-  const transactionMonth = searchParams.get('month')
-  const transactionYear = searchParams.get('year')
 
-  const startDate = new Date(transactionYear, transactionMonth, 1)
-  const endDate = new Date(transactionYear, transactionMonth, 0)
+  const { searchParams } = new URL(req.url)
+
+  const page = +searchParams.get('page') || 1
+  const limit = +searchParams.get('limit') || 10
+
+  const paginationQuery = { skip: (page - 1) * limit, take: limit, orderBy: { dueDate: 'desc' } }
+
+  const transactionQuery = { where: { deletedAt: null } }
+
+  const transactionType = searchParams.get('type')
+
+  if (transactionType && transactionType !== 'all') {
+    transactionQuery.where.type = transactionType
+  };
+
+  const transactionMonth = +searchParams.get('month') || new Date().getMonth()
+  const transactionYear = +searchParams.get('year') || new Date().getFullYear()
+
+  const startDate = startOfMonth(new Date(transactionYear, transactionMonth))
+  const endDate = endOfMonth(new Date(transactionYear, transactionMonth))
+
+  transactionQuery.where.dueDate = {
+    gte: startDate, lt: endDate
+  }
 
   try {
     const foundUser = await prisma.user.findFirstOrThrow({ where: { clerkUserId, deletedAt: null } })
@@ -23,15 +42,29 @@ export async function GET (req) {
       where: { societyId: { in: userSocieties.map((userSociety) => userSociety.societyId) }, deletedAt: null }
     })
 
-    const transactionQuery = { where: { companyId: { in: userCompanies.map((userCompany) => userCompany.id) }, dueDate: { gte: startDate, lte: endDate }, deletedAt: null } }
+    transactionQuery.where.companyId = {
+      in: userCompanies.map((userCompany) => userCompany.id)
+    }
 
-    if (transactionType !== 'all') {
-      transactionQuery.where.type = transactionType
-    };
+    const transactionsCount = await prisma.transaction.count(transactionQuery)
 
-    const transactions = await prisma.transaction.findMany(transactionQuery)
+    const transactionsSummary = await prisma.transaction.groupBy({
+      by: ['type', 'value']
+    })
 
-    return NextResponse.json({ data: transactions }, { status: 200 })
+    let totalCosts = 0
+    let totalRevenues = 0
+
+    for (const transaction of transactionsSummary) {
+      if (transaction.type === 'revenue') totalRevenues += transaction.value
+      if (transaction.type === 'cost') totalCosts += transaction.value
+    }
+
+    const transactions = await prisma.transaction.findMany({ ...transactionQuery, ...paginationQuery })
+
+    const totalPages = Math.floor(transactionsCount / limit)
+
+    return NextResponse.json({ data: { totalPages, transactions, totalRevenues, totalCosts } }, { status: 200 })
   } catch (error) {
     console.log('Erro ao buscar transactions: ', error)
     return NextResponse.json({ error: 'Erro ao buscar transactions: ' }, { status: 500 })
