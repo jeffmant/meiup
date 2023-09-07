@@ -6,11 +6,12 @@
   "scripts": {
     "dev": "next dev",
     "start": "next start",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "export": "next export",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@clerk/localizations": "^1.24.1",
@@ -26,7 +27,7 @@
     "@mui/x-date-pickers": "5.0.19",
     "@prisma/client": "^5.1.1",
     "apexcharts": "3.37.0",
-    "axios": "^1.4.0",
+    "axios": "^1.5.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "date-fns": "2.29.3",

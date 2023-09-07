@@ -1,61 +1,43 @@
+import axios from 'axios'
 import { NextResponse } from 'next/server'
 
-const getMockedCompanyData = async (cnpj) => {
-  return new Promise((resolve) => resolve(cnpj === '36255676000173'
-    ? {
-        data: [
-          {
-            normalizado_cnpj: '36255676000173',
-            razao_social: 'BOAZ Tecnologias LTDA.',
-            nome_fantasia: 'BOAZ Tecnologias',
-            situacao_cadastral: 'ATIVA',
-            email: 'jgsmantovani@gmail.com',
-            telefone: '11936187180',
-            abertura_data: '05/02/2020',
-            normalizado_endereco_cep: '87309086',
-            endereco_logradouro: 'Rua Geremias Araujo',
-            endereco_numero: '241',
-            endereco_municipio: 'Campo Mourão',
-            endereco_uf: 'PR',
-            endereco_bairro: 'Jardim Albuquerque'
-          }
-        ]
-      }
-    : { data: [] }))
-}
-
 export async function GET (req) {
-  // const {
-  //   NEXT_PUBLIC_INFOSIMPLES_BASE_URL,
-  //   NEXT_PUBLIC_INFOSIMPLES_TOKEN
-  // } = process.env
+  const {
+    NEXT_PUBLIC_INFOSIMPLES_BASE_URL,
+    NEXT_PUBLIC_INFOSIMPLES_TOKEN
+  } = process.env
 
   const { searchParams } = new URL(req.url)
 
   const cnpj = searchParams.get('cnpj')
 
   try {
-    // const { data: { data } } = await fetch(
-    //   `${NEXT_PUBLIC_INFOSIMPLES_BASE_URL}/receita-federal/cnpj/?
-    //     token=${NEXT_PUBLIC_INFOSIMPLES_TOKEN},
-    //     cnpj=${cnpj}
-    //     origem=web
-    //   `, {
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     }
-    //   })
-
-    // getting mocked company data while infosimples api isn't working
-    const { data } = await getMockedCompanyData(cnpj)
+    const { data: { data } } = await axios.get(
+      `${NEXT_PUBLIC_INFOSIMPLES_BASE_URL}/receita-federal/cnpj`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        params: {
+          token: NEXT_PUBLIC_INFOSIMPLES_TOKEN,
+          cnpj,
+          origem: 'web'
+        }
+      })
 
     if (!data?.length) throw new Error('Company not found')
 
     const foundCnpj = data[0]
 
+    if (foundCnpj.porte !== 'ME') throw new Error('Company is not valid')
+
     const company = {
       document: foundCnpj.normalizado_cnpj,
       name: foundCnpj.razao_social,
+      type: foundCnpj.natureza_juridica_codigo === '2062'
+        ? 'me'
+        : foundCnpj.natureza_juridica_codigo === '2135'
+          ? 'mei'
+          : '',
       fantasyName: foundCnpj.nome_fantasia,
       status: foundCnpj.situacao_cadastral === 'ATIVA',
       email: foundCnpj.email,
@@ -78,10 +60,10 @@ export async function GET (req) {
       status: 200
     })
   } catch (error) {
+    console.log(error)
     return NextResponse.json({
       error: error.message || 'Internal Server Error'
-    }, {
-      status: error.statusCode || 500
-    })
+    },
+    { status: 500 })
   }
 }

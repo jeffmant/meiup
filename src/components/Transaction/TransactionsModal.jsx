@@ -1,3 +1,5 @@
+'use client'
+import { useAuth } from '@clerk/nextjs'
 import {
   Button,
   CircularProgress,
@@ -15,52 +17,89 @@ import {
 } from '@mui/material'
 import Box from '@mui/material/Box'
 import { useFormik } from 'formik'
-import { useState } from 'react'
-import { formatCurrency } from 'src/utils/masks'
+import { useEffect, useState } from 'react'
+import {
+  createTransaction,
+  deleteTransaction,
+  updateTransaction
+} from 'src/utils/transactions-utils'
 import * as Yup from 'yup'
 
-const TransactionsModal = ({ transaction, openModal, handleCloseModal }) => {
+const TransactionsModal = ({ transaction, refreshTransactions, openModal, handleCloseModal }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
+  const { getToken } = useAuth()
+
   const handleDelete = async () => {
+    const accessToken = await getToken()
     if (transaction) {
       try {
+        await deleteTransaction(transaction.id, accessToken)
+        await refreshTransactions()
         setConfirmDelete(false)
       } catch (error) {
         setConfirmDelete(false)
+      } finally {
+        formik.resetForm()
+        handleCloseModal()
       }
     }
   }
+
+  const handleSave = async (values) => {
+    const accessToken = await getToken()
+    if (transaction) {
+      try {
+        setIsLoading(true)
+        await updateTransaction(transaction.id, values, accessToken)
+        refreshTransactions()
+      } catch (err) {
+        console.log(err)
+      } finally {
+        setIsLoading(false)
+        formik.resetForm()
+        handleCloseModal()
+      }
+    } else {
+      try {
+        setIsLoading(true)
+        await createTransaction(values, accessToken)
+        refreshTransactions()
+      } catch (err) {
+        console.log(err)
+      } finally {
+        setIsLoading(false)
+        formik.resetForm()
+        handleCloseModal()
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (transaction) {
+      formik.setValues({
+        type: transaction.type,
+        partyName: transaction.partyName,
+        value: transaction.value,
+        dueDate: transaction.dueDate
+      })
+    }
+  }, [transaction])
 
   const formik = useFormik({
     initialValues: {
       type: 'revenue',
       partyName: '',
-      amount: '',
-      date: ''
+      value: '',
+      dueDate: ''
     },
     validationSchema: Yup.object({
       type: Yup.string().required(),
       partyName: Yup.string().required(),
-      amount: Yup.number().required(),
-      date: Yup.date().required()
-    }),
-    onSubmit: async (values, helpers) => {
-      try {
-        console.log('Salvando...')
-        setIsLoading(true)
-        setTimeout(() => {
-          setIsLoading(false)
-        }, 3000)
-        console.log('transaction data -> ', values)
-      } catch (err) {
-        helpers.setStatus({ success: false })
-        console.log(err)
-      } finally {
-        formik.resetForm()
-      }
-    }
+      value: Yup.number().required(),
+      dueDate: Yup.date().required()
+    })
   })
 
   return (
@@ -116,9 +155,10 @@ const TransactionsModal = ({ transaction, openModal, handleCloseModal }) => {
             />
 
             <TextField
+              type='number'
               fullWidth
-              name='amount'
-              value={formatCurrency(formik.values.amount)}
+              name='value'
+              value={formik.values.value}
               label='Valor'
               onChange={formik.handleChange}
               sx={{ mb: 2 }}
@@ -127,13 +167,12 @@ const TransactionsModal = ({ transaction, openModal, handleCloseModal }) => {
             <TextField
               fullWidth
               type='date'
-              name='date'
-              value={formik.values.date}
+              name='dueDate'
+              value={formik.values.dueDate}
               label='Data'
               onChange={formik.handleChange}
               sx={{ mb: 2 }}
             />
-
           </DialogContent>
           <DialogActions>
             {formik.errors.submit && (
@@ -164,18 +203,15 @@ const TransactionsModal = ({ transaction, openModal, handleCloseModal }) => {
             >
               Cancelar
             </Button>
-            {isLoading
-              ? (
-                <CircularProgress />
-                )
-              : (
-                <Button
-                  variant='contained'
-                  type='submit'
-                >
-                  Salvar
-                </Button>
-                )}
+            <Button
+              disabled={!formik.isValid}
+              variant='contained'
+              onClick={async () => await handleSave(formik.values)}
+            >
+              {isLoading
+                ? <CircularProgress size={20} />
+                : 'Salvar'}
+            </Button>
           </DialogActions>
         </form>
         <Dialog

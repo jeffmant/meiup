@@ -12,7 +12,7 @@ export const cnpjMask = (value) => {
 export const removeMask = (value) => value.replace(/[^\d]+/g, '')
 
 // 000.000.000-00
-export const maskCPF = value => {
+export const maskCPF = (value) => {
   return value
     .replace(/\D/g, '')
     .replace(/(\d{3})(\d)/, '$1.$2')
@@ -22,7 +22,7 @@ export const maskCPF = value => {
 }
 
 // (00) 00000-0000
-export const maskPhone = value => {
+export const maskPhone = (value) => {
   return value
     .replace(/\D/g, '')
     .replace(/(\d{2})(\d)/, '($1) $2')
@@ -31,12 +31,12 @@ export const maskPhone = value => {
 }
 
 // 00000-000
-export const maskCEP = value => {
+export const maskCEP = (value) => {
   return value.replace(/\D/g, '').replace(/^(\d{5})(\d{3})+?$/, '$1-$2')
 }
 
 // 00/00/0000
-export const maskDate = value => {
+export const maskDate = (value) => {
   return value
     .replace(/\D/g, '')
     .replace(/(\d{2})(\d)/, '$1/$2')

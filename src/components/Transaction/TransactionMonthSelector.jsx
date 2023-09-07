@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 const TransactionMonthSelector = ({ handleTransactionMonth }) => {
   const currentMonth = new Date().getMonth()
+
   const months = [
     'Janeiro',
     'Fevereiro',

@@ -1,4 +1,5 @@
 'use client'
+import { useAuth } from '@clerk/nextjs'
 import {
   Box,
   Button,
@@ -6,23 +7,21 @@ import {
   CardActions,
   CardContent,
   Container,
-  FormControl,
   Unstable_Grid2 as Grid,
-  InputLabel,
-  MenuItem,
   Pagination,
-  Select,
   Typography,
   useMediaQuery
 } from '@mui/material'
 import { Stack } from '@mui/system'
 import Head from 'next/head'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 import { TransactionTable } from 'src/components/Transaction/TransactionTable'
+import TransactionTypeSelector from 'src/components/Transaction/TransactionTypeSelector'
 import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
+import { getAllTransactions } from 'src/utils/transactions-utils'
 
 const currentMonth = new Date().getMonth()
 const currentYear = new Date().getFullYear()
@@ -34,30 +33,47 @@ const Dashboard = () => {
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
   const [transactionYear, setTransactionYear] = useState(currentYear)
+  const [transactions, setTransactions] = useState([])
+  const [monthlyRevenue, setMonthlyRevenue] = useState(0)
+  const [monthlyCost, setMonthlyCost] = useState(0)
+  const [totalPages, setTotalPages] = useState([])
+  const [page, setPage] = useState(1)
+  const limit = 10
 
-  const transactions = []
-  const monthlyRevenue = 0
-  const monthlyCost = 0
+  const { getToken } = useAuth()
 
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
 
+  const refreshTransactions = async () => {
+    const accessToken = await getToken()
+    const { totalPages, transactions: fetchedTransactions, totalRevenues, totalCosts } =
+      await getAllTransactions(accessToken, transactionType, transactionMonth, transactionYear, page, limit)
+    setTransactions(fetchedTransactions)
+    setTotalPages(totalPages)
+    setMonthlyRevenue(totalRevenues)
+    setMonthlyCost(totalCosts)
+  }
+
   const handleTransactionSelect = (transaction) => {
     setSelectedTransaction(transaction)
+    setOpenTransactionModal(true)
   }
 
   const handleTransactionMonth = async (month) => {
     setTransactionMonth(month)
-    console.log('selected month -> ', transactionMonth)
   }
 
   const handleTransactionYear = async (year) => {
     setTransactionYear(year)
-    console.log('selected year -> ', transactionYear)
   }
 
-  const handleTransactionType = async (e) => {
-    e.stopPropagation()
-    setTransactionType(e.target.value)
+  useEffect(() => {
+    refreshTransactions()
+  }, [transactionYear, transactionMonth, transactionType, page])
+
+  const handleTransactionType = async (type) => {
+    setTransactionType(type)
+    refreshTransactions()
   }
 
   return (
@@ -172,29 +188,19 @@ const Dashboard = () => {
                     <Stack>
                       <Stack sx={{ flexDirection: 'row' }}>
                         <Stack sx={{ mr: 2 }}>
-                          <TransactionMonthSelector handleTransactionMonth={handleTransactionMonth} />
+                          <TransactionMonthSelector
+                            handleTransactionMonth={handleTransactionMonth}
+                          />
                         </Stack>
+
                         <Stack sx={{ mr: 2 }}>
                           <TransactionYearSelector handleTransactionYear={handleTransactionYear} />
                         </Stack>
 
-                        <FormControl
-                          fullWidth
-                          sx={{ width: '128px' }}
-                        >
-                          <InputLabel id='select-type-label'>Tipo</InputLabel>
-                          <Select
-                            labelId='select-type-label'
-                            id='select-type'
-                            value={transactionType}
-                            label='Tipo'
-                            onChange={handleTransactionType}
-                          >
-                            <MenuItem value='all'>Todos</MenuItem>
-                            <MenuItem value='revenue'>Receita</MenuItem>
-                            <MenuItem value='cost'>Despesa</MenuItem>
-                          </Select>
-                        </FormControl>
+                        <Stack sx={{ mr: 2 }}>
+                          <TransactionTypeSelector handleTransactionType={handleTransactionType} />
+                        </Stack>
+
                       </Stack>
                     </Stack>
                     <Stack
@@ -202,7 +208,9 @@ const Dashboard = () => {
                         flexDirection: 'row'
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: lgUp ? 'flex-end' : 'center' }}>
+                      <div
+                        style={{ display: 'flex', justifyContent: lgUp ? 'flex-end' : 'center' }}
+                      >
                         {!selectedTransaction && (
                           <Button
                             variant='contained'
@@ -214,13 +222,13 @@ const Dashboard = () => {
                         )}
                       </div>
                     </Stack>
-
                   </Box>
 
                   <Typography
                     sx={{ mt: 8 }}
                     variant='h5'
-                  >Transações
+                  >
+                    Transações
                   </Typography>
 
                   {mdUp
@@ -245,14 +253,15 @@ const Dashboard = () => {
                       justifyContent: 'center'
                     }}
                   >
-                    {
-                      transactions.length > 0 && (
-                        <Pagination
-                          count={transactions.length}
-                          size='small'
-                        />
-                      )
-                    }
+                    {totalPages > 1 && (
+                      <Pagination
+                        onChange={(_e, value) => {
+                          setPage(value)
+                        }}
+                        count={totalPages}
+                        size='small'
+                      />
+                    )}
                   </Box>
                 </CardActions>
               </Card>
@@ -265,7 +274,11 @@ const Dashboard = () => {
         sx={{ width: { xs: '100%', sm: '50%' }, height: 'auto' }}
         openModal={openTransactionModal}
         transaction={selectedTransaction}
-        handleCloseModal={() => setOpenTransactionModal(false)}
+        refreshTransactions={refreshTransactions}
+        handleCloseModal={() => {
+          setOpenTransactionModal(false)
+          setSelectedTransaction(null)
+        }}
       />
     </>
   )

@@ -156,7 +156,7 @@ export default function Home () {
                         variant='h5'
                         sx={{ py: 4 }}
                       >
-                        você vai se juntar ao time? ;)
+                        digite o seu cnpj ;)
                       </Typography>
 
                       <form

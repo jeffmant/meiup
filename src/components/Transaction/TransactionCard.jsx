@@ -5,9 +5,9 @@ import { Stack } from '@mui/system'
 
 export const TransactionCard = ({
   type,
-  amount,
+  value,
   partyName,
-  createdAt,
+  dueDate,
   onClick
 }) => {
   return (
@@ -47,11 +47,11 @@ export const TransactionCard = ({
             </Stack>
           </Stack>
           <Stack>
-            {createdAt}
+            {dueDate}
           </Stack>
           <Stack spacing={1}>
             <Typography variant='p'>
-              R$ {amount}
+              {value.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
             </Typography>
           </Stack>
         </Stack>

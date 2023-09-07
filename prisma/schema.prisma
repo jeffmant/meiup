@@ -19,7 +19,7 @@ enum PartyType {
 }
 
 enum TransactionType {
-  receipt
+  revenue
   cost
 }
 
@@ -44,11 +44,14 @@ model User {
 }
 
 model UserSociety {
-  id        String  @id @default(uuid())
-  user      User    @relation(fields: [userId], references: [id])
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id])
   userId    String
-  society   Society @relation(fields: [societyId], references: [id])
+  society   Society   @relation(fields: [societyId], references: [id])
   societyId String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([societyId])
   @@index([userId])
@@ -69,6 +72,7 @@ model Society {
 model Company {
   id             String        @id @default(uuid())
   name           String
+  type           CompanyType
   email          String?
   phone          String?
   fantasyName    String
@@ -87,7 +91,7 @@ model Company {
 }
 
 model Address {
-  id        String  @id @default(uuid())
+  id        String    @id @default(uuid())
   zipcode   String
   street    String
   number    Int
@@ -95,8 +99,11 @@ model Address {
   block     String
   state     String
   country   String
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String  @unique
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Party {
@@ -116,10 +123,12 @@ model Party {
 
 model Transaction {
   id        String          @id @default(uuid())
+  partyName String
   type      TransactionType
   company   Company         @relation(fields: [companyId], references: [id])
   companyId String
   value     Float
+  dueDate   DateTime
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
   deletedAt DateTime?
