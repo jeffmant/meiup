@@ -6,11 +6,12 @@
   "scripts": {
     "dev": "next dev",
     "start": "next start",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "export": "next export",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@clerk/localizations": "^1.24.1",
