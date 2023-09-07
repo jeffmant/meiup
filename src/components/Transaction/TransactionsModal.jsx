@@ -16,10 +16,8 @@ import {
   Typography
 } from '@mui/material'
 import Box from '@mui/material/Box'
-import { format } from 'date-fns'
 import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
-import { formatCurrency } from 'src/utils/masks'
 import {
   createTransaction,
   deleteTransaction,
@@ -43,6 +41,7 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
       } catch (error) {
         setConfirmDelete(false)
       } finally {
+        formik.resetForm()
         handleCloseModal()
       }
     }
@@ -58,6 +57,7 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
       } catch (err) {
         console.log(err)
       } finally {
+        setIsLoading(false)
         formik.resetForm()
         handleCloseModal()
       }
@@ -81,8 +81,8 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
       formik.setValues({
         type: transaction.type,
         partyName: transaction.partyName,
-        value: String(transaction.value),
-        dueDate: format(new Date(transaction.dueDate), 'dd/MM/yyyy')
+        value: transaction.value,
+        dueDate: transaction.dueDate
       })
     }
   }, [transaction])
@@ -92,12 +92,12 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
       type: 'revenue',
       partyName: '',
       value: '',
-      dueDate: format(new Date(), 'yyyy-MM-dd')
+      dueDate: ''
     },
     validationSchema: Yup.object({
       type: Yup.string().required(),
       partyName: Yup.string().required(),
-      value: Yup.string().required(),
+      value: Yup.number().required(),
       dueDate: Yup.date().required()
     })
   })
@@ -155,9 +155,10 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
             />
 
             <TextField
+              type='number'
               fullWidth
               name='value'
-              value={formatCurrency(formik.values.value)}
+              value={formik.values.value}
               label='Valor'
               onChange={formik.handleChange}
               sx={{ mb: 2 }}
@@ -208,10 +209,7 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
               onClick={async () => await handleSave(formik.values)}
             >
               {isLoading
-                ? <CircularProgress
-                    size={20}
-                    color='secondary'
-                  />
+                ? <CircularProgress size={20} />
                 : 'Salvar'}
             </Button>
           </DialogActions>
