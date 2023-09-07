@@ -72,6 +72,7 @@ model Society {
 model Company {
   id             String        @id @default(uuid())
   name           String
+  type           CompanyType
   email          String?
   phone          String?
   fantasyName    String
