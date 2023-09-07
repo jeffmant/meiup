@@ -55,7 +55,6 @@ export async function POST (req) {
     await prisma.transaction.create({
       data: {
         ...transactionBody,
-        value: +String(transactionBody.value).replace(',', ''),
         dueDate: new Date(transactionBody.dueDate),
         companyId: userCompanies?.[0]?.id
       }
@@ -84,33 +83,6 @@ export async function DELETE (req) {
     return NextResponse.json({ status: 200 })
   } catch (error) {
     console.log('Erro ao deletar transaction: ', error)
-
-    return NextResponse.json({ error: 'Erro ao deletar transaction: ' }, { status: 500 })
-  }
-}
-
-export async function PATCH (req) {
-  const url = new URL(req.url)
-  const transactionId = url.searchParams.get('id')
-  const transactionData = await req.json()
-  const { type, partyName, value } = transactionData
-
-  try {
-    const updatedTransaction = await prisma.transaction.update({
-      where: {
-        id: transactionId,
-        createdAt: null
-      },
-      data: {
-        type,
-        partyName,
-        value
-      }
-    })
-
-    return NextResponse.json({ status: 200 }, { data: updatedTransaction })
-  } catch (error) {
-    console.log('Houve um erro ao atualizar a transação: ', error)
 
     return NextResponse.json({ error: 'Erro ao deletar transaction: ' }, { status: 500 })
   }
