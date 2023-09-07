@@ -5,7 +5,7 @@ const TransactionYearSelector = ({ handleTransactionYear }) => {
   const currentYear = new Date().getFullYear()
 
   const years = []
-  const startYear = 2020
+  const startYear = 2008
   for (let year = startYear; year <= currentYear; year++) {
     years.push(year)
   }
