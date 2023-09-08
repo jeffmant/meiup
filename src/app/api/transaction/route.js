@@ -49,7 +49,8 @@ export async function GET (req, params) {
     const transactionsCount = await prisma.transaction.count(transactionQuery)
 
     const transactionsSummary = await prisma.transaction.groupBy({
-      by: ['type', 'value']
+      by: ['type', 'value'],
+      where: { deletedAt: null }
     })
 
     let totalCosts = 0

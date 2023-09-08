@@ -12,6 +12,7 @@ import {
   MenuItem,
   Modal,
   Select,
+  Stack,
   TextField,
   Typography
 } from '@mui/material'
@@ -174,7 +175,12 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
               sx={{ mb: 2 }}
             />
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+          >
             {formik.errors.submit && (
               <Typography
                 color='error'
@@ -184,34 +190,53 @@ const TransactionsModal = ({ transaction, refreshTransactions, openModal, handle
                 {formik.errors.submit}
               </Typography>
             )}
-            {transaction && (
-              <Button
-                variant='contained'
-                color='error'
-                onClick={() => setConfirmDelete(true)}
-              >
-                Excluir
-              </Button>
-            )}
-            <Button
-              onClick={() => {
-                handleCloseModal()
-                formik.resetForm()
-              }}
-              variant='outlined'
-              sx={{ mr: 1 }}
+            <Stack>
+              {transaction && (
+                <Button
+                  variant='contained'
+                  color='error'
+                  onClick={() => setConfirmDelete(true)}
+                >
+                  Excluir
+                </Button>
+              )}
+            </Stack>
+            <Stack sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              alignItems: 'center'
+            }}
             >
-              Cancelar
-            </Button>
-            <Button
-              disabled={!formik.isValid}
-              variant='contained'
-              onClick={async () => await handleSave(formik.values)}
-            >
-              {isLoading
-                ? <CircularProgress size={20} />
-                : 'Salvar'}
-            </Button>
+              <Stack>
+                <Button
+                  onClick={() => {
+                    handleCloseModal()
+                    formik.resetForm()
+                  }}
+                  variant='outlined'
+                  sx={{ mr: 1 }}
+                >
+                  Cancelar
+                </Button>
+
+              </Stack>
+              <Stack>
+                <Button
+                  disabled={!formik.isValid}
+                  variant='contained'
+                  onClick={async () => await handleSave(formik.values)}
+                >
+                  {isLoading
+                    ? <CircularProgress
+                        color='info'
+                        size={30}
+                      />
+                    : 'Salvar'}
+                </Button>
+
+              </Stack>
+            </Stack>
           </DialogActions>
         </form>
         <Dialog

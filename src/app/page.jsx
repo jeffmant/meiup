@@ -201,7 +201,7 @@ export default function Home () {
                               type='submit'
                             >
                               {isLoading
-                                ? <CircularProgress color='#fff' />
+                                ? <CircularProgress color='info' />
                                 : 'Avançar'}
                             </Button>
                           </form>
