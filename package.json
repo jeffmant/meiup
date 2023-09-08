@@ -8,6 +8,8 @@
     "start": "next start",
     "build": "prisma generate && next build",
     "export": "next export",
+    "db:migrate": "npx prisma migrate dev",
+    "db:seed": "node prisma/seed.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
     "prepare": "husky install",

@@ -4,20 +4,21 @@ import { useAuth, useUser } from '@clerk/nextjs'
 import { Button, CircularProgress, Grid, TextField, Typography } from '@mui/material'
 import { Box, Stack } from '@mui/system'
 import { useFormik } from 'formik'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useContext, useEffect, useState } from 'react'
 import NotificationContext from 'src/contexts/notification.context'
 import { cnpjMask, removeMask } from 'src/utils/masks'
 import * as Yup from 'yup'
 
 export default function Home () {
+  const { push } = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [userCompanies, setUserCompanies] = useState([])
   const { isSignedIn, isLoaded, getToken } = useAuth()
   const { user: currentLoggedUser } = useUser()
   const notificationCtx = useContext(NotificationContext)
 
-  if (userCompanies?.length > 0) redirect('/dashboard')
+  if (userCompanies?.length > 0) push('/dashboard')
 
   async function getOrCreateUser () {
     const userToken = await getToken()
@@ -96,7 +97,7 @@ export default function Home () {
 
         if (data) {
           notificationCtx.success('Empresa Criada com Sucesso!')
-          redirect('/dashboard')
+          push('/dashboard')
         }
       } else {
         notificationCtx.warning('CNPJ não encontrado')
@@ -111,96 +112,114 @@ export default function Home () {
 
     isSignedIn &&
         isLoaded &&
-        (!userCompanies || userCompanies.length === 0) &&
-        (
-          <Box
-            component='main'
-            sx={{
-              display: 'flex',
-              flex: '1 1 auto'
-            }}
-          >
-            <Grid
-              container
-              sx={{ flex: '1 1 auto' }}
-            >
-              <Grid
-                item
-                xs={12}
-                lg={12}
-                sx={{
-                  backgroundColor: 'neutral.900',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  position: 'relative'
-                }}
-              >
-                <Box
-                  sx={{
-                    flex: '1 1 auto',
-                    alignItems: 'center',
-                    display: 'flex',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <Box
-                    sx={{
-                      maxWidth: 400,
-                      px: 3,
-                      py: '100px',
-                      width: '100%'
-                    }}
-                  >
-                    <div>
-                      <Typography
-                        variant='h5'
-                        sx={{ py: 4 }}
-                      >
-                        digite o seu cnpj ;)
-                      </Typography>
+       (
+         <Box
+           component='main'
+           sx={{
+             display: 'flex',
+             flex: '1 1 auto'
+           }}
+         >
+           <Grid
+             container
+             sx={{ flex: '1 1 auto' }}
+           >
+             <Grid
+               item
+               xs={12}
+               lg={12}
+               sx={{
+                 backgroundColor: 'neutral.900',
+                 display: 'flex',
+                 flexDirection: 'column',
+                 position: 'relative'
+               }}
+             >
+               <Box
+                 sx={{
+                   flex: '1 1 auto',
+                   alignItems: 'center',
+                   display: 'flex',
+                   justifyContent: 'center'
+                 }}
+               >
+                 <Box
+                   sx={{
+                     maxWidth: 400,
+                     px: 3,
+                     py: '100px',
+                     width: '100%'
+                   }}
+                 >
+                   <div>
+                     <Typography
+                       variant='h5'
+                       sx={{ py: 4 }}
+                     >
+                       {
+                        userCompanies?.length === 0
+                          ? 'digite o seu cnpj ;)'
+                          : 'Verificando a sua conta...'
+                      }
 
-                      <form
-                        noValidate
-                        onSubmit={formik.handleSubmit}
-                      >
-                        <Stack spacing={3}>
-                          <TextField
-                            error={!!(formik.touched.cnpj && formik.errors.cnpj)}
-                            fullWidth
-                            helperText={formik.touched.cnpj && formik.errors.cnpj}
-                            label='CNPJ'
-                            name='cnpj'
-                            onBlur={formik.handleBlur}
-                            onChange={formik.handleChange}
-                            value={cnpjMask(formik.values.cnpj || '')}
-                          />
-                        </Stack>
-                        {formik.errors.submit && (
-                          <Typography
-                            color='error'
-                            sx={{ mt: 3 }}
-                            variant='body2'
+                     </Typography>
+                     {
+                      userCompanies?.length === 0
+                        ? (
+
+                          <form
+                            noValidate
+                            onSubmit={formik.handleSubmit}
                           >
-                            {formik.errors.submit}
-                          </Typography>
-                        )}
-                        <Button
-                          disabled={!formik.values.cnpj}
-                          fullWidth
-                          size='large'
-                          sx={{ mt: 3 }}
-                          variant='contained'
-                          type='submit'
-                        >
-                          {isLoading ? <CircularProgress color='secondary' /> : 'Avançar'}
-                        </Button>
-                      </form>
-                    </div>
-                  </Box>
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-        )
+                            <Stack spacing={3}>
+                              <TextField
+                                error={!!(formik.touched.cnpj && formik.errors.cnpj)}
+                                fullWidth
+                                helperText={formik.touched.cnpj && formik.errors.cnpj}
+                                label='CNPJ'
+                                name='cnpj'
+                                onBlur={formik.handleBlur}
+                                onChange={formik.handleChange}
+                                value={cnpjMask(formik.values.cnpj || '')}
+                              />
+                            </Stack>
+                            {formik.errors.submit && (
+                              <Typography
+                                color='error'
+                                sx={{ mt: 3 }}
+                                variant='body2'
+                              >
+                                {formik.errors.submit}
+                              </Typography>
+                            )}
+                            <Button
+                              disabled={!formik.values.cnpj}
+                              fullWidth
+                              size='large'
+                              sx={{ mt: 3 }}
+                              variant='contained'
+                              type='submit'
+                            >
+                              {isLoading
+                                ? <CircularProgress color='#fff' />
+                                : 'Avançar'}
+                            </Button>
+                          </form>
+                          )
+                        : (
+                          <CircularProgress
+                            size={50}
+                            color='primary'
+                          />
+                          )
+                     }
+
+                   </div>
+                 </Box>
+               </Box>
+             </Grid>
+           </Grid>
+         </Box>
+       )
   )
 }
