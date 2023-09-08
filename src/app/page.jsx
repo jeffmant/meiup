@@ -12,13 +12,11 @@ import * as Yup from 'yup'
 
 export default function Home () {
   const { push } = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [userCompanies, setUserCompanies] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
   const { isSignedIn, isLoaded, getToken } = useAuth()
   const { user: currentLoggedUser } = useUser()
   const notificationCtx = useContext(NotificationContext)
-
-  if (userCompanies?.length > 0) push('/dashboard')
 
   async function getOrCreateUser () {
     const userToken = await getToken()
@@ -46,6 +44,7 @@ export default function Home () {
   }
 
   async function getUserCompanies () {
+    setIsLoading(true)
     const userToken = await getToken()
     const user = await getOrCreateUser()
     if (user) {
@@ -53,7 +52,9 @@ export default function Home () {
         headers: { Authorization: `Bearer ${userToken}` }
       }).then(response => response.json())
 
-      setUserCompanies(response?.data || [])
+      const userCompanies = response?.data || []
+
+      if (userCompanies?.length > 0) push('/dashboard')
     }
   }
 
@@ -83,7 +84,7 @@ export default function Home () {
       cnpj: Yup.string().required('Digite o CNPJ')
     }),
     onSubmit: async (values, helpers) => {
-      setIsLoading(true)
+      setIsLoadingSubmit(true)
       const userToken = await getToken()
 
       const { data: companyData } = await validateCompanyDocument(removeMask(values.cnpj))
@@ -104,7 +105,7 @@ export default function Home () {
       }
 
       formik.resetForm()
-      setIsLoading(false)
+      setIsLoadingSubmit(false)
     }
   })
 
@@ -157,16 +158,21 @@ export default function Home () {
                        sx={{ py: 4 }}
                      >
                        {
-                        userCompanies?.length === 0
-                          ? 'digite o seu cnpj ;)'
-                          : 'Verificando a sua conta...'
+                        isLoading
+                          ? 'Verificando a sua conta...'
+                          : 'digite o seu cnpj ;)'
                       }
 
                      </Typography>
                      {
-                      userCompanies?.length === 0
+                      isLoading
                         ? (
-
+                          <CircularProgress
+                            size={50}
+                            color='primary'
+                          />
+                          )
+                        : (
                           <form
                             noValidate
                             onSubmit={formik.handleSubmit}
@@ -200,17 +206,12 @@ export default function Home () {
                               variant='contained'
                               type='submit'
                             >
-                              {isLoading
+                              {isLoadingSubmit
                                 ? <CircularProgress color='info' />
                                 : 'Avançar'}
                             </Button>
                           </form>
-                          )
-                        : (
-                          <CircularProgress
-                            size={50}
-                            color='primary'
-                          />
+
                           )
                      }
 
