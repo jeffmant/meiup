@@ -67,14 +67,13 @@ const Dashboard = () => {
     setTransactionYear(year)
   }
 
+  const handleTransactionType = async (type) => {
+    setTransactionType(type)
+  }
+
   useEffect(() => {
     refreshTransactions()
   }, [transactionYear, transactionMonth, transactionType, page])
-
-  const handleTransactionType = async (type) => {
-    setTransactionType(type)
-    refreshTransactions()
-  }
 
   return (
     <>

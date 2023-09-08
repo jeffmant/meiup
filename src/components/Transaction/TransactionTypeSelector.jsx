@@ -2,6 +2,7 @@ import { Button, Menu, MenuItem } from '@mui/material'
 import { useState } from 'react'
 
 const TransactionTypeSelector = ({ handleTransactionType }) => {
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const [selectedType, setSelectedType] = useState('Todos')
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -19,8 +20,9 @@ const TransactionTypeSelector = ({ handleTransactionType }) => {
     setAnchorEl(null)
   }
 
-  const handleTypeSelect = async (value) => {
-    const type = types.find(type => type.value === value)
+  const handleTypeSelect = async (index) => {
+    setSelectedIndex(index)
+    const type = types[index]
     if (type) {
       setSelectedType(type.label)
       handleTransactionType(type.value)
@@ -42,13 +44,11 @@ const TransactionTypeSelector = ({ handleTransactionType }) => {
         open={Boolean(anchorEl)}
         onClose={handleCloseMenu}
       >
-        {types.map(type => (
+        {types.map((type, index) => (
           <MenuItem
             key={type.value}
-            onClick={(e) => {
-              e.stopPropagation()
-              handleTypeSelect(type.value)
-            }}
+            selected={index === selectedIndex}
+            onClick={() => handleTypeSelect(index)}
           >
             {type.label}
           </MenuItem>
