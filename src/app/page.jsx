@@ -92,15 +92,17 @@ export default function Home () {
       const { data: companyData } = await validateCompanyDocument(removeMask(values.cnpj))
 
       if (companyData) {
-        const { data } = await fetch('/api/company', {
+        const { success } = await fetch('/api/company', {
           method: 'POST',
           headers: { Authorization: userToken },
           body: JSON.stringify(companyData)
         }).then(response => response.json())
 
-        if (data) {
+        if (success) {
           notificationCtx.success('Empresa Criada com Sucesso!')
           push('/dashboard')
+        } else {
+          notificationCtx.error('Empresa Não foi Criada!')
         }
       } else {
         notificationCtx.warning('CNPJ não encontrado')
