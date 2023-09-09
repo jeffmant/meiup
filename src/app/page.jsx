@@ -55,6 +55,8 @@ export default function Home () {
       const userCompanies = response?.data || []
 
       if (userCompanies?.length > 0) push('/dashboard')
+
+      setIsLoading(false)
     }
   }
 
