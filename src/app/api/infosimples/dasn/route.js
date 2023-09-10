@@ -2,7 +2,7 @@ import axios from 'axios'
 import { NextResponse } from 'next/server'
 
 export async function GET (req) {
-  console.log('GET DAS')
+  console.log('GET DASN')
   const {
     NEXT_PUBLIC_INFOSIMPLES_BASE_URL,
     NEXT_PUBLIC_INFOSIMPLES_TOKEN
@@ -16,7 +16,7 @@ export async function GET (req) {
 
   try {
     const { data: { data } } = await axios.get(
-      `${NEXT_PUBLIC_INFOSIMPLES_BASE_URL}/receita-federal/simples-das`, {
+      `${NEXT_PUBLIC_INFOSIMPLES_BASE_URL}/receita-federal/simples-dasn`, {
         headers: {
           'Content-Type': 'application/json'
         },

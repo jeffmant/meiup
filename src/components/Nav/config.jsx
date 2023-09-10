@@ -7,10 +7,28 @@ import { SvgIcon } from '@mui/material'
 export const items = [
   {
     title: 'Início',
-    path: '/dashboard',
+    path: '/transactions',
     icon: (
       <SvgIcon fontSize='small'>
         <BuildingStorefrontIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'DAS',
+    path: '/das',
+    icon: (
+      <SvgIcon fontSize='small'>
+        <BanknotesIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'DASN',
+    path: '/dasn',
+    icon: (
+      <SvgIcon fontSize='small'>
+        <BookOpenIcon />
       </SvgIcon>
     )
   },
@@ -21,26 +39,6 @@ export const items = [
     icon: (
       <SvgIcon fontSize='small'>
         <ArchiveBoxIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'DAS (em breve)',
-    path: '/das',
-    disabled: true,
-    icon: (
-      <SvgIcon fontSize='small'>
-        <BanknotesIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'DASN (em breve)',
-    path: '/dasn',
-    disabled: true,
-    icon: (
-      <SvgIcon fontSize='small'>
-        <BookOpenIcon />
       </SvgIcon>
     )
   }
