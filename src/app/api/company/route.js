@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs'
+import { clerkClient, currentUser } from '@clerk/nextjs'
 import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
@@ -37,7 +37,7 @@ export async function POST (req) {
         throw new Error('This society already exists')
       }
 
-      const createdCompany = await tx.company.create({
+      let createdCompany = await tx.company.create({
         data: companyBody
       })
 
@@ -52,12 +52,19 @@ export async function POST (req) {
         data: { companyId: createdCompany.id }
       })
 
-      await tx.company.update({ where: { id: createdCompany.id, deletedAt: null }, data: { societyId: createdSociety.id } })
+      createdCompany = await tx.company.update({ where: { id: createdCompany.id, deletedAt: null }, data: { societyId: createdSociety.id } })
 
       await tx.userSociety.create({
         data: {
           societyId: createdSociety.id,
           userId: foundUser.id
+        }
+      })
+
+      await clerkClient.users.updateUserMetadata(clerkUserId, {
+        publicMetadata: {
+          userId: foundUser.id,
+          userCompanies: [createdCompany.id]
         }
       })
     })
