@@ -1,4 +1,8 @@
+import { parseISO } from 'date-fns'
+
 export async function createTransaction (transactionBody, accessToken) {
+  const { dueDate } = transactionBody
+  transactionBody.dueDate = parseISO(dueDate)
   try {
     const fetchResponse = await fetch('/api/transaction', {
       method: 'POST',
@@ -18,12 +22,17 @@ export async function createTransaction (transactionBody, accessToken) {
 
 export async function getAllTransactions (accessToken, type, month, year, page, limit) {
   try {
-    const { data: { totalPages, transactions, totalRevenues, totalCosts } } = await fetch(`/api/transaction/?type=${type}&month=${month}&year=${year}&page=${page}&limit=${limit}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`
+    const {
+      data: { totalPages, transactions, totalRevenues, totalCosts }
+    } = await fetch(
+      `/api/transaction/?type=${type}&month=${month}&year=${year}&page=${page}&limit=${limit}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       }
-    }).then((response) => response.json())
+    ).then((response) => response.json())
 
     return { totalPages, transactions, totalRevenues, totalCosts }
   } catch (error) {
