@@ -1,4 +1,4 @@
-import { clerkClient, currentUser } from '@clerk/nextjs'
+import { auth, clerkClient, currentUser } from '@clerk/nextjs'
 import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
@@ -64,7 +64,11 @@ export async function POST (req) {
       await clerkClient.users.updateUserMetadata(clerkUserId, {
         publicMetadata: {
           userId: foundUser.id,
-          userCompanies: [createdCompany.id]
+          userCompanies: [{
+            id: createdCompany.id,
+            document: createdCompany.document,
+            foundationDate: createdCompany.foundationDate
+          }]
         }
       })
     })
@@ -81,13 +85,14 @@ export async function POST (req) {
 
 export async function GET (req) {
   try {
+    const { userId: clerkUserId } = auth()
+
     const { searchParams } = new URL(req.url)
-    let params = { deletedAt: null }
+
+    let params = { clerkUserId, deletedAt: null }
 
     const userId = searchParams.get('userId')
     if (userId) params = { ...params, id: userId }
-    const clerkUserId = searchParams.get('clerkUserId')
-    if (clerkUserId) params = { ...params, clerkUserId }
 
     // TODO: add params to query
 
@@ -98,6 +103,17 @@ export async function GET (req) {
     const userSocietiesIds = userSocieties.map(userSociety => userSociety.societyId)
 
     const userCompanies = await prisma.company.findMany({ where: { societyId: { in: userSocietiesIds }, deletedAt: null } })
+
+    await clerkClient.users.updateUserMetadata(clerkUserId, {
+      publicMetadata: {
+        userId: foundUser.id,
+        userCompanies: userCompanies.map((company) => ({
+          id: company.id,
+          document: company.document,
+          foundationDate: company.foundationDate
+        }))
+      }
+    })
 
     return NextResponse.json({
       data: userCompanies

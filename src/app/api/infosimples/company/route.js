@@ -42,7 +42,11 @@ export async function GET (req) {
       status: foundCnpj.situacao_cadastral === 'ATIVA',
       email: foundCnpj.email,
       phone: foundCnpj.telefone,
-      foundationDate: new Date(foundCnpj.abertura_data),
+      foundationDate: new Date(`
+        ${foundCnpj.abertura_data.split('/')[2]}-
+        ${foundCnpj.abertura_data.split('/')[1]}-
+        ${foundCnpj.abertura_data.split('/')[0]}
+      `),
       address: {
         zipcode: foundCnpj.normalizado_endereco_cep,
         street: foundCnpj.endereco_logradouro,
