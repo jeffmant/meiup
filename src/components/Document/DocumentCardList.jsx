@@ -6,7 +6,12 @@ export const DocumentCardList = ({ documents, isLoading }) => {
   return (
     <Box>
       {isLoading
-        ? <CircularProgress />
+        ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Typography>Por gentileza, aguarde... </Typography>
+            <CircularProgress />
+          </div>
+          )
         : documents?.length
           ? (
               documents.map((document) => (

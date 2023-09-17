@@ -63,7 +63,12 @@ export default function DAS () {
             >
               {
                 isLoading
-                  ? <CircularProgress />
+                  ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <Typography>Por gentileza, aguarde... </Typography>
+                      <CircularProgress />
+                    </div>
+                    )
                   : documents?.map(document => (
                     <DasnCard
                       key={document.year}

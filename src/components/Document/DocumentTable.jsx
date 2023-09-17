@@ -11,7 +11,7 @@ export const DocumentTable = ({ documents, isLoading }) => {
       {isLoading
         ? (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Typography>Por gentileza, aguarde...</Typography>
+            <Typography>Por gentileza, aguarde... </Typography>
             <CircularProgress />
           </div>
           )
