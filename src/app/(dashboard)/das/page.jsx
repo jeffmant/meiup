@@ -29,11 +29,11 @@ export default function DAS () {
       }
       setYearsOptions(years)
 
-      const { data: documents } = await fetch(`/api/infosimples/das/?cnpj=${document}&year=${selectedYear}`, {
+      const { data } = await fetch(`/api/infosimples/das/?cnpj=${document}&year=${selectedYear}`, {
         headers: { Authorization: `Bearer ${accessToken}` }
       }).then(response => response.json())
 
-      setDocuments(documents || [])
+      setDocuments(data)
       setIsLoading(false)
     }
   }
