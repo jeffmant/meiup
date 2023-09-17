@@ -3,14 +3,13 @@ import { useAuth, useUser } from '@clerk/nextjs'
 import { useEffect } from 'react'
 
 export default function DAS () {
-  console.log('DASN Server Component Page')
   const { getToken } = useAuth()
   const { user } = useUser()
 
   const getDas = async () => {
     const accessToken = await getToken()
-    const cnpj = user?.publicMetadata?.userCompanies?.[0]
-    const { data } = await fetch(`/api/infosimples/das/?cnpj=${cnpj}`, {
+    const cnpj = user?.publicMetadata?.userCompanies?.[0]?.document
+    const { data } = await fetch(`/api/infosimples/dasn/?cnpj=${cnpj}`, {
       headers: { Authorization: `Bearer ${accessToken}` }
     }).then(response => response.json())
 
