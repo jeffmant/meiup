@@ -1,31 +1,124 @@
 'use client'
 import { useAuth, useUser } from '@clerk/nextjs'
-import { useEffect } from 'react'
+import { Card, CardContent, Container, Grid, Typography, useMediaQuery } from '@mui/material'
+import { Box, Stack } from '@mui/system'
+import Head from 'next/head'
+import { useEffect, useState } from 'react'
+import { DocumentCardList } from 'src/components/Document/DocumentCardList'
+import { DocumentTable } from 'src/components/Document/DocumentTable'
+import YearSelector from 'src/components/Selects/YearSelector'
 
 export default function DAS () {
-  console.log('DAS Server Component Page')
+  const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'))
   const { getToken } = useAuth()
   const { user } = useUser()
 
-  const getDas = async () => {
+  const [documents, setDocuments] = useState()
+  const [isLoading, setIsLoading] = useState(false)
+  const [yearsOptions, setYearsOptions] = useState([new Date().getFullYear()])
+
+  const getDas = async (selectedYear) => {
+    setIsLoading(true)
     const accessToken = await getToken()
     if (user) {
-      const cnpj = user?.publicMetadata?.userCompanies?.[0]
-      const { data } = await fetch(`/api/infosimples/das/?cnpj=${cnpj}`, {
+      const userCompany = user?.publicMetadata?.userCompanies?.[0]
+      const { document, foundationDate } = userCompany
+      const years = []
+      for (let year = new Date(foundationDate).getFullYear(); year <= new Date().getFullYear(); year++) {
+        years.push(year)
+      }
+      setYearsOptions(years)
+
+      const { data: documents } = await fetch(`/api/infosimples/das/?cnpj=${document}&year=${selectedYear}`, {
         headers: { Authorization: `Bearer ${accessToken}` }
       }).then(response => response.json())
 
-      console.log('data -> ', data)
+      if (documents?.length) {
+        setDocuments(documents)
+        setIsLoading(false)
+      }
     }
   }
 
   useEffect(() => {
     if (user) {
-      getDas()
+      getDas(yearsOptions[0])
     }
   }, [user])
 
   return (
-    <h1>DAS</h1>
+    <>
+
+      <Head>
+        <title>das | meiup</title>
+      </Head>
+      <Box
+        component='main'
+        sx={{
+          flexGrow: 1,
+          py: 2
+        }}
+      >
+        <Container maxWidth='xl'>
+
+          <Grid
+            container
+            spacing={3}
+          >
+            <Grid
+              item
+              xs={12}
+            >
+              <Card
+                sx={{
+                  minHeight: '70vh',
+                  height: '100%',
+                  width: '100%'
+                }}
+              >
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Stack>
+                      <Typography variant='h5'>
+                        DAS
+                      </Typography>
+
+                    </Stack>
+                    <Stack>
+                      <YearSelector
+                        handleChange={getDas}
+                        options={yearsOptions}
+                      />
+                    </Stack>
+                  </Box>
+
+                  {mdUp
+                    ? (
+                      <DocumentTable
+                        documents={documents}
+                        isLoading={isLoading}
+                      />
+                      )
+                    : (
+                      <DocumentCardList
+                        documents={documents}
+                        isLoading={isLoading}
+                      />
+                      )}
+                </CardContent>
+
+              </Card>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+    </>
+
   )
 }
