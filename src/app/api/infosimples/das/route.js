@@ -49,7 +49,7 @@ export async function GET (req) {
       month: period.periodo.split('/')[0],
       year: period.periodo.split('/')[1],
       type: 'das'
-    }))
+    })).reverse()
 
     return NextResponse.json({
       data: documents

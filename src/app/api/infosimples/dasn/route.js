@@ -1,18 +1,18 @@
+import { currentUser } from '@clerk/nextjs'
 import axios from 'axios'
 import { NextResponse } from 'next/server'
 
 export async function GET (req) {
-  console.log('GET DASN')
   const {
     NEXT_PUBLIC_INFOSIMPLES_BASE_URL,
     NEXT_PUBLIC_INFOSIMPLES_TOKEN
   } = process.env
 
+  const { publicMetadata: { userCompanies } } = await currentUser()
+
   const { searchParams } = new URL(req.url)
 
   const cnpj = searchParams.get('cnpj')
-
-  console.log('cnpj ->', cnpj)
 
   try {
     const { data: { data } } = await axios.get(
@@ -27,10 +27,19 @@ export async function GET (req) {
         }
       })
 
-    console.log('data ->', data)
+    if (!data?.length) throw new Error('Documents not found')
+
+    const { original: foundDocuments } = data[0]
+
+    const documents = Object.entries(foundDocuments).map(document => ({
+      year: document[0],
+      status: document[1] === 'indisponivel'
+    })).reverse()
 
     return NextResponse.json({
-      data
+      data: documents.filter(document =>
+        +document.year >= new Date(userCompanies?.[0]?.foundationDate).getFullYear()
+      )
     }, {
       status: 200
     })
