@@ -20,7 +20,6 @@ export default function DAS () {
       headers: { Authorization: `Bearer ${accessToken}` }
     }).then(response => response.json())
 
-    console.log('data -> ', data)
     setDocuments(data)
     setIsLoading(false)
   }
@@ -35,9 +34,7 @@ export default function DAS () {
 
     <>
       <Head>
-        <title>
-          Companies | Devias Kit
-        </title>
+        <title>dasn | meiup</title>
       </Head>
       <Box
         component='main'

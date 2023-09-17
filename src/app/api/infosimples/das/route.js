@@ -2,7 +2,6 @@ import axios from 'axios'
 import { NextResponse } from 'next/server'
 
 export async function GET (req) {
-  console.log('GET DAS')
   const {
     NEXT_PUBLIC_INFOSIMPLES_BASE_URL,
     NEXT_PUBLIC_INFOSIMPLES_TOKEN

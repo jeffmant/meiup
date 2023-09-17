@@ -9,7 +9,12 @@ export const DocumentTable = ({ documents, isLoading }) => {
   return (
     <Box sx={{ minWidth: 800, mt: 2 }}>
       {isLoading
-        ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}><CircularProgress /></div>
+        ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Typography>Por gentileza, aguarde...</Typography>
+            <CircularProgress />
+          </div>
+          )
         : (
             documents?.length > 0
               ? (
