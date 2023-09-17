@@ -33,10 +33,8 @@ export default function DAS () {
         headers: { Authorization: `Bearer ${accessToken}` }
       }).then(response => response.json())
 
-      if (documents?.length) {
-        setDocuments(documents)
-        setIsLoading(false)
-      }
+      setDocuments(documents || [])
+      setIsLoading(false)
     }
   }
 
