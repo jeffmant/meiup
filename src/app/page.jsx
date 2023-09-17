@@ -54,7 +54,7 @@ export default function Home () {
 
       const userCompanies = response?.data || []
 
-      if (userCompanies?.length > 0) push('/dashboard')
+      if (userCompanies?.length > 0) push('/transactions')
 
       setIsLoading(false)
     }
@@ -100,7 +100,7 @@ export default function Home () {
 
         if (success) {
           notificationCtx.success('Empresa Criada com Sucesso!')
-          push('/dashboard')
+          push('/transactions')
         } else {
           notificationCtx.error('Empresa Não foi Criada!')
         }

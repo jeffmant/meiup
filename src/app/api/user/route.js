@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs'
+import { clerkClient, currentUser } from '@clerk/nextjs'
 import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
@@ -27,6 +27,8 @@ export async function GET (_req) {
 
 export async function POST (req) {
   try {
+    const { id: clerkUserId } = await currentUser()
+
     const userBody = await req.json()
     let createdUser
 
@@ -55,6 +57,12 @@ export async function POST (req) {
         data: userBody
       })
     }
+
+    await clerkClient.users.updateUserMetadata(clerkUserId, {
+      publicMetadata: {
+        userId: createdUser.id
+      }
+    })
 
     return NextResponse.json({
       data: createdUser

@@ -16,11 +16,11 @@ import { Stack } from '@mui/system'
 import Head from 'next/head'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import YearSelector from 'src/components/Selects/YearSelector'
 import { TransactionCardList } from 'src/components/Transaction/TransactionCardList'
 import TransactionMonthSelector from 'src/components/Transaction/TransactionMonthSelector'
 import { TransactionTable } from 'src/components/Transaction/TransactionTable'
 import TransactionTypeSelector from 'src/components/Transaction/TransactionTypeSelector'
-import TransactionYearSelector from 'src/components/Transaction/TransactionYearSelector'
 import TransactionsModal from 'src/components/Transaction/TransactionsModal'
 import { getAllTransactions } from 'src/utils/transactions-utils'
 
@@ -34,6 +34,7 @@ const Dashboard = () => {
   const [transactionType, setTransactionType] = useState('all')
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [transactionMonth, setTransactionMonth] = useState(currentMonth)
+  const [yearsOptions, setYearsOptions] = useState(new Date().getFullYear())
   const [transactionYear, setTransactionYear] = useState(currentYear)
   const [transactions, setTransactions] = useState([])
   const [monthlyRevenue, setMonthlyRevenue] = useState(0)
@@ -66,6 +67,12 @@ const Dashboard = () => {
       }).then(response => response.json())
 
       const userCompanies = response?.data || []
+
+      const years = []
+      for (let year = new Date(userCompanies?.[0]?.foundationDate).getFullYear(); year <= new Date().getFullYear(); year++) {
+        years.push(year)
+      }
+      setYearsOptions(years)
 
       if (userCompanies?.length > 0) setUserHasCompany(true)
       else push('/')
@@ -226,7 +233,10 @@ const Dashboard = () => {
                           </Stack>
 
                           <Stack sx={{ mr: 2 }}>
-                            <TransactionYearSelector handleTransactionYear={handleTransactionYear} />
+                            <YearSelector
+                              handleChange={handleTransactionYear}
+                              options={yearsOptions}
+                            />
                           </Stack>
 
                           <Stack sx={{ mr: 2 }}>
