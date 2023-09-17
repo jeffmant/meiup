@@ -18,6 +18,8 @@ export default function Home () {
   const { user: currentLoggedUser } = useUser()
   const notificationCtx = useContext(NotificationContext)
 
+  console.log('currentLoggedUser ->', currentLoggedUser)
+
   async function getOrCreateUser () {
     const userToken = await getToken()
     const { data: foundUser } = await fetch('/api/user', {
