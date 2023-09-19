@@ -69,13 +69,9 @@ export default function Home () {
   const validateCompanyDocument = async (document) => {
     const userToken = await getToken()
 
-    const response = await fetch(`/api/infosimples/company?cnpj=${document}`, {
+    return fetch(`/api/infosimples/company?cnpj=${document}`, {
       headers: { Authorization: userToken }
-    })
-
-    const externalCompanyInformations = await response.json()
-
-    return externalCompanyInformations
+    }).then(response => response.json())
   }
 
   const formik = useFormik({
@@ -89,7 +85,7 @@ export default function Home () {
       setIsLoadingSubmit(true)
       const userToken = await getToken()
 
-      const { data: companyData } = await validateCompanyDocument(removeMask(values.cnpj))
+      const { data: companyData, error } = await validateCompanyDocument(removeMask(values.cnpj))
 
       if (companyData) {
         const { success } = await fetch('/api/company', {
@@ -101,15 +97,19 @@ export default function Home () {
         if (success) {
           notificationCtx.success('Empresa Criada com Sucesso!')
           push('/transactions')
+          formik.resetForm()
+          setIsLoadingSubmit(false)
         } else {
-          notificationCtx.error('Empresa Não foi Criada!')
+          helpers.setErrors({ cnpj: error })
+          notificationCtx.error('Empresa Não foi Criada! Tente novamente.')
+          formik.resetForm()
+          setIsLoadingSubmit(false)
         }
       } else {
-        notificationCtx.warning('CNPJ não encontrado')
+        notificationCtx.error(error)
+        formik.resetForm()
+        setIsLoadingSubmit(false)
       }
-
-      formik.resetForm()
-      setIsLoadingSubmit(false)
     }
   })
 

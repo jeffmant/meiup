@@ -22,18 +22,19 @@ export default function DAS () {
     const accessToken = await getToken()
     if (user) {
       const userCompany = user?.publicMetadata?.userCompanies?.[0]
-      const { document, foundationDate } = userCompany
-      const years = []
-      for (let year = new Date(foundationDate).getFullYear(); year <= new Date().getFullYear(); year++) {
-        years.push(year)
+      if (userCompany) {
+        const { document, foundationDate } = userCompany
+        const years = []
+        for (let year = new Date(foundationDate).getFullYear(); year <= new Date().getFullYear(); year++) {
+          years.push(year)
+        }
+        setYearsOptions(years)
+        const { data } = await fetch(`/api/infosimples/das/?cnpj=${document}&year=${selectedYear}`, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        }).then(response => response.json())
+
+        setDocuments(data)
       }
-      setYearsOptions(years)
-
-      const { data } = await fetch(`/api/infosimples/das/?cnpj=${document}&year=${selectedYear}`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      }).then(response => response.json())
-
-      setDocuments(data)
       setIsLoading(false)
     }
   }

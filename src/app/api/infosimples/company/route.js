@@ -24,20 +24,16 @@ export async function GET (req) {
         }
       })
 
-    if (!data?.length) throw new Error('Company not found')
+    if (!data?.length) throw new Error('Empresa não encontrada')
 
     const foundCnpj = data[0]
 
-    if (foundCnpj.porte !== 'ME') throw new Error('Company is not valid')
+    if (foundCnpj.natureza_juridica_codigo !== '2135') throw new Error('Empresa não é MEI')
 
     const company = {
       document: foundCnpj.normalizado_cnpj,
       name: foundCnpj.razao_social,
-      type: foundCnpj.natureza_juridica_codigo === '2062'
-        ? 'me'
-        : foundCnpj.natureza_juridica_codigo === '2135'
-          ? 'mei'
-          : '',
+      type: 'mei',
       fantasyName: foundCnpj.nome_fantasia,
       status: foundCnpj.situacao_cadastral === 'ATIVA',
       email: foundCnpj.email,
