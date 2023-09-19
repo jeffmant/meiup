@@ -47,7 +47,7 @@ export default function DAS () {
           <Stack spacing={3}>
             <Stack
               direction='row'
-              justifyContent='space-between'
+              justifyContent='center'
               spacing={4}
             >
               <Stack spacing={1}>

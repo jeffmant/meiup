@@ -34,24 +34,20 @@ export async function POST (req) {
 
     const foundUser = await prisma.user.findFirst({
       where: {
-        foundUser: userBody.foundUser
+        email: userBody.email
       }
     })
 
     if (foundUser) {
-      if (foundUser.deletedAt !== null) {
-        createdUser = await prisma.user.update({
-          where: {
-            id: foundUser.id
-          },
-          data: {
-            deletedAt: null,
-            ...userBody
-          }
-        })
-      } else {
-        throw new Error('User already exists')
-      }
+      createdUser = await prisma.user.update({
+        where: {
+          id: foundUser.id
+        },
+        data: {
+          deletedAt: null,
+          ...userBody
+        }
+      })
     } else {
       createdUser = await prisma.user.create({
         data: userBody
